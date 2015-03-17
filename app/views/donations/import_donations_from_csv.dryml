@@ -1,0 +1,10 @@
+<page>
+  <content-body:>
+    <%= @imported_donations.size %> donations have been imported from the CSV
+    <br/>
+    <%= @already_existing_donations.size %> donations were already in the database and have not been imported
+    <br/>
+    <br/>
+    <%= @message.html_safe %>
+  </content-body:>
+</page>
