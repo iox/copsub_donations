@@ -1,6 +1,5 @@
 class SeamlessDonation < ActiveRecord::Base
   establish_connection "wordpress_database"
-  PREFIX = "yinj4m_"
   self.table_name = "#{PREFIX}posts"
 
   default_scope where(:post_type => 'dgx-donation').where("donation_method.meta_value = 'PAYPALSTD'").

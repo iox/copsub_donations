@@ -1,0 +1,34 @@
+development:
+  adapter: mysql2
+  host: 10.0.3.1
+  database: copsub_donations
+  pool: 5
+  username: root
+  password: softwarelibre
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  adapter: mysql2
+  host: 10.0.3.1
+  database: test_copsub_donations
+  pool: 5
+  username: root
+  password: softwarelibre
+
+production:
+  adapter: mysql2
+  host: 10.0.3.1
+  database: copsub_donations
+  pool: 5
+  username: root
+  password: softwarelibre
+
+wordpress_database:
+  adapter: mysql2
+  host: 10.0.3.1
+  database: cs
+  pool: 5
+  username: root
+  password: softwarelibre

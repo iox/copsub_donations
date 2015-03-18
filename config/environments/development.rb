@@ -31,4 +31,9 @@ CopsubDonations::Application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  BetterErrors::Middleware.allow_ip! '10.0.3.1'
+
+  Rails.application.routes.default_url_options[:host] = 'localhost:3016'
+  PREFIX = "yinj4m_"
 end

@@ -1,11 +1,10 @@
 class WordpressUser < ActiveRecord::Base
 
   establish_connection "wordpress_database"
-  PREFIX = "yinj4m_"
   self.table_name = "#{PREFIX}users"
 
   def self.fuzzy_search(search)
-    self.where("user_email LIKE ? OR user_login LIKE ? OR user_nicename LIKE ? OR display_name LIKE ?", "%#{search}%","%#{search}%","%#{search}%","%#{search}%").limit(10)
+    self.where("ID LIKE ? OR user_email LIKE ? OR user_login LIKE ? OR user_nicename LIKE ? OR display_name LIKE ?", "%#{search}%", "%#{search}%", "%#{search}%", "%#{search}%", "%#{search}%").limit(10)
   end
 
   def name

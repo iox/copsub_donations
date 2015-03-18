@@ -2,7 +2,15 @@
   <content-body: replace>
     <div class="row">
       <div class="span6">
-        <content-body restore/>
+        <div class="form-horizontal">
+          <field-list fields="bank_reference, email, wordpress_user_id, amount, amount_in_dkk, donation_method, donated_at, updated_at"/>
+        </div>
+        <div class="well" unless="&@donation.related_unassigned_donations.blank?">
+          <h4>There are some donations similar to this one</h4>
+          <div class="table-plus">
+            <table class="table" with="&@donation.related_unassigned_donations" fields="this, amount, email, bank_reference"/>
+          </div>
+        </div>
       </div>
       <div class="span6">
         <right-column/>
@@ -25,11 +33,6 @@
   </if>
 
   <else>
-    <div class="well" unless="&@donation.related_unassigned_donations.blank?">
-      <h4>There are some donations similar to this one</h4>
-      <collection with="&@donation.related_unassigned_donations"/>
-    </div>
-
     <div class="well">
       <h4>Find a user and assign the donations:</h4>
       <form method="get" updates="#assign-user">
@@ -47,7 +50,7 @@
 <def tag="card" for="WordpressUser">
   <card class="user" param="default" merge>
     <header: param>
-      <h4 param="heading"><%= this.user_email %></h4>
+      <h4 param="heading">User <%=this.id%>: <%= this.user_email %></h4>
       <p>Display Name: <%= this.display_name %></p>
       <p>User Nicename: <%= this.user_nicename %></p>
       <a class="btn btn-primary" href="/assign_donation?donation_id=#{@donation.id}&user_id=#{this.id}">Assign to this user</a>
