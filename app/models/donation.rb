@@ -5,12 +5,12 @@ class Donation < ActiveRecord::Base
   fields do
     amount         :decimal, :required, :precision => 8, :scale => 2
     amount_in_dkk  :decimal, :precision => 8, :scale => 2
-    currency       :string
+    currency       enum_string(:'DKK', :'EUR', :'USD')
     donated_at     :datetime
     bank_reference :string
     email          :string
     seamless_donation_id :integer
-    donation_method :string
+    donation_method enum_string(:'bank', :'paypal')
     wordpress_user_id :integer
     user_assigned :boolean, :default => false
     timestamps

@@ -51,6 +51,7 @@ class DonationsController < ApplicationController
 
   def index
     @search = Donation.search(params[:q])
+    @total = @search.result.sum(:amount_in_dkk)
     @donations = @search.result.paginate(:page => params[:page])
   end
 

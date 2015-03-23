@@ -1,6 +1,7 @@
 <index-page>
   <collection: replace>
-    <table-plus-with-filters with="&@donations" fields="this, email, bank_reference, wordpress_user_id, amount, currency, amount_in_dkk, donated_at, updated_at, donation_method" filters="email, bank_reference, currency, donation_method, user_assigned">
+    <table-plus-with-filters with="&@donations" fields="this, email, bank_reference, wordpress_user_id, amount, currency, amount_in_dkk, donated_at, updated_at, donation_method" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency">
+      <append-result-counter:>| Total: <%= number_to_currency(@total, :unit => '', :separator => ',', :delimiter => '.') %> DKK</append-result-counter:>
     </table-plus-with-filters>
   </collection>
 </index-page>

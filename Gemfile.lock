@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/suyccom/hobo-metasearch
-  revision: 3e3f517a55496c582c971ad2faf44e40c0071fb7
+  revision: e51770fa9b91ea29472514db71a3461130716693
   specs:
     hobo-metasearch (0.1)
       ransack
@@ -135,7 +135,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
-    ransack (1.6.3)
+    ransack (1.6.4)
       actionpack (>= 3.0)
       activerecord (>= 3.0)
       activesupport (>= 3.0)
