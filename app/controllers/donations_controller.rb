@@ -46,7 +46,7 @@ class DonationsController < ApplicationController
     @user = WordpressUser.find params[:user_id]
     @donation.assign(@user)
     flash[:notice] = "Donation #{@donation.id} was assigned to #{@user.id} (#{@user.user_email})"
-    redirect_to '/'
+    redirect_to @donation
   end
 
   def index

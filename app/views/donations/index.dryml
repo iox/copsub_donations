@@ -1,6 +1,14 @@
 <index-page>
   <collection: replace>
     <table-plus-with-filters with="&@donations" fields="this, email, bank_reference, wordpress_user_id, amount, currency, amount_in_dkk, donated_at, updated_at, donation_method" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency">
+      <wordpress-user-id-view:>
+        <if>
+          <a href="/wordpress_users/#{this}"><this/></a>
+        </if>
+        <else>
+          Not assigned
+        </else>
+      </wordpress-user-id-view:>
       <append-result-counter:>| Total: <%= number_to_currency(@total, :unit => '', :separator => ',', :delimiter => '.') %> DKK</append-result-counter:>
     </table-plus-with-filters>
   </collection>

@@ -11,6 +11,8 @@ CopsubDonations::Application.routes.draw do
   get '/import_donations_from_wordpress' => 'donations#import_donations_from_wordpress'
   post '/import_donations_from_csv' => 'donations#import_donations_from_csv'
   get '/assign_donation' => 'donations#assign_donation'
+
+  resources :wordpress_users
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

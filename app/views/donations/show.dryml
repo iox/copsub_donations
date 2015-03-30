@@ -24,7 +24,11 @@
   <if test="&@user">
     <div class="well">
       <p>This donation is assigned to:</p>
-      <h4 param="heading"><%= @user.user_email %></h4>
+      <h4 param="heading">
+        <a href="&wordpress_user_path(:id => @user.id)">
+          <%= @user.user_email %>
+        </a>
+      </h4>
       <p>Display Name: <%= @user.display_name %></p>
       <p>User Nicename: <%= @user.user_nicename %></p>
       <p>Wordpress ID: <%= @user.id %></p>
@@ -37,7 +41,8 @@
       <h4>Find a user and assign the donations:</h4>
       <form method="get" updates="#assign-user">
         <input type="text" name="search" value="&@search_value"/>
-        <input type="submit" value="Search"/>
+        &nbsp;
+        <input type="submit" value="Search" class="btn"/>
       </form>
       <div part="assign-user">
          <collection with="&@users"/>

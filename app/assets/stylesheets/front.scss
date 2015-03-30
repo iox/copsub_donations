@@ -14,3 +14,12 @@
  *= require jquery-ui/redmond
  *= require_tree ./front
 */
+
+
+.form-horizontal .control-label {
+    width: 150px !important;
+}
+
+.form-horizontal .controls {
+    margin-left: 166px !important;
+}

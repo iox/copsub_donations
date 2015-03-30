@@ -1,0 +1,35 @@
+<page>
+  <content:>
+    <div class="well">
+      <a href="http://copenhagensuborbitals.com/wp-admin/user-edit.php?user_id=#{@wordpress_user.id}" target="_blank" class="btn btn-large btn-success pull-right">Edit in Wordpress</a>
+
+      <h2>Wordpress User <%= @wordpress_user.id %></h2>
+    </div>
+    <div class="form-horizontal">
+      <field-list with="&@wordpress_user" fields="id, user_email, user_login, user_nicename, display_name, user_registered">
+      <id-label:>Wordpress ID</id-label:>
+      </field-list>
+
+      <% @wordpress_user.additional_data.each do |key, data| %>
+        <div class="control-group   id-field">
+          <label for="" class="control-label id-label"><%= key %></label>
+          <div class="controls">              <span class="id-tag view "><%= data %></span></div>
+        </div>
+      <% end %>
+    </div>
+
+
+    <div class="well" unless="&@wordpress_user.donations.blank?">
+      <h4>Donations made by this user</h4>
+      <div class="table-plus">
+        <table class="table" with="&@wordpress_user.donations.order('donated_at desc')" fields="this, email, bank_reference, donated_at, amount_in_dkk">
+          <tfoot:>
+          <th colspan="3"></th>
+          <th>Total</th>
+          <th><%= @wordpress_user.donations.sum(:amount_in_dkk) %> DKK</th>
+          </tfoot:>
+        </table>
+      </div>
+    </div>
+  </content:>
+</page>
