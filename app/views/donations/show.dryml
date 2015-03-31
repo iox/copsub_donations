@@ -3,24 +3,36 @@
     <div class="row">
       <div class="span6">
         <div class="form-horizontal">
-          <field-list fields="bank_reference, email, wordpress_user_id, amount, amount_in_dkk, donation_method, donated_at, updated_at"/>
-        </div>
-        <div class="well" unless="&@donation.related_unassigned_donations.blank?">
-          <h4>There are some donations similar to this one</h4>
-          <div class="table-plus">
-            <table class="table" with="&@donation.related_unassigned_donations" fields="this, amount, email, bank_reference"/>
-          </div>
+          <field-list fields="bank_reference, email, amount_in_dkk, donation_method, donated_at, updated_at">
+            <append-amount-in-dkk-view:>
+              <% if this_parent.currency.downcase != 'dkk' %>
+                <%= "(#{this_parent.amount} #{this_parent.currency})" %>
+              <% end %>
+            </append-amount-in-dkk-view:>
+          </field-list>
         </div>
       </div>
       <div class="span6">
         <right-column/>
       </div>
     </div>
+    <assign-a-user/>
   </content-body:>
 </show-page>
 
 
 <def tag="right-column">
+  <div class="well" unless="&@donation.related_unassigned_donations.blank?">
+    <h4>There are some donations similar to this one</h4>
+    <div class="table-plus" style="height:200px; overflow: auto">
+      <table class="table" with="&@donation.related_unassigned_donations.order('donated_at desc')" fields="this, amount, email, bank_reference">
+        <this-view:><a><%= l(this.donated_at.to_date, :format => :long) %></a></this-view:>
+      </table>
+    </div>
+  </div>
+</def>
+
+<def tag="assign-a-user">
   <if test="&@user">
     <div class="well">
       <p>This donation is assigned to:</p>
@@ -39,30 +51,29 @@
   <else>
     <div class="well">
       <h4>Find a user and assign the donations:</h4>
+      <br/>
       <form method="get" updates="#assign-user">
         <input type="text" name="search" value="&@search_value"/>
         &nbsp;
         <input type="submit" value="Search" class="btn"/>
       </form>
       <div part="assign-user">
-         <collection with="&@users"/>
+        <p if="&@users_count > 20"><%= @users_count %> users found. Only showing the first 20 results, please search for a more specific term</p>
+        <div class="table-plus" style="font-size: 12px">
+          <table class="table" with="&@users" fields="#{WordpressUser::ALL_FIELDS.join(',')}, actions" field-tag="highlighted-field">
+          <ID-view:><a href="/wordpress_users/#{this}"><highlighted-field/></a></ID-view:>
+            <actions-view:><a class="btn btn-primary btn-small" href="/assign_donation?donation_id=#{@donation.id}&user_id=#{this_parent.id}">Assign</a></actions-view:>
+          </table>
+        </div>
       </div>
     </div>
   </else>
 </def>
 
 
-<def tag="card" for="WordpressUser">
-  <card class="user" param="default" merge>
-    <header: param>
-      <h4 param="heading">User <%=this.id%>: <%= this.user_email %></h4>
-      <p>Display Name: <%= this.display_name %></p>
-      <p>User Nicename: <%= this.user_nicename %></p>
-      <a class="btn btn-primary" href="/assign_donation?donation_id=#{@donation.id}&user_id=#{this.id}">Assign to this user</a>
-    </header:>
-  </card>
+<def tag="highlighted-field">
+  <%= highlight(this.to_s, @search_value.split(' ')) %>
 </def>
-
 
 
 <def tag="card" for="Donation">

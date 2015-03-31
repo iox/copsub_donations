@@ -35,7 +35,8 @@ class DonationsController < ApplicationController
     @donation = Donation.find(params[:id])
     @user = @donation.user
     @search_value = params[:search] || @donation.email || @donation.bank_reference.gsub(/[^0-9]/, '')
-    @users = WordpressUser.fuzzy_search(@search_value)
+    @users_count = WordpressUser.fuzzy_search(@search_value).count
+    @users = WordpressUser.fuzzy_search(@search_value).limit(20)
     if request.xhr?
       hobo_ajax_response
     end
