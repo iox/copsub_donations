@@ -1,0 +1,39 @@
+<page>
+  <content-body:>
+    <div class="header content-header well">
+      <h2 class="heading">Wordpress User Index</h2>
+    </div>
+
+    <search-box/>
+
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="#{WordpressUser::ALL_FIELDS.join(',')}" field-tag="highlighted-field">
+      <ID-view:><a href="/wordpress_users/#{this}"><highlighted-field/></a></ID-view:>
+    </table>
+
+    <page-nav/>
+  </content-body:>
+</page>
+
+
+
+
+<def tag="search-box">
+  <div class="well header">
+    <div style="" class="header" id="busqueda-normal">
+      <div style="display:block" class="search">
+        <form style="float:left;" method="get" class="form-horizontal search-form" action="">
+          <input type="search" value="&params[:search]" name="search" class="search"/>
+          <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit"/>&nbsp;
+        </form>
+      </div>
+    </div>
+    <p style="float:right;" class="result-counter"><%= @wordpress_users.total_entries %> results. Page <%= @wordpress_users.current_page %> of <%= @wordpress_users.total_pages %></p>
+  </div>
+</def>
+
+
+
+
+<def tag="highlighted-field">
+  <%= highlight(this.to_s, params[:search].split(' ')) %>
+</def>

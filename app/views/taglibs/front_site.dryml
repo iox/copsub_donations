@@ -21,7 +21,8 @@
 
 <def tag="main-nav">
   <navigation class="main-nav" merge-attrs param="default">
-    <nav-item with="&Donation"><ht key="donation.nav_item" count="100"><model-name-human count="100"/></ht></nav-item>
+    <nav-item with="&Donation">Donations</nav-item>
+    <nav-item with="&WordpressUser">Wordpress Users</nav-item>
     <nav-item href="#{base_url}/import">Import</nav-item>
   </navigation>
 </def>
