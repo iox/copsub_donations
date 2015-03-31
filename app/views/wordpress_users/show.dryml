@@ -6,16 +6,9 @@
       <h2>Wordpress User <%= @wordpress_user.id %></h2>
     </div>
     <div class="form-horizontal">
-      <field-list with="&@wordpress_user" fields="id, user_email, user_login, user_nicename, display_name, user_registered">
-      <id-label:>Wordpress ID</id-label:>
+      <field-list with="&@wordpress_user" fields="#{WordpressUser::ALL_FIELDS.join(',')}, user_registered">
+      <ID-label:>Wordpress ID</ID-label:>
       </field-list>
-
-      <% @wordpress_user.additional_data.each do |key, data| %>
-        <div class="control-group   id-field">
-          <label for="" class="control-label id-label"><%= key %></label>
-          <div class="controls">              <span class="id-tag view "><%= data %></span></div>
-        </div>
-      <% end %>
     </div>
 
 

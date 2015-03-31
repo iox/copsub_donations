@@ -5,25 +5,6 @@ class WordpressUser < ActiveRecord::Base
 
   has_many :donations
 
-  # Other user fields which we might enable in the future: user_nicename
-  USER_FIELDS = %w{ID user_email user_login display_name}
-  # Other usermeta fields which we might enable in the future: alternative_id nickname donation_method
-  USERMETA_FIELDS = %w{user_adress city country paymentid paypal_id user_phone }
-
-
-  # USERMETA_FIELDS= %w(user_address)
-  ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS
-
-  def additional_data
-    data_fields = WordpressUser.find_by_sql("SELECT * FROM #{PREFIX}usermeta WHERE meta_key IN (#{USERMETA_FIELDS.map{|f|f.inspect}.join(',')})")
-    result = Hash.new
-    for field in data_fields
-      result[field.meta_key] = field.meta_value
-    end
-
-    return result
-  end
-
   def name
     self.inspect.to_s
   end
@@ -33,7 +14,14 @@ class WordpressUser < ActiveRecord::Base
   end
 
 
-  ############### Scopes ###############
+
+
+  # Other user fields which we might enable in the future: user_nicename
+  USER_FIELDS = %w{ID user_email user_login display_name}
+  # Other usermeta fields which we might enable in the future: alternative_id nickname donation_method
+  USERMETA_FIELDS = %w{user_adress city country paymentid paypal_id user_phone }
+
+  ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS
 
 
   # This scope method allows to search for users using several fields, for example "WordpressUser.fuzzy_search('ignacio')"
