@@ -14,7 +14,7 @@
         <form multipart action="/import_donations_from_csv">
           <input type="file" name="csv"/>
           <br/><br/>
-          <input type="submit" class="btn btn-primary" value="Import Paypal Donations from CSV"/>
+          <input type="submit" class="btn btn-primary" value="Import Bank Donations from CSV"/>
         </form>
       </div>
     </header>
