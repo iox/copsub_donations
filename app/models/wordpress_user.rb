@@ -49,7 +49,7 @@ class WordpressUser < ActiveRecord::Base
       scope = scope.joins("LEFT JOIN #{PREFIX}usermeta #{field} ON #{PREFIX}users.id = #{field}.user_id AND #{field}.meta_key = '#{field}'")
     end
 
-    return scope.select("#{PREFIX}users.*, " + USERMETA_FIELDS.map{|f| "#{f}.meta_value AS #{f}"}.join(', '))
+    return scope.select("distinct #{PREFIX}users.*, " + USERMETA_FIELDS.map{|f| "#{f}.meta_value AS #{f}"}.join(', '))
   end
 
 end
