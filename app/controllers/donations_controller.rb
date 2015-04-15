@@ -51,7 +51,8 @@ class DonationsController < ApplicationController
   end
 
   def index
-    @search = Donation.search(params[:q])
+    scope = params[:other_income] ? Donation.other_income : Donation.not_other_income
+    @search = scope.search(params[:q])
     @total = @search.result.sum(:amount_in_dkk)
     @donations = @search.result.paginate(:page => params[:page])
   end

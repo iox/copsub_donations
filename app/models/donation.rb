@@ -13,9 +13,10 @@ class Donation < ActiveRecord::Base
     donation_method enum_string(:'bank', :'paypal')
     wordpress_user_id :integer
     user_assigned :boolean, :default => false
+    other_income :boolean, :default => false
     timestamps
   end
-  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id
+  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income
 
 
   before_save :store_user_assigned, :store_amount_in_dkk

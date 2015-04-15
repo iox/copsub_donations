@@ -3,12 +3,13 @@
     <div class="row">
       <div class="span6">
         <div class="form-horizontal">
-          <field-list fields="bank_reference, email, amount_in_dkk, donation_method, donated_at, updated_at">
+          <field-list fields="bank_reference, email, amount_in_dkk, donation_method, donated_at, updated_at, other_income">
             <append-amount-in-dkk-view:>
               <% if this_parent.currency.downcase != 'dkk' %>
                 <%= "(#{this_parent.amount} #{this_parent.currency})" %>
               <% end %>
             </append-amount-in-dkk-view:>
+            <other-income-view:><editor/></other-income-view:>
           </field-list>
         </div>
       </div>

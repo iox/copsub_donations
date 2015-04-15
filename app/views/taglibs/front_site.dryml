@@ -20,9 +20,11 @@
 
 
 <def tag="main-nav">
+  
   <navigation class="main-nav" merge-attrs param="default">
-    <nav-item with="&Donation">Donations</nav-item>
-    <nav-item with="&WordpressUser">Wordpress Users</nav-item>
+    <nav-item href="/donations" name="nothing"><%= scope.current_navigation %></nav-item>
+    <nav-item with="&WordpressUser">Users</nav-item>
+    <nav-item href="/donations?other_income=true" name="other_income">Other Income</nav-item>
     <nav-item href="#{base_url}/import">Import</nav-item>
   </navigation>
 </def>

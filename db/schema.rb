@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150317133549) do
+ActiveRecord::Schema.define(version: 20150415135132) do
 
   create_table "donations", force: true do |t|
     t.decimal  "amount",               precision: 8, scale: 2
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20150317133549) do
     t.string   "donation_method"
     t.integer  "wordpress_user_id"
     t.boolean  "user_assigned",                                default: false
+    t.boolean  "other_income",                                 default: false
   end
 
   create_table "users", force: true do |t|
