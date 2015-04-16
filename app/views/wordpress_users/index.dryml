@@ -21,10 +21,12 @@
   <div class="well header">
     <div style="" class="header" id="busqueda-normal">
       <div style="display:block" class="search">
-        <form style="float:left;" method="get" class="form-horizontal search-form" action="">
+        <form method="get" class="pull-left form-horizontal search-form" action="">
           <input type="search" value="&params[:search]" name="search" class="search"/>
           <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit"/>&nbsp;
         </form>
+        <a style="margin-top:-5px" class="pull-left btn" unless="&params[:last_year_less_than]" href="?last_year_less_than=100">Search for users who donated last year less than 100 DKK</a>
+        <a style="margin-top:-5px" class="pull-left btn" if="&params[:last_year_less_than]" href="?">Cancel filtering users who donated less than 100 DKK last year</a>
       </div>
     </div>
     <p style="float:right;" class="result-counter"><%= @wordpress_users.total_entries %> results. Page <%= @wordpress_users.current_page %> of <%= @wordpress_users.total_pages %></p>

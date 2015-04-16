@@ -8,7 +8,11 @@ class WordpressUsersController < ApplicationController
 
   def index
     params[:search] ||= ""
-    @wordpress_users = WordpressUser.with_all_fields.fuzzy_search(params[:search]).paginate(:page => params[:page])
+
+    scope = WordpressUser.with_all_fields.fuzzy_search(params[:search])
+    scope = params[:last_year_less_than] ? scope.having("IFNULL(sum(copsub_donations.donations.amount_in_dkk),0) < #{params[:last_year_less_than].to_i}") : scope
+
+    @wordpress_users = scope.paginate(:page => params[:page])
   end
 
 end

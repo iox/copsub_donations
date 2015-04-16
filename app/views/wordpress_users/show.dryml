@@ -6,7 +6,7 @@
       <h2>Wordpress User <%= @wordpress_user.id %></h2>
     </div>
     <div class="form-horizontal">
-      <field-list with="&@wordpress_user" fields="#{WordpressUser::ALL_FIELDS.join(',')}, user_registered">
+      <field-list with="&@wordpress_user" fields="#{WordpressUser::ALL_FIELDS.join(',')}, user_registered, donated_last_year_in_dkk">
       <ID-label:>Wordpress ID</ID-label:>
       </field-list>
     </div>
