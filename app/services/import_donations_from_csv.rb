@@ -2,43 +2,61 @@ class ImportDonationsFromCSV
 
   def initialize(csv)
     @csv = csv
-    @imported_donations = []
-    @already_existing_donations = []
-    @message = ""
+    @result = {
+      :source => 'CSV from Bank',
+      :no_user_found => [],
+      :user_assigned => [],
+      :multiple_users_found => [],
+      :already_existing => []
+    }
   end
 
   def import
     # encoding: 'ISO-8859-1'
     CSV.foreach(@csv.path, headers: true, col_sep: ';') do |row|
-      donation = row.to_hash
-      if donation["Beløb"].to_f > 0.0
-        existing_donation = Donation.where(:donation_method => 'bank', :bank_reference => donation["Tekst"], :donated_at => donation["Bogført"].to_time, :amount => donation["Beløb"].to_f).first
-        if existing_donation
-          @already_existing_donations << donation
-        else
-          @imported_donations << donation
-          donation = Donation.new(
-            :bank_reference => donation["Tekst"],
-            :donated_at => donation["Bogført"],
-            :amount => donation["Beløb"],
-            :currency => 'DKK',
-            :donation_method => 'bank'
-          )
-          if !donation.save
-            logger.info donation.errors.inspect
-          else
-            @message += "<br/> - Donation #{donation.id}, amount #{donation.amount}, bank reference #{donation.bank_reference} imported"
-            @message += "<strong>User found: #{donation.wordpress_user_id}</strong>" if donation.wordpress_user_id
-          end
-        end
+      row = row.to_hash
+      if row["Beløb"].to_f > 0.0
+        process_row(row)
       end
     end
 
-    return {
-      :imported_donations => @imported_donations,
-      :already_existing_donations => @already_existing_donations,
-      :message => @message
-    }
+    return @result
+  end
+
+  private
+
+  def process_row(row)
+    return if already_existing?(row)
+
+    donation = prepare_donation_from_row(row)
+
+    if donation.save
+      status = AssignUserAutomatically.new(donation).try_to_assign_user
+      @result[status] << donation
+    else
+      logger.info donation.errors.inspect
+    end
+  end
+
+
+  def already_existing?(row)
+    donation = Donation.where(:donation_method => 'bank', :bank_reference => row["Tekst"], :donated_at => row["Bogført"].to_time, :amount => row["Beløb"].to_f).first
+    if donation
+      @result[:already_existing] << donation
+      return true
+    else
+      return false
+    end
+  end
+
+  def prepare_donation_from_row(row)
+    Donation.new(
+      :bank_reference => row["Tekst"],
+      :donated_at => row["Bogført"],
+      :amount => row["Beløb"],
+      :currency => 'DKK',
+      :donation_method => 'bank'
+    )
   end
 
 end

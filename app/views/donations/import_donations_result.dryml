@@ -1,0 +1,48 @@
+<page>
+  <content-body:>
+    <h2>Import results</h2>
+    <p>Source: <%= @result[:source] %></p>
+    <br/>
+
+    <do with="&@result[:user_assigned]" if="&@result[:user_assigned].size > 0">
+      <h4>Imported donations with a user assigned automatically: <%= @result[:user_assigned].size %></h4>
+      <results-table/>
+    </do>
+
+    <hr/>
+
+    <do with="&@result[:no_user_found]" if="&@result[:no_user_found].size > 0">
+      <h4>Imported donations with no user found: <%= @result[:no_user_found].size %></h4>
+      <p>Once you assign these donations manually, future similar donations (from the same email/bank reference) will be assigned automatically.</p>
+      <results-table/>
+    </do>
+
+    <hr/>
+
+    <do with="&@result[:multiple_users_found]" if="&@result[:multiple_users_found].size > 0">
+      <h4>Imported donations with multiple users found: <%= @result[:multiple_users_found].size %></h4>
+      <p>This problem the "paymentid" of several users match with a bank reference. You will need to assign these donations manually.</p>
+      <results-table/>
+    </do>
+
+    <hr/>
+
+    <do with="&@result[:multiple_users_found]" if="&@result[:multiple_users_found].size > 0">
+      <h4><%= @result[:multiple_users_found].size %> donations have not been imported, because they were already in the database</h4>
+      <results-table/>
+    </do>
+
+  </content-body:>
+</page>
+
+
+
+<def tag="results-table">
+  <div style="max-height:300px; overflow:auto;">
+    <table class="table table-bordered table-striped" with="&this.first(100)" fields="this, #{'user,' if this.first.wordpress_user_id} email, bank_reference, amount_in_dkk, donated_at">
+      <this-heading:>ID</this-heading:>
+      <user-view:><a>User <%= this.id %></a></user-view:>
+    </table>
+    <p if="&this.size > 100"><strong>Only displaying the first 100. Use the donations tab to navigate all.</strong></p>
+  </div>
+</def>

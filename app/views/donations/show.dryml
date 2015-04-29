@@ -23,10 +23,10 @@
 
 
 <def tag="right-column">
-  <div class="well" unless="&@donation.related_unassigned_donations.blank?">
+  <div class="well" unless="&@related_unassigned_donations.blank?">
     <h4>There are some donations similar to this one</h4>
     <div class="table-plus" style="height:200px; overflow: auto">
-      <table class="table" with="&@donation.related_unassigned_donations.order('donated_at desc')" fields="this, amount, email, bank_reference">
+      <table class="table" with="&@related_unassigned_donations.order('donated_at desc')" fields="this, amount, email, bank_reference">
         <this-view:><a><%= l(this.donated_at.to_date, :format => :long) %></a></this-view:>
       </table>
     </div>

@@ -1,3 +1,0 @@
-<page>
-<content-body:><div class="well"><%= @message.html_safe %></div></content-body:>
-</page>
