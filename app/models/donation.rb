@@ -21,14 +21,13 @@ class Donation < ActiveRecord::Base
     WordpressUser.where(:id => self.wordpress_user_id).first
   end
 
-  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income
+  belongs_to :category
 
-
-
+  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id
 
   # --- Hooks --- #
 
-  before_save :convert_amount_to_dkk
+  before_save :convert_amount_to_dkk, :set_default_category
 
   def convert_amount_to_dkk
     self.amount_in_dkk ||= case self.currency
@@ -39,8 +38,9 @@ class Donation < ActiveRecord::Base
     return true
   end
 
-
-
+  def set_default_category
+    self.category ||= Category.where(default: true).first
+  end
 
   # --- Permissions --- #
 

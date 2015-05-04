@@ -11,7 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150415135132) do
+ActiveRecord::Schema.define(version: 20150504150335) do
+
+  create_table "categories", force: true do |t|
+    t.string   "name"
+    t.boolean  "default",    default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "donations", force: true do |t|
     t.decimal  "amount",               precision: 8, scale: 2
@@ -27,7 +34,10 @@ ActiveRecord::Schema.define(version: 20150415135132) do
     t.integer  "wordpress_user_id"
     t.boolean  "user_assigned",                                default: false
     t.boolean  "other_income",                                 default: false
+    t.integer  "category_id"
   end
+
+  add_index "donations", ["category_id"], name: "index_donations_on_category_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "crypted_password",          limit: 40
