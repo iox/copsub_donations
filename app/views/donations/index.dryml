@@ -1,6 +1,10 @@
 <index-page>
+  <heading:>
+    <if test="&params[:q][:other_income_eq] == 't'">Other Income</if>
+    <else>List of donations</else>
+  </heading:>
   <collection: replace>
-    <table-plus-with-filters with="&@donations" fields="this, email, bank_reference, wordpress_user_id, amount, currency, amount_in_dkk, donated_at, updated_at, donation_method" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency">
+    <table-plus-with-filters with="&@donations" fields="this, email, bank_reference, wordpress_user_id, amount, currency, amount_in_dkk, donated_at, updated_at, donation_method" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency, other_income, category">
       <wordpress-user-id-view:>
         <if>
           <a href="/wordpress_users/#{this}"><this/></a>

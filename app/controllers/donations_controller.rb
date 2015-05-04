@@ -39,8 +39,18 @@ class DonationsController < ApplicationController
   end
 
   def index
-    scope = params[:other_income] ? Donation.other_income : Donation.not_other_income
-    @search = scope.search(params[:q])
+    # By default we only show donations and hide all the income marked as "other_income"
+    params[:q] = Hash.new if !params[:q]
+    if params[:q].blank? || !params[:q][:other_income_eq].blank?
+      params[:q][:other_income_eq] == 'f'
+    end
+
+    # Workaround for bug in Hobo metasearch, clear the key in the search hash if it's empty or nil
+    if params[:q] && params[:q][:category_id_eq].blank?
+      params[:q].delete(:category_id_eq)
+    end
+
+    @search = Donation.search(params[:q])
     @total = @search.result.sum(:amount_in_dkk)
     @donations = @search.result.paginate(:page => params[:page])
   end
