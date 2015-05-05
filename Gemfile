@@ -56,6 +56,7 @@ gem "hobo_bootstrap_ui", "2.1.1"
 gem "jquery-ui-themes", "~> 0.0.4"
 gem "hobo_clean_admin", "2.1.1"
 gem 'hobo-metasearch', :git => "git://github.com/suyccom/hobo-metasearch"
+gem 'charlock_holmes'
 
 group :development do
   gem "better_errors"

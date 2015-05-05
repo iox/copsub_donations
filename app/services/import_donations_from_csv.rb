@@ -12,8 +12,8 @@ class ImportDonationsFromCSV
   end
 
   def import
-    # encoding: 'ISO-8859-1'
-    CSV.foreach(@csv.path, headers: true, col_sep: ';') do |row|
+    encoding = CharlockHolmes::EncodingDetector.detect(File.read(@csv.path))[:encoding]
+    CSV.foreach(@csv.path, headers: true, col_sep: ';', encoding: encoding ) do |row|
       row = row.to_hash
       if row["Beløb"].to_f > 0.0
         process_row(row)
