@@ -38,6 +38,18 @@ class DonationsController < ApplicationController
     redirect_to '/donations?q[user_assigned_eq]=f'
   end
 
+  def unassign_donation
+    @donation = Donation.find params[:donation_id]
+    if @donation.user
+      UnassignUser.new(@donation).unassign
+      flash[:notice] = "Donation #{@donation.id} has been unassigned. Now you can assign it to another user"
+      redirect_to :back
+    else
+      flash[:error] = "Donation #{@donation.id} had no user assigned, so it could not be unassigned."
+      redirect_to :back
+    end
+  end
+
   def index
     # By default we only show donations and hide all the income marked as "other_income"
     params[:q] = Hash.new if !params[:q]

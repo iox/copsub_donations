@@ -37,6 +37,7 @@
 <def tag="assign-a-user">
   <if test="&@user">
     <div class="well">
+      <a class="btn pull-right btn-warning" href="/unassign_donation?donation_id=#{@donation.id}">Unassign this user from this donation</a>
       <p>This donation is assigned to:</p>
       <h4 param="heading">
         <a href="&wordpress_user_path(:id => @user.id)">
