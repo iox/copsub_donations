@@ -2,6 +2,7 @@
   <content-body:>
     <div class="header content-header well">
       <h2 class="heading">Wordpress User Index</h2>
+      <p if="&params[:last_year_less_than]">Only showing users who donated less than 100DKK last year and who are not subscribers</p>
     </div>
 
     <search-box/>
