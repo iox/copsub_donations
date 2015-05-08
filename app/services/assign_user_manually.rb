@@ -7,8 +7,10 @@ class AssignUserManually
 
   def assign(user)
     @donation.update_attribute(:wordpress_user_id, user.id)
+    @donation.update_attribute(:user_assigned, true)
     for donation in related_unassigned_donations
       donation.update_attribute(:wordpress_user_id, user.id)
+      donation.update_attribute(:user_assigned, true)
     end
   end
 
