@@ -4,7 +4,14 @@
     <else>List of donations</else>
   </heading:>
   <collection: replace>
-    <table-plus-with-filters with="&@donations" fields="this, email, bank_reference, wordpress_user_id, amount, currency, amount_in_dkk, donated_at, updated_at, donation_method" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency, other_income, category">
+    <table-plus-with-filters with="&@donations" fields="this, email, wordpress_user_id, amount_in_dkk, donated_at, donation_method, other_income" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency, other_income, category">
+      <email-heading:>Email / Bank Reference</email-heading:>
+      <email-view:><this/><%= this_parent.bank_reference%></email-view:>
+      <other-income-view:>
+        <div class="pull-left" style="margin-right:4px"><editor/></div>
+        <div class="pull-left"><click-editor with="&this_parent" field="category"/></div>
+      </other-income-view:>
+
       <wordpress-user-id-view:>
         <if>
           <a href="/wordpress_users/#{this}"><this/></a>
