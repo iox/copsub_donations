@@ -27,8 +27,8 @@
 
     <hr/>
 
-    <do with="&@result[:multiple_users_found]" if="&@result[:multiple_users_found].size > 0">
-      <h4><%= @result[:multiple_users_found].size %> donations have not been imported, because they were already in the database</h4>
+    <do with="&@result[:already_existing]" if="&@result[:already_existing].size > 0">
+      <h4><%= @result[:already_existing].size %> donations have not been imported, because they were already in the database</h4>
       <results-table/>
     </do>
 
