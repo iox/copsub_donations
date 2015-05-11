@@ -40,7 +40,8 @@ class ImportDonationsFromCSV
 
 
   def already_existing?(row)
-    donation = Donation.where(:donation_method => 'bank', :bank_reference => row["Tekst"], :donated_at => row["Bogført"].to_time, :amount => row["Beløb"].to_f).first
+    Time.zone = "UTC" # When parsing data, assume it's in UTC time
+    donation = Donation.where(:donation_method => 'bank', :bank_reference => row["Tekst"], :donated_at => Time.zone.parse(row["Bogført"]), :amount => row["Beløb"].to_f).first
     if donation
       @result[:already_existing] << donation
       return true
