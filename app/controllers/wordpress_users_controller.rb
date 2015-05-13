@@ -18,6 +18,11 @@ class WordpressUsersController < ApplicationController
     end
 
     @wordpress_users = scope.paginate(:page => params[:page])
+
+    respond_to do |format|
+      format.html
+      format.text { render csv: scope, only: [:ID, :user_email, :user_login, :display_name], add_methods: [:user_adress, :city, :country, :user_phone, :paymentid, :paypal_id, :role] }
+    end
   end
 
 end

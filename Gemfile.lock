@@ -145,6 +145,8 @@ GEM
       polyamorous (~> 1.1)
     rdoc (4.2.0)
       json (~> 1.4)
+    render_csv (2.0.0)
+      rails (>= 3.0)
     sass (3.2.19)
     sass-rails (4.0.5)
       railties (>= 4.0.0, < 5.0)
@@ -196,6 +198,7 @@ DEPENDENCIES
   protected_attributes
   quiet_assets
   rails (= 4.0.13)
+  render_csv
   sass-rails (~> 4.0.2)
   sdoc
   turbolinks

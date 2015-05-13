@@ -10,7 +10,7 @@
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role" field-tag="highlighted-field">
       <ID-view:><a href="/wordpress_users/#{this}"><highlighted-field/></a></ID-view:>
     </table>
-
+    <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
     <page-nav/>
   </content-body:>
 </page>

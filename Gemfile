@@ -58,6 +58,7 @@ gem "hobo_clean_admin", "2.1.1"
 gem 'hobo-metasearch', :git => "git://github.com/suyccom/hobo-metasearch"
 gem 'charlock_holmes' # Autodetect imported CSV encoding
 gem 'php_serialize' # Parse serialized arrays from the Wordpress database
+gem 'render_csv'
 
 group :development do
   gem "better_errors"
