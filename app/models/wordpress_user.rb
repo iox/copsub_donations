@@ -17,11 +17,6 @@ class WordpressUser < ActiveRecord::Base
     donations.where("donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").sum(:amount_in_dkk)
   end
 
-  def role
-    db_value = read_attribute("role")
-    db_value ? PHP.unserialize(db_value).keys.join(', ') : nil
-  end
-
   # Other user fields which we might enable in the future: user_nicename
   USER_FIELDS = %w{ID user_email user_login display_name}
   # Other usermeta fields which we might enable in the future: alternative_id nickname donation_method
@@ -29,6 +24,58 @@ class WordpressUser < ActiveRecord::Base
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']
 
+
+
+
+  #################################
+  # Code related to editing users #
+  #################################
+
+  attr_accessible *ALL_FIELDS
+
+  USERMETA_FIELDS.each do |attr|
+    define_method("#{attr}=") do |val|
+      meta = WordpressUsermeta.where(:user_id => self.id).where(meta_key: attr).first
+      if meta
+        meta.update_attribute(:meta_value, val)
+      else
+        WordpressUsermeta.create(user_id: self.id, meta_key: attr, meta_value: val)
+      end
+    end
+  end
+
+  # In Wordpress, the roles are stores using a serialized hash with the form {"administrator" => true}
+  def role
+    db_value = read_attribute("role")
+    begin
+      db_value ? PHP.unserialize(db_value).keys.join(', ') : nil
+    rescue
+      db_value
+    end
+  end
+
+  def role=(val)
+    db_hash = {val => true}
+    db_value = PHP.serialize(db_hash)
+    meta = WordpressUsermeta.where(:user_id => self.id).where(meta_key: "#{PREFIX}capabilities").first
+    if meta
+      meta.update_attribute(:meta_value, db_value)
+    else
+      Rails.logger.info "Could not find the usermeta capabilities record for the user #{self.id}"
+    end
+  end
+
+  # Small hack to ensure that editing users works
+  def editable_by?(someone, something)
+    true
+  end
+
+
+
+
+  #################################
+  #      Scopes and searches      #
+  #################################
 
   # This scope method allows to search for users using several fields, for example "WordpressUser.fuzzy_search('ignacio')"
   def self.fuzzy_search(search)

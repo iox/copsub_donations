@@ -1,0 +1,26 @@
+<page>
+  <content:>
+    <div class="well">
+      <a href="http://copenhagensuborbitals.com/wp-admin/user-edit.php?user_id=#{@wordpress_user.id}" target="_blank" class="btn btn-large btn-success pull-right">Edit in Wordpress</a>
+
+      <h2>Wordpress User <%= @wordpress_user.id %></h2>
+    </div>
+
+    <form with="&@wordpress_user" action="/wordpress_users/#{@wordpress_user.id}" method="PUT">
+      <field-list fields="#{WordpressUser::ALL_FIELDS.reject{|e|e == 'ID'}.join(',')}" tag="custom-editor">
+        <role-view:><select-input options="&[:administrator, :supporter, :subscriber, :author, :reviewer, :subadmin, :moderator]"/></role-view:>
+      </field-list>
+
+      <div class="actions form-actions">
+        <submit value="Save"/> or <a class="btn" href="/wordpress_users/#{@wordpress_user.id}">Cancel</a>
+      </div>
+
+    </form>
+  </content:>
+</page>
+
+
+<def tag="custom-editor">
+  <input if="&this" />
+  <input type="text" name="wordpress_user[#{this_field}]" unless="&this"/>
+</def>

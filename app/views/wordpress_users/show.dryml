@@ -3,6 +3,8 @@
     <div class="well">
       <a href="http://copenhagensuborbitals.com/wp-admin/user-edit.php?user_id=#{@wordpress_user.id}" target="_blank" class="btn btn-large btn-success pull-right">Edit in Wordpress</a>
 
+      <a href="/wordpress_users/#{@wordpress_user.id}/edit" class="btn btn-large pull-right" style="margin-right:20px">Edit</a>
+
       <h2>Wordpress User <%= @wordpress_user.id %></h2>
     </div>
     <div class="form-horizontal">

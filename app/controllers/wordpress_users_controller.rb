@@ -25,4 +25,14 @@ class WordpressUsersController < ApplicationController
     end
   end
 
+  def edit
+    @wordpress_user = WordpressUser.with_all_fields.find(params[:id])
+  end
+
+  def update
+    @wordpress_user = WordpressUser.with_all_fields.find(params[:id])
+    @wordpress_user.update_attributes(params[:wordpress_user])
+    redirect_to @wordpress_user
+  end
+
 end
