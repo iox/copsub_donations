@@ -8,6 +8,7 @@
     <search-box/>
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role" field-tag="highlighted-field">
+      <field-heading-row:><sorting-row fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role"/></field-heading-row:>
       <ID-view:><a href="/wordpress_users/#{this}"><highlighted-field/></a></ID-view:>
     </table>
     <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
@@ -41,4 +42,25 @@
 
 <def tag="highlighted-field">
   <%= highlight(this.to_s, params[:search].split(' ')) %>
+</def>
+
+
+
+<def tag="sorting-row" attrs="fields">
+  <% for field in fields.split(', ') %>
+    <% link_text = field.humanize %>
+    <% direction = 'asc' %>
+    <% if params[:sort] == field %>
+      <% if params[:direction] == 'asc' %>
+        <% link_text += " ▲" %>
+        <% direction = 'desc' %>
+      <% else %>
+        <% link_text += " ▼" %>
+      <% end %>
+    <% end %>
+    <th>
+      <% url = wordpress_users_path(params.merge({sort: field, direction: direction})) %>
+      <%= link_to link_text, url %>
+    </th>
+  <% end %>
 </def>

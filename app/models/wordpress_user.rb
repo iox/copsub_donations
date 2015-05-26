@@ -26,8 +26,6 @@ class WordpressUser < ActiveRecord::Base
 
   ROLES = [:administrator, :supporter, :subscriber, :author, :reviewer, :subadmin, :moderator]
 
-
-
   #################################
   # Code related to editing users #
   #################################
@@ -107,6 +105,10 @@ class WordpressUser < ActiveRecord::Base
     scope = scope.joins("LEFT JOIN #{PREFIX}usermeta #{PREFIX}capabilities ON #{PREFIX}users.id = #{PREFIX}capabilities.user_id AND #{PREFIX}capabilities.meta_key = '#{PREFIX}capabilities'")
 
     return scope.select("distinct #{PREFIX}users.*, " + USERMETA_FIELDS.map{|f| "#{f}.meta_value AS #{f}"}.join(', ') + ", #{PREFIX}capabilities.meta_value AS role")
+  end
+
+  def self.name_attribute
+    name
   end
 
 end

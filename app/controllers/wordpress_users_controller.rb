@@ -8,8 +8,10 @@ class WordpressUsersController < ApplicationController
 
   def index
     params[:search] ||= ""
+    params[:sort] ||= "ID"
+    params[:direction] ||= "asc"
 
-    @wordpress_users = wordpress_users_scope.paginate(:page => params[:page])
+    @wordpress_users = wordpress_users_scope.order("#{params[:sort]} #{params[:direction]}").paginate(:page => params[:page])
 
     respond_to do |format|
       format.html
