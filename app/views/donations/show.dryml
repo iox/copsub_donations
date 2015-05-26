@@ -1,4 +1,5 @@
 <show-page>
+  <edit-link: replace/>
   <content-body: replace>
     <div class="row">
       <div class="span6">
