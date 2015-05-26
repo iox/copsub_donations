@@ -8,7 +8,7 @@
 
     <form with="&@wordpress_user" action="/wordpress_users/#{@wordpress_user.id}" method="PUT">
       <field-list fields="#{WordpressUser::ALL_FIELDS.reject{|e|e == 'ID'}.join(',')}" tag="custom-editor">
-        <role-view:><select-input options="&[:administrator, :supporter, :subscriber, :author, :reviewer, :subadmin, :moderator]"/></role-view:>
+        <role-view:><select-input options="&WordpressUser::ROLES"/></role-view:>
       </field-list>
 
       <div class="actions form-actions">

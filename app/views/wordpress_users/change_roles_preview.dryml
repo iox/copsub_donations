@@ -1,0 +1,17 @@
+<page>
+  <content-body:>
+    <div class="header content-header well">
+      <h2 class="heading">Change roles to users</h2>
+    </div>
+    <p class="alert">With this action you will change the role to all the users in the following list</p>
+
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role">
+      <ID-view:><a href="/wordpress_users/#{this}"><this/></a></ID-view:>
+    </table>
+
+    <form class="well" action="&change_roles_assign_path(params)" method="POST">
+      <select-input name="role" options="&WordpressUser::ROLES"/>
+      <submit class="btn-danger" value="Assign" style="margin-left:10px"/>
+    </form>
+  </content-body:>
+</page>

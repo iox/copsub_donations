@@ -24,6 +24,7 @@ class WordpressUser < ActiveRecord::Base
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']
 
+  ROLES = [:administrator, :supporter, :subscriber, :author, :reviewer, :subadmin, :moderator]
 
 
 
