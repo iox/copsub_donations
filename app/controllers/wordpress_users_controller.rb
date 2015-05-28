@@ -50,8 +50,11 @@ class WordpressUsersController < ApplicationController
     if params[:last_year_less_than]
       # Add an additional JOIN to filter by the amount donated last year
       scope = scope.joins("LEFT OUTER JOIN copsub_donations.donations ON #{PREFIX}users.id = copsub_donations.donations.wordpress_user_id AND copsub_donations.donations.donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").group("#{PREFIX}users.id").
-              where("#{PREFIX}capabilities.meta_value NOT LIKE '%subscriber%'").
               having("IFNULL(sum(copsub_donations.donations.amount_in_dkk),0) < #{params[:last_year_less_than].to_i}")
+    end
+
+    if !params[:role].blank?
+      scope = scope.where("#{PREFIX}capabilities.meta_value LIKE ?", "%#{params[:role]}%")
     end
 
     return scope

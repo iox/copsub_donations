@@ -79,7 +79,7 @@ class WordpressUser < ActiveRecord::Base
   # This scope method allows to search for users using several fields, for example "WordpressUser.fuzzy_search('ignacio')"
   def self.fuzzy_search(search)
     # Build a string like: "ID LIKE :search OR user_email LIKE :search ..."
-    sql_user_fields = USER_FIELDS.map{|f|"#{f} LIKE :search"}.join(" OR ")
+    sql_user_fields = USER_FIELDS.map{|f|"#{PREFIX}users.#{f} LIKE :search"}.join(" OR ")
     sql_user_fields += " OR " + USERMETA_FIELDS.map{|f|"#{f}.meta_value LIKE :search"}.join(" OR ")
 
     # If the user searches for "Ignacio Hedehusene", then

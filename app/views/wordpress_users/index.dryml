@@ -2,7 +2,7 @@
   <content-body:>
     <div class="header content-header well">
       <h2 class="heading">Wordpress User Index</h2>
-      <p if="&params[:last_year_less_than]">Only showing users who donated less than 100DKK last year and who are not subscribers</p>
+      <p if="&params[:last_year_less_than]">Only showing users who donated less than 100DKK last year</p>
     </div>
 
     <search-box/>
@@ -25,12 +25,14 @@
   <div class="well header">
     <div style="" class="header" id="busqueda-normal">
       <div style="display:block" class="search">
-        <form method="get" class="pull-left form-horizontal search-form" action="">
+        <form method="get" class="pull-left form-horizontal search-form form-inline" action="">
           <input type="search" value="&params[:search]" name="search" class="search"/>
+          <select-input name="role" options="&WordpressUser::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 5px"/>
+          <label class="checkbox">
+            <input type="checkbox" name="last_year_less_than" value="100" checked="&params[:last_year_less_than]" style="margin-top:0; margin-left: 5px"/> Donated less than 100 DKK last year
+          </label>
           <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit"/>&nbsp;
         </form>
-        <a style="margin-top:-5px" class="pull-left btn" unless="&params[:last_year_less_than]" href="?last_year_less_than=100">Search for users who donated last year less than 100 DKK</a>
-        <a style="margin-top:-5px" class="pull-left btn" if="&params[:last_year_less_than]" href="?">Cancel filtering users who donated less than 100 DKK last year</a>
       </div>
     </div>
     <p style="float:right;" class="result-counter"><%= @wordpress_users.total_entries %> results. Page <%= @wordpress_users.current_page %> of <%= @wordpress_users.total_pages %></p>
