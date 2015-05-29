@@ -10,7 +10,7 @@
     </table>
 
     <form class="well" action="&change_roles_assign_path(params)" method="POST">
-      <select-input name="role" options="&WordpressUser::ROLES"/>
+      <select-input name="new_role" options="&WordpressUser::ROLES"/>
       <submit class="btn-danger" value="Assign" style="margin-left:10px"/>
     </form>
   </content-body:>

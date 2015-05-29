@@ -35,11 +35,11 @@ class WordpressUsersController < ApplicationController
 
   def change_roles_assign
     for user in wordpress_users_scope
-      user.role = params[:role]
+      user.role = params[:new_role]
     end
-    flash[:info] = "The selected users have been updated to the '#{params[:role]}' role"
-    params.delete :role
-    redirect_to wordpress_users_path(params)
+    flash[:info] = "The selected users have been updated to the '#{params[:new_role]}' role"
+    params.delete :new_role
+    redirect_to wordpress_users_path
   end
 
   private
