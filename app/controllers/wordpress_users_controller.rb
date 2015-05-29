@@ -47,10 +47,10 @@ class WordpressUsersController < ApplicationController
   def wordpress_users_scope
     scope = WordpressUser.with_all_fields.fuzzy_search(params[:search])
 
-    if params[:last_year_less_than]
+    if params[:donated_last_year] && !params[:last_year_from].blank? && !params[:last_year_to].blank?
       # Add an additional JOIN to filter by the amount donated last year
       scope = scope.joins("LEFT OUTER JOIN copsub_donations.donations ON #{PREFIX}users.id = copsub_donations.donations.wordpress_user_id AND copsub_donations.donations.donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").group("#{PREFIX}users.id").
-              having("IFNULL(sum(copsub_donations.donations.amount_in_dkk),0) < #{params[:last_year_less_than].to_i}")
+              having("IFNULL(sum(copsub_donations.donations.amount_in_dkk),0) BETWEEN #{params[:last_year_from].to_i} AND #{params[:last_year_to].to_i}")
     end
 
     if !params[:role].blank?

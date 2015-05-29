@@ -7,8 +7,9 @@
 
     <search-box/>
 
-    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role" field-tag="highlighted-field">
-      <field-heading-row:><sorting-row fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role"/></field-heading-row:>
+    <% fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role" %>
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="&fields" field-tag="highlighted-field">
+      <field-heading-row:><sorting-row fields="&fields"/></field-heading-row:>
       <ID-view:><a href="/wordpress_users/#{this}"><highlighted-field/></a></ID-view:>
     </table>
     <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
@@ -29,8 +30,11 @@
           <input type="search" value="&params[:search]" name="search" class="search"/>
           <select-input name="role" options="&WordpressUser::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 5px"/>
           <label class="checkbox">
-            <input type="checkbox" name="last_year_less_than" value="100" checked="&params[:last_year_less_than]" style="margin-top:0; margin-left: 5px"/> Donated less than 100 DKK last year
+            <input type="checkbox" name="donated_last_year" value="100" checked="&params[:donated_last_year]" style="margin-top:0; margin-left: 5px"/>
+            Donated last year
           </label>
+          <input class="span1" type="text" name="last_year_from" placeholder="From" value="&params[:last_year_from]"/>
+          <input class="span1" type="text" name="last_year_to" placeholder="To" value="&params[:last_year_to]"/>
           <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit"/>&nbsp;
         </form>
       </div>
