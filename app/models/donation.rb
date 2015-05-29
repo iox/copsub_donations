@@ -28,6 +28,7 @@ class Donation < ActiveRecord::Base
   # --- Hooks --- #
 
   before_save :convert_amount_to_dkk, :set_default_category
+  after_save :cache_amount_donated_last_year
 
   def convert_amount_to_dkk
     self.amount_in_dkk ||= case self.currency
@@ -36,6 +37,12 @@ class Donation < ActiveRecord::Base
       else self.amount
     end
     return true
+  end
+
+  def cache_amount_donated_last_year
+    if wordpress_user_id && user
+      user.update_amount_donated_last_year!
+    end
   end
 
   def set_default_category
