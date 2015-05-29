@@ -5,7 +5,8 @@
     </div>
     <p class="alert">With this action you will change the role to all the users in the following list</p>
 
-    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role">
+    <% fields="ID, user_email, user_login, display_name, city, country, paymentid, paypal_id, role, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@wordpress_users" fields="&fields">
       <ID-view:><a href="/wordpress_users/#{this}"><this/></a></ID-view:>
     </table>
 
