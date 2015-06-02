@@ -21,7 +21,7 @@ class DonationsController < ApplicationController
   def show
     @donation = Donation.find(params[:id])
     @user = @donation.user
-    @search_value = params[:search] || @donation.email || @donation.bank_reference.gsub(/[^0-9]/, '')
+    @search_value = params[:search] || @donation.default_search_value
     @users_count = WordpressUser.fuzzy_search(@search_value).count
     @users = WordpressUser.fuzzy_search(@search_value).limit(20)
     @related_unassigned_donations = AssignUserManually.new(@donation).related_unassigned_donations

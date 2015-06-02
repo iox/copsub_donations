@@ -49,6 +49,20 @@ class Donation < ActiveRecord::Base
     self.category ||= Category.where(default: true).first
   end
 
+  def default_search_value
+    if email
+      email
+      return
+    end
+
+    only_numbers_bank_reference = bank_reference.gsub(/[^0-9]/, '')
+    if only_numbers_bank_reference.size > 2
+      only_numbers_bank_reference
+    else
+      bank_reference.split.join(" ") # Remove extra spaces
+    end
+  end
+
   # --- Permissions --- #
 
   def create_permitted?
