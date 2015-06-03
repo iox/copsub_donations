@@ -50,10 +50,7 @@ class Donation < ActiveRecord::Base
   end
 
   def default_search_value
-    if email
-      email
-      return
-    end
+    return email if email
 
     only_numbers_bank_reference = bank_reference.gsub(/[^0-9]/, '')
     if only_numbers_bank_reference.size > 2
