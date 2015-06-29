@@ -64,3 +64,7 @@ group :development do
   gem "better_errors"
   gem "binding_of_caller"
 end
+
+
+#gem 'agilecrm-wrapper', github: 'iox/agilecrm-wrapper'
+gem 'thin'
