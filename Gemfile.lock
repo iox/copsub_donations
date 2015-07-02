@@ -1,4 +1,14 @@
 GIT
+  remote: git://github.com/iox/agilecrm-wrapper.git
+  revision: f8484030ac1ec753f7352524b49d61fb97a910d3
+  specs:
+    agilecrm-wrapper (1.2.2)
+      faraday (~> 0.9)
+      faraday_middleware
+      hashie
+      json
+
+GIT
   remote: git://github.com/suyccom/hobo-metasearch
   revision: e51770fa9b91ea29472514db71a3461130716693
   specs:
@@ -64,6 +74,11 @@ GEM
     erubis (2.7.0)
     eventmachine (1.0.4)
     execjs (2.4.0)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
+    hashie (3.4.2)
     hike (1.2.3)
     hobo (2.1.1)
       dryml (= 2.1.1)
@@ -120,6 +135,7 @@ GEM
       i18n (>= 0.6.4, <= 0.7.0)
     multi_json (1.11.0)
     multi_xml (0.5.5)
+    multipart-post (2.0.0)
     mysql2 (0.3.18)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
@@ -201,6 +217,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  agilecrm-wrapper!
   better_errors
   binding_of_caller
   charlock_holmes

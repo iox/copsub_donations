@@ -15,6 +15,7 @@ class Donation < ActiveRecord::Base
     user_assigned :boolean, :default => false
     other_income :boolean, :default => false
     paypal_transaction_id :string
+    agilecrm_id :string
     timestamps
   end
 
