@@ -6,27 +6,20 @@ namespace :agilecrm do
     # The following line runs in batches of 100 records
     threads = []
     WordpressUser.with_all_fields.find_each do |user|
-      # threads << Thread.new do
-        # Rename some attributes
-        attributes = user.attributes
-        attributes['address'] = attributes.delete('user_adress')
+      # Rename some attributes
+      attributes = user.attributes
+      attributes['address'] = attributes.delete('user_adress')
 
-        # Connect to AgileCRM API
-        contact = find_or_create_contact(user.user_email)
-        contact.update user.attributes
+      # Connect to AgileCRM API
+      contact = find_or_create_contact(user.user_email)
+      contact.update user.attributes
 
-        # Store the AgileCRM contact ID in the donations table
-        user.donations.update_all(agilecrm_id: contact.id)
+      # Store the AgileCRM contact ID in the donations table
+      user.donations.update_all(agilecrm_id: contact.id)
 
-        puts "User migrated: #{user.user_email}"
-    #   end
-    #   sleep 0.2 # Let's not overload things, 10 users/second should be fast enough
+      puts "User migrated: #{user.user_email}"
     end
 
-    # # Wait for all threads to finish
-    # for thread in threads
-    #   thread.join
-    # end
   end
 end
 
