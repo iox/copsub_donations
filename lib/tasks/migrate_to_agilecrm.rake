@@ -6,13 +6,18 @@ namespace :agilecrm do
     # The following line runs in batches of 100 records
     threads = []
     WordpressUser.with_all_fields.find_each do |user|
-      # Rename some attributes
       attributes = user.attributes
+      # Rename some attributes
       attributes['address'] = attributes.delete('user_adress')
+      attributes['wordpress_id'] = attributes.delete('ID')
+      # Clean the "role" attribute
+      attributes['role'] = user.role
+      # Delete user_email attribute (so it is not duplicated)
+      attributes.delete('user_email')
 
       # Connect to AgileCRM API
       contact = find_or_create_contact(user.user_email)
-      contact.update user.attributes
+      contact.update attributes
 
       # Store the AgileCRM contact ID in the donations table
       user.donations.update_all(agilecrm_id: contact.id)
