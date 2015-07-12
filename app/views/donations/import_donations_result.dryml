@@ -39,7 +39,7 @@
 
 <def tag="results-table">
   <div style="max-height:300px; overflow:auto;">
-    <table class="table table-bordered table-striped" with="&this.first(100)" fields="this, #{'user,' if this.first.wordpress_user_id} email, bank_reference, amount_in_dkk, donated_at">
+    <table class="table table-bordered table-striped" with="&this.first(100)" fields="this, #{'user,' if this.first.agilecrm_id} email, bank_reference, amount_in_dkk, donated_at">
       <this-heading:>ID</this-heading:>
       <user-view:><a>User <%= this.id if this %></a></user-view:>
     </table>

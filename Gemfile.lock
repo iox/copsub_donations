@@ -1,14 +1,4 @@
 GIT
-  remote: git://github.com/iox/agilecrm-wrapper.git
-  revision: f8484030ac1ec753f7352524b49d61fb97a910d3
-  specs:
-    agilecrm-wrapper (1.2.2)
-      faraday (~> 0.9)
-      faraday_middleware
-      hashie
-      json
-
-GIT
   remote: git://github.com/suyccom/hobo-metasearch
   revision: e51770fa9b91ea29472514db71a3461130716693
   specs:
@@ -45,6 +35,11 @@ GEM
       multi_json (~> 1.3)
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
+    agilecrm-wrapper (1.3.2)
+      faraday (~> 0.9)
+      faraday_middleware
+      hashie
+      json
     arel (4.0.2)
     better_errors (2.1.1)
       coderay (>= 1.0.0)
@@ -217,7 +212,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  agilecrm-wrapper!
+  agilecrm-wrapper (= 1.3.2)
   better_errors
   binding_of_caller
   charlock_holmes

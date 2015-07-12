@@ -13,10 +13,6 @@ class WordpressUser < ActiveRecord::Base
     name
   end
 
-  def update_amount_donated_last_year!
-    self.donated_last_year_in_dkk = donations.where("donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").sum(:amount_in_dkk)
-  end
-
   # Other user fields which we might enable in the future: user_nicename
   USER_FIELDS = %w{ID user_email user_login display_name}
   # Other usermeta fields which we might enable in the future: alternative_id nickname donation_method

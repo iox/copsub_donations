@@ -41,13 +41,13 @@
       <a class="btn pull-right btn-warning" href="/unassign_donation?donation_id=#{@donation.id}">Unassign this user from this donation</a>
       <p>This donation is assigned to:</p>
       <h4 param="heading">
-        <a href="&wordpress_user_path(:id => @user.id)">
-          <%= @user.user_email %>
+        <a target="_blank" href="https://ihuerta.agilecrm.com/#contact/#{@user.id}">
+          <%= @user.email %>
         </a>
       </h4>
       <p>Display Name: <%= @user.display_name %></p>
       <p>User Nicename: <%= @user.user_nicename %></p>
-      <p>Wordpress ID: <%= @user.id %></p>
+      <p>AgileCRM ID: <%= @user.id %></p>
     </div>
 
   </if>
@@ -62,18 +62,24 @@
         <input type="submit" value="Search" class="btn"/>
       </form>
       <div part="assign-user">
-        <p if="&@users_count > 20"><%= @users_count %> users found. Only showing the first 20 results, please search for a more specific term</p>
         <div class="table-plus" style="font-size: 12px">
-          <table class="table" with="&@users" fields="#{WordpressUser::ALL_FIELDS.join(',')}, actions" field-tag="highlighted-field">
-          <ID-view:><a href="/wordpress_users/#{this}"><highlighted-field/></a></ID-view:>
-            <actions-view:><a class="btn btn-primary btn-small" href="/assign_donation?donation_id=#{@donation.id}&user_id=#{this_parent.id}">Assign</a></actions-view:>
+          <table class="table" with="&@users" fields="#{AgileContact::BASIC_FIELDS.join(',')}, actions">
+            <tbody:>
+              <% for user in @users %>
+                <tr>
+                <% for field in AgileContact::BASIC_FIELDS %>
+                  <td><highlighted-field with="&user.send(field)"/></td>
+                <% end %>
+                <td><a class="btn btn-primary btn-small" href="/assign_donation?donation_id=#{@donation.id}&user_id=#{user.id}">Assign</a></td>
+                </tr>
+              <% end %>
+            </tbody:>
           </table>
         </div>
       </div>
     </div>
   </else>
 </def>
-
 
 <def tag="highlighted-field">
   <%= highlight(this.to_s, @search_value.split(' ')) %>

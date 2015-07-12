@@ -6,17 +6,17 @@ class AssignUserManually
   end
 
   def assign(user)
-    @donation.update_attribute(:wordpress_user_id, user.id)
+    @donation.update_attribute(:agilecrm_id, user.id)
     @donation.update_attribute(:user_assigned, true)
     for donation in related_unassigned_donations
-      donation.update_attribute(:wordpress_user_id, user.id)
+      donation.update_attribute(:agilecrm_id, user.id)
       donation.update_attribute(:user_assigned, true)
     end
   end
 
   # This method returns a list of unassigned donations which are similar to this one (made by the same user via Paypal or via Bank)
   def related_unassigned_donations
-    scope = Donation.where("id != ?", @donation.id).where(:wordpress_user_id => nil)
+    scope = Donation.where("id != ?", @donation.id).where(:agilecrm_id => nil)
     if !@donation.bank_reference.blank?
       scope.where(:bank_reference => @donation.bank_reference)
     elsif !@donation.email.blank?

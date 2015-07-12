@@ -66,7 +66,7 @@ group :development do
 end
 
 
-gem 'agilecrm-wrapper', github: 'iox/agilecrm-wrapper'
+gem 'agilecrm-wrapper', "1.3.2"
 gem 'thin'
 
 # Handle Paypal IPN

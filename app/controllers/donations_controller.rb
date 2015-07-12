@@ -22,8 +22,8 @@ class DonationsController < ApplicationController
     @donation = Donation.find(params[:id])
     @user = @donation.user
     @search_value = params[:search] || @donation.default_search_value
-    @users_count = WordpressUser.fuzzy_search(@search_value).count
-    @users = WordpressUser.fuzzy_search(@search_value).limit(20)
+    @users = AgileContact.search(@search_value)
+    @users_count = @users.count
     @related_unassigned_donations = AssignUserManually.new(@donation).related_unassigned_donations
     if request.xhr?
       hobo_ajax_response
@@ -32,9 +32,9 @@ class DonationsController < ApplicationController
 
   def assign_donation
     @donation = Donation.find params[:donation_id]
-    @user = WordpressUser.find params[:user_id]
+    @user = AgileContact.find params[:user_id]
     AssignUserManually.new(@donation).assign(@user)
-    flash[:notice] = "Donation #{@donation.id} was assigned to #{@user.id} (#{@user.user_email})"
+    flash[:notice] = "Donation #{@donation.id} was assigned to #{@user.id} (#{@user.email})"
     redirect_to '/donations?q[user_assigned_eq]=f'
   end
 

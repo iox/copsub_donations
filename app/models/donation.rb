@@ -20,12 +20,12 @@ class Donation < ActiveRecord::Base
   end
 
   def user
-    WordpressUser.where(:id => self.wordpress_user_id).first
+    self.agilecrm_id ? AgileContact.find(self.agilecrm_id) : nil
   end
 
   belongs_to :category
 
-  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id, :paypal_transaction_id
+  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id, :agilecrm_id, :paypal_transaction_id
 
   # --- Hooks --- #
 
@@ -42,7 +42,7 @@ class Donation < ActiveRecord::Base
   end
 
   def cache_amount_donated_last_year
-    if wordpress_user_id && user
+    if agilecrm_id && user
       user.update_amount_donated_last_year!
     end
   end
