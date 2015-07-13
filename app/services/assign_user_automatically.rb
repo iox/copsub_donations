@@ -16,8 +16,12 @@ class AssignUserAutomatically
     # Step 2: If that didn't work and we have a bank reference, check if there's a user with a paymentid field that matches
     if @donation.agilecrm_id.blank? && !@donation.bank_reference.blank?
       # Step 2.1: Divide the bank reference into words and search for them independently. For example "12345 John Smith" >> ['12345', 'John', 'Smith']
-      search_string = @donation.bank_reference.split(" ").map{|string| "paymentid.meta_value LIKE '%#{Mysql2::Client.escape(string)}%'"}.join(" OR ")
-      users = WordpressUser.with_all_fields.where(search_string)
+      users = []
+      for word in @donation.bank_reference.split(" ")
+        users += AgileContact.search(word)
+      end
+      users.uniq{|u|u.id}
+
       # Step 2.2: Only accept as valid those users whose complete bank reference matches. For example, accept "John Smith" or "12345 John". But not "John Johansen".
       users.select!{|u| @donation.bank_reference.include?(u.paymentid)}
       if users.size == 1
