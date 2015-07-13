@@ -17,7 +17,7 @@ class PaypalController < ApplicationController
     if notify.acknowledge
       notify.complete? ? store_donation(notify) : (log += "\nNotification is not complete, please investigate".to_s)
     else
-      log += "\nFailed to verify Paypal's notification, please investigate".to_s)
+      log += "\nFailed to verify Paypal's notification, please investigate"
     end
 
     logger.error log
