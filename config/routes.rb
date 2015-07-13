@@ -16,6 +16,10 @@ CopsubDonations::Application.routes.draw do
   get '/change_roles_preview' => 'wordpress_users#change_roles_preview'
   post '/change_roles_assign' => 'wordpress_users#change_roles_assign'
 
+
+  post '/paypal_ipn' => 'paypal#ipn'
+  get '/paypal_ipn' => 'paypal#ipn'
+
   resources :wordpress_users
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

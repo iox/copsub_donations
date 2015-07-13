@@ -68,3 +68,6 @@ end
 
 #gem 'agilecrm-wrapper', github: 'iox/agilecrm-wrapper'
 gem 'thin'
+
+# Handle Paypal IPN
+gem 'offsite_payments'
