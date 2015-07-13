@@ -8,18 +8,20 @@ class PaypalController < ApplicationController
   # OffsitePayments.mode = :test
 
   def ipn
-    logger.info "Paypal IPN received. params:"
-    logger.info params.inspect
+    log = "Paypal IPN received. params:\n"
+    log += params.inspect.to_s
 
     notify = Paypal::Notification.new(request.raw_post)
-    logger.info notify.inspect
+    log += notify.inspect.to_s
 
     if notify.acknowledge
-      notify.complete? ? store_donation(notify) : logger.error("Notification is not complete, please investigate")
+      notify.complete? ? store_donation(notify) : (log += "\nNotification is not complete, please investigate".to_s)
     else
-      logger.error("Failed to verify Paypal's notification, please investigate")
+      log += "\nFailed to verify Paypal's notification, please investigate".to_s)
     end
 
+    logger.error log
+    ActionMailer::Base.mail(from: 'no-reply@copsub.com', to: 'rasmusagdestein.e9187@m.evernote.com', subject: 'Donations app received a Paypal IPN @CopSub_Log', body: log).deliver
     head 200
   end
 
