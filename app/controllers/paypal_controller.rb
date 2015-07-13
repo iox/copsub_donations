@@ -5,6 +5,7 @@ class PaypalController < ApplicationController
 
   include OffsitePayments::Integrations
   require 'money'
+  # OffsitePayments.mode = :test
 
   def ipn
     logger.info "Paypal IPN received. params:"
@@ -26,7 +27,7 @@ class PaypalController < ApplicationController
 
   def store_donation(notify)
     donation = Donation.new(
-      :transaction_id => notify.transaction_id,
+      :paypal_transaction_id => notify.transaction_id,
       :amount => notify.amount,
       :donated_at => notify.received_at,
       :currency => notify.currency,
