@@ -36,7 +36,9 @@ class PaypalController < ApplicationController
       :email => params['payer_email'],
       :donation_method => 'paypal'
     )
-    if !donation.save
+    if donation.save
+      AssignUserAutomatically.new(donation).try_to_assign_user
+    else
       logger.info "Error while creating donation: #{donation.errors.inspect}"
     end
   end
