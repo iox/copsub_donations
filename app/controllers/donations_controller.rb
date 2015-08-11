@@ -65,6 +65,11 @@ class DonationsController < ApplicationController
     @search = Donation.search(params[:q])
     @total = @search.result.sum(:amount_in_dkk)
     @donations = @search.result.paginate(:page => params[:page])
+
+    respond_to do |format|
+      format.html
+      format.text { render csv: @search.result }
+    end
   end
 
 end

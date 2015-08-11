@@ -15,7 +15,7 @@ class WordpressUsersController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.text { render csv: scope, only: [:ID, :user_email, :user_login, :display_name], add_methods: [:user_adress, :city, :country, :user_phone, :paymentid, :paypal_id, :role] }
+      format.text { render csv: wordpress_users_scope, only: [:ID, :user_email, :user_login, :display_name], add_methods: [:user_adress, :city, :country, :user_phone, :paymentid, :paypal_id, :role] }
     end
   end
 
