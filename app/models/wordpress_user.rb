@@ -66,7 +66,7 @@ class WordpressUser < ActiveRecord::Base
 
   # Small hack to ensure that editing users works
   def editable_by?(someone, something)
-    true
+    someone.administrator?
   end
 
 

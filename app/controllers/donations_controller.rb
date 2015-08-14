@@ -4,6 +4,12 @@ class DonationsController < ApplicationController
 
   auto_actions :all
 
+  before_filter :require_admin, :except => [:index, :show]
+
+  def require_admin
+    redirect_to '/' unless current_user.administrator?
+  end
+
   def import_donations_from_wordpress
     @result = ImportDonationsFromWordpress.new.import
     render 'import_donations_result'

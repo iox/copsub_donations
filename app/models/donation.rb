@@ -76,7 +76,7 @@ class Donation < ActiveRecord::Base
   end
 
   def view_permitted?(field)
-    acting_user.administrator?
+    acting_user
   end
 
 end
