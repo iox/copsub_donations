@@ -36,6 +36,12 @@ class PaypalController < ApplicationController
       :email => params['payer_email'],
       :donation_method => 'paypal'
     )
+
+    # Autoassign Single Donations to Single Donations category
+    if params['subscr_id'].blank?
+      donation.category = Category.where(id: 5).first
+    end
+
     if donation.save
       AssignUserAutomatically.new(donation).try_to_assign_user
     else
