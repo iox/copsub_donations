@@ -35,5 +35,5 @@ CopsubDonations::Application.configure do
   BetterErrors::Middleware.allow_ip! '10.0.3.1'
 
   Rails.application.routes.default_url_options[:host] = 'localhost:3016'
-  PREFIX = "yinj4m_"
+  PREFIX = "cy3su_"
 end
