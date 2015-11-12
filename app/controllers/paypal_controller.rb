@@ -43,7 +43,7 @@ class PaypalController < ApplicationController
     end
 
     # Add the user to sponsors list in the website, if he was not already there
-    AddToSponsorsList.new(params['address_country', 'first_name', 'last_name']).call
+    AddToSponsorsList.new(params['address_country'], params['first_name'], params['last_name']).call
 
     if donation.save
       AssignUserAutomatically.new(donation).try_to_assign_user
