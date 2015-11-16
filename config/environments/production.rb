@@ -80,4 +80,12 @@ CopsubDonations::Application.configure do
 
   Rails.application.routes.default_url_options[:host] = 'copenhagensuborbitals.com:3000'
   PREFIX = "cy3su_"
+
+  Rails.application.config.middleware.use ExceptionNotification::Rack,
+  :email => {
+    :email_prefix => "[COPSUB DONATIONS ERROR] ",
+    :sender_address => %{"no-reply" <no-reply@copsub.com>},
+    :exception_recipients => %w{ignacio@ihuerta.net}
+  }
+
 end

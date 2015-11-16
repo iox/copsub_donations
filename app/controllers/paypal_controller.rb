@@ -43,7 +43,12 @@ class PaypalController < ApplicationController
     end
 
     # Add the user to sponsors list in the website, if he was not already there
-    AddToSponsorsList.new(params['address_country'], params['first_name'], params['last_name']).call
+    begin
+      AddToSponsorsList.new(params['address_country'], params['first_name'], params['last_name']).call
+    rescue => exception
+      ExceptionNotifier.notify_exception(exception, :env => request.env, :data => {:message => "Adding an Sponsor to the list failed"})
+      Rails.logger.info "ERROR in AddToSponsorsList"
+    end
 
     if donation.save
       AssignUserAutomatically.new(donation).try_to_assign_user

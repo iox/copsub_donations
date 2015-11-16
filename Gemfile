@@ -71,3 +71,6 @@ gem 'thin'
 
 # Handle Paypal IPN
 gem 'offsite_payments'
+
+# Send an email when an error occurs
+gem 'exception_notification'

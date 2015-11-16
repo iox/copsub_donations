@@ -63,6 +63,9 @@ GEM
       hobo_support (= 2.1.1)
     erubis (2.7.0)
     eventmachine (1.0.4)
+    exception_notification (4.1.1)
+      actionmailer (>= 3.0.4)
+      activesupport (>= 3.0.4)
     execjs (2.4.0)
     hike (1.2.3)
     hobo (2.1.1)
@@ -205,6 +208,7 @@ DEPENDENCIES
   binding_of_caller
   charlock_holmes
   coffee-rails (~> 4.0.0)
+  exception_notification
   hobo (= 2.1.1)
   hobo-metasearch!
   hobo_bootstrap (= 2.1.1)
