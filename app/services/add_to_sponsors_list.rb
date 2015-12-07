@@ -8,7 +8,12 @@ class AddToSponsorsList
   end
 
   def call
-    return false if sponsor_already_exists?
+    if sponsor_already_exists?
+      Rails.logger.info "Sponsor #{@first_name} #{@last_name} is already in the DB, doing nothing"
+      return false
+    end
+
+    Rails.logger.info "Sponsor not found in the DB, so we try to create a new record: #{@first_name} #{@last_name} from #{@country}"
 
     # Create a new sponsor post
     post = WordpressPost.new(post_title: "#{@first_name} #{@last_name}", post_status: 'publish', post_type: 'spons')
@@ -20,6 +25,7 @@ class AddToSponsorsList
     # Add the post to the "Private Sponsor" category (hardcoded ID 276)
     term_relationship = WordpressTermRelationship.create(object_id: post.id, term_taxonomy_id: 276)
 
+    Rails.logger.info "Sponsor created, with post ID #{post.id}"
     return true
   end
 

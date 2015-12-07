@@ -44,8 +44,6 @@ class PaypalController < ApplicationController
 
     # Add the user to sponsors list in the website, if he was not already there
     begin
-      Rails.logger.info "About to call AddToSponsorsList with first name #{params['first_name']} and last name #{params['last_name']}"
-      Rails.logger.info "We tried converting first name and last name to: #{params['first_name'].force_encoding('ISO-8859-1').encode('UTF-8')} and #{params['last_name'].force_encoding('ISO-8859-1').encode('UTF-8')}"
       AddToSponsorsList.new(params['address_country'], params['first_name'].force_encoding('ISO-8859-1').encode('UTF-8'), params['last_name'].force_encoding('ISO-8859-1').encode('UTF-8')).call
     rescue => exception
       ExceptionNotifier.notify_exception(exception, :env => request.env, :data => {:message => "Adding an Sponsor to the list failed"})
