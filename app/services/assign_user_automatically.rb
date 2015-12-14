@@ -1,8 +1,10 @@
 class AssignUserAutomatically
   # This service tries to find a user to a new donation
 
-  def initialize(donation)
+  def initialize(donation, subscriber=false, display_name=nil)
     @donation = donation
+    @subscriber = subscriber
+    @display_name = display_name
   end
 
   # This methods returns :user_assigned, :no_user_found or :multiple_users_found
@@ -27,7 +29,21 @@ class AssignUserAutomatically
       end
     end
 
-    # Step 3: store a boolean value to facilitate searching
+    # Step 3: If that didn't work and we have en email, try to find an existing user via email
+    if @donation.wordpress_user_id.blank? && !@donation.email.blank?
+      user = WordpressUser.where(user_email: @donation.email).first
+      if user
+        @donation.wordpress_user_id = user.id
+      end
+    end
+
+    # Step 4: If we have not had luck yet, and the donations comes from a subscriber, create a new user
+    if @donation.wordpress_user_id.blank? && !@donation.email.blank? && @subscriber
+      user = WordpressUser.create(user_email: @donation.email, display_name: @display_name)
+      @donation.wordpress_user_id = user.id
+    end
+
+    # Step 5: store a boolean value to facilitate searching
     if @donation.wordpress_user_id.blank?
       @donation.user_assigned = false
       return :no_user_found
