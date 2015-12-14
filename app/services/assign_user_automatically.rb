@@ -40,6 +40,7 @@ class AssignUserAutomatically
     # Step 4: If we have not had luck yet, and the donations comes from a subscriber, create a new user
     if @donation.wordpress_user_id.blank? && !@donation.email.blank? && @subscriber
       user = WordpressUser.create(user_email: @donation.email, display_name: @display_name)
+      user.role = "subscriber"
       @donation.wordpress_user_id = user.id
     end
 

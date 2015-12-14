@@ -60,7 +60,8 @@ class WordpressUser < ActiveRecord::Base
     if meta
       meta.update_attribute(:meta_value, db_value)
     else
-      Rails.logger.info "Could not find the usermeta capabilities record for the user #{self.id}"
+      Rails.logger.info "Could not find the usermeta capabilities record for the user #{self.id}. Creating it now."
+      WordpressUsermeta.create(user_id: self.id, meta_key: "#{PREFIX}capabilities", meta_value: db_value)
     end
   end
 
