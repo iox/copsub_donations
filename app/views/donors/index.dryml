@@ -1,0 +1,72 @@
+<index-page>
+  <content-body:>
+    <search-box/>
+
+    <% fields="id, user_email, user_login, display_name, city, country, paymentid, paypal_id, role, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&fields" field-tag="highlighted-field">
+      <field-heading-row:><sorting-row fields="&fields"/></field-heading-row:>
+      <id-view:><a href="/donors/#{this}"><highlighted-field/></a></id-view:>
+    </table>
+    <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
+    <!-- TODO -->
+    <if test="&false && current_user.administrator?">
+      <%= link_to "<i class='icon-pencil'></i> Change roles".html_safe, change_roles_preview_path(params), class: 'btn pull-right', style: 'margin-right:10px' %>
+    </if>
+
+    <page-nav/>
+
+  </content-body:>
+</index-page>
+
+
+
+
+
+<def tag="search-box">
+  <div class="well header">
+    <div style="" class="header" id="busqueda-normal">
+      <div style="display:block" class="search">
+        <form method="get" class="pull-left form-horizontal search-form form-inline" action="">
+          <input type="search" value="&params[:search]" name="search" class="search"/>
+          <select-input name="role" options="&Donor::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 5px"/>
+          <label class="checkbox">
+            <input type="checkbox" name="donated_last_year" value="100" checked="&params[:donated_last_year]" style="margin-top:0; margin-left: 5px"/>
+            Donated last year
+          </label>
+          <input class="span1" type="text" name="last_year_from" placeholder="From" value="&params[:last_year_from]"/>
+          <input class="span1" type="text" name="last_year_to" placeholder="To" value="&params[:last_year_to]"/>
+          <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit"/>&nbsp;
+        </form>
+      </div>
+    </div>
+    <p style="float:right;" class="result-counter"><%= @donors.total_entries %> results. Page <%= @donors.current_page %> of <%= @donors.total_pages %></p>
+  </div>
+</def>
+
+
+
+
+<def tag="highlighted-field">
+  <%= highlight(this.to_s, params[:search].split(' ')) %>
+</def>
+
+
+
+<def tag="sorting-row" attrs="fields">
+  <% for field in fields.split(', ') %>
+    <% link_text = field.humanize %>
+    <% direction = 'asc' %>
+    <% if params[:sort] == field %>
+      <% if params[:direction] == 'asc' %>
+        <% link_text += " ▲" %>
+        <% direction = 'desc' %>
+      <% else %>
+        <% link_text += " ▼" %>
+      <% end %>
+    <% end %>
+    <th>
+      <% url = donors_path(params.merge({sort: field, direction: direction})) %>
+      <%= link_to link_text, url %>
+    </th>
+  <% end %>
+</def>

@@ -11,6 +11,10 @@ class AssignUserManually
     for donation in related_unassigned_donations
       donation.update_attribute(:wordpress_user_id, user.id)
       donation.update_attribute(:user_assigned, true)
+
+      # TODO: Temporary hack using the new donors table. To be removed after we remove the Wordpress DB connection
+      donor_id = Donor.find_by_wordpress_id(user.id).try(:id)
+      donation.update_attribute(:donor_id, donor_id) if donor_id
     end
   end
 

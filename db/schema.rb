@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150713200404) do
+ActiveRecord::Schema.define(version: 20160330095356) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -35,11 +35,29 @@ ActiveRecord::Schema.define(version: 20150713200404) do
     t.boolean  "user_assigned",                                 default: false
     t.boolean  "other_income",                                  default: false
     t.integer  "category_id"
-    t.string   "agilecrm_id"
     t.string   "paypal_transaction_id"
+    t.integer  "donor_id"
   end
 
   add_index "donations", ["category_id"], name: "index_donations_on_category_id", using: :btree
+  add_index "donations", ["donor_id"], name: "index_donations_on_donor_id", using: :btree
+
+  create_table "donors", force: true do |t|
+    t.integer  "wordpress_id"
+    t.string   "user_email"
+    t.string   "user_login"
+    t.string   "display_name"
+    t.text     "user_adress"
+    t.string   "city"
+    t.string   "country"
+    t.integer  "paymentid"
+    t.integer  "paypal_id"
+    t.string   "user_phone"
+    t.integer  "donated_last_year_in_dkk"
+    t.string   "role"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "crypted_password",          limit: 40
