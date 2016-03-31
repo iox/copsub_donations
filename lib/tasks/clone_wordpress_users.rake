@@ -19,6 +19,7 @@ task :clone_wordpress_users => :environment do
     donor.user_phone = wpuser.user_phone
     donor.donated_last_year_in_dkk = wpuser.donated_last_year_in_dkk
     donor.role = wpuser.role
+    donor.alternative_id = wpuser.alternative_id
 
     donor.save
 

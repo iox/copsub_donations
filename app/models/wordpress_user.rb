@@ -19,8 +19,8 @@ class WordpressUser < ActiveRecord::Base
 
   # Other user fields which we might enable in the future: user_nicename
   USER_FIELDS = %w{ID user_email user_login display_name}
-  # Other usermeta fields which we might enable in the future: alternative_id nickname donation_method
-  USERMETA_FIELDS = %w{user_adress city country paymentid paypal_id user_phone donated_last_year_in_dkk}
+  # Other usermeta fields which we might enable in the future: nickname donation_method
+  USERMETA_FIELDS = %w{user_adress city country paymentid paypal_id user_phone donated_last_year_in_dkk alternative_id}
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']
 

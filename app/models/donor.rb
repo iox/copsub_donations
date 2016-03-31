@@ -10,23 +10,22 @@ class Donor < ActiveRecord::Base
     user_adress              :text
     city                     :string
     country                  :string
-    paymentid                :integer
-    paypal_id                :integer
+    paymentid                :string
+    paypal_id                :string
+    alternative_id           :string
     user_phone               :string
     donated_last_year_in_dkk :integer
     role                     :string
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypal_id, :user_phone, :donated_last_year_in_dkk, :role
+  attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypal_id, :user_phone, :donated_last_year_in_dkk, :role, :alternative_id
 
   has_many :donations
 
   ROLES = [:administrator, :supporter, :subscriber, :author, :reviewer, :subadmin, :moderator]
 
-  # Other user fields which we might enable in the future: user_nicename
   USER_FIELDS = %w{ID user_email user_login display_name}
-  # Other usermeta fields which we might enable in the future: alternative_id nickname donation_method
-  USERMETA_FIELDS = %w{user_adress city country paymentid paypal_id user_phone donated_last_year_in_dkk}
+  USERMETA_FIELDS = %w{user_adress city country paymentid paypal_id user_phone donated_last_year_in_dkk alternative_id}
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']
 
