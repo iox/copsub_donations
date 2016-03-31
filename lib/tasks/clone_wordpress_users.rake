@@ -6,7 +6,7 @@ task :clone_wordpress_users => :environment do
 
   WordpressUser.with_all_fields.find_each do |wpuser|
 
-    donor = Donor.new
+    donor = Donor.where(wordpress_id: wpuser.id).first || Donor.new
     donor.wordpress_id = wpuser.id
     donor.user_email = wpuser.user_email
     donor.user_login = wpuser.user_login
@@ -15,14 +15,16 @@ task :clone_wordpress_users => :environment do
     donor.city = wpuser.city
     donor.country = wpuser.country
     donor.paymentid = wpuser.paymentid
-    donor.paypal_id = wpuser.paypal_id
     donor.user_phone = wpuser.user_phone
     donor.donated_last_year_in_dkk = wpuser.donated_last_year_in_dkk
     donor.role = wpuser.role
-    donor.alternative_id = wpuser.alternative_id
+
+    # Note: these 2 fields have been renamed
+    donor.paypalid = wpuser.paypal_id
+    donor.alternativeid = wpuser.alternative_id
+
 
     donor.save
-
 
     Donation.where(wordpress_user_id: wpuser.id).update_all(donor_id: donor.id)
 

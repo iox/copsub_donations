@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160331170646) do
+ActiveRecord::Schema.define(version: 20160331171129) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -51,13 +51,13 @@ ActiveRecord::Schema.define(version: 20160331170646) do
     t.string   "city"
     t.string   "country"
     t.string   "paymentid"
-    t.string   "paypal_id"
+    t.string   "paypalid"
     t.string   "user_phone"
     t.integer  "donated_last_year_in_dkk"
     t.string   "role"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "alternative_id"
+    t.string   "alternativeid"
   end
 
   create_table "users", force: true do |t|
