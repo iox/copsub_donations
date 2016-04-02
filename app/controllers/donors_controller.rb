@@ -17,6 +17,20 @@ class DonorsController < ApplicationController
     end
   end
 
+  def change_roles_preview
+    @donors = donors_scope
+  end
+
+  def change_roles_assign
+    for user in donors_scope
+      user.role = params[:new_role]
+      user.save
+    end
+    flash[:info] = "The selected users have been updated to the '#{params[:new_role]}' role"
+    params.delete :new_role
+    redirect_to donors_path
+  end
+
   private
 
   def donors_scope

@@ -12,7 +12,5 @@
         </table>
       </div>
     </div>
-    <br/><br/><br/>
-    <a href="/wordpress_users/#{this.wordpress_id}">DEBUG: Wordpress User</a>
   </append-content-body:>
 </show-page>

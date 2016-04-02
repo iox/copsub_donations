@@ -19,7 +19,7 @@ class Donation < ActiveRecord::Base
   end
 
   def user
-    WordpressUser.where(:id => self.wordpress_user_id).first
+    Donor.where(:id => self.donor_id).first
   end
 
   belongs_to :category

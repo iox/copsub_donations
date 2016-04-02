@@ -1,0 +1,7 @@
+<edit-page>
+  <form:>
+    <field-list:>
+      <role-view:><select-input options="&Donor::ROLES"/></role-view:>
+    </field-list:>
+  </form:>
+</edit-page>

@@ -24,13 +24,13 @@ class Donor < ActiveRecord::Base
 
   ROLES = [:administrator, :supporter, :subscriber, :author, :reviewer, :subadmin, :moderator]
 
-  USER_FIELDS = %w{ID user_email user_login display_name}
+  USER_FIELDS = %w{id user_email user_login display_name}
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']
 
 
-  # This scope method allows to search for users using several fields, for example "WordpressUser.fuzzy_search('ignacio')"
+  # This scope method allows to search for users using several fields, for example "Donor.fuzzy_search('ignacio')"
   def self.fuzzy_search(search)
     # Build a string like: "ID LIKE :search OR user_email LIKE :search ..."
     sql_user_fields = ALL_FIELDS.map{|f|"donors.#{f} LIKE :search"}.join(" OR ")

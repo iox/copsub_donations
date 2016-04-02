@@ -8,8 +8,7 @@
       <id-view:><a href="/donors/#{this}"><highlighted-field/></a></id-view:>
     </table>
     <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
-    <!-- TODO -->
-    <if test="&false && current_user.administrator?">
+    <if test="&current_user.administrator?">
       <%= link_to "<i class='icon-pencil'></i> Change roles".html_safe, change_roles_preview_path(params), class: 'btn pull-right', style: 'margin-right:10px' %>
     </if>
 
