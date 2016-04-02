@@ -1,7 +1,0 @@
-class WordpressUsersController < ApplicationController
-
-
-
-
-
-end
