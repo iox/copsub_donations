@@ -49,9 +49,6 @@ class AssignUserAutomatically
       @donation.user_assigned = false
       return :no_user_found
     else
-      # TODO: Temporary hack using the new donors table. To be removed after we remove the Wordpress DB connection
-      @donation.donor_id = Donor.find_by_donor_id(@donation.donor_id).try(:id)
-
       @donation.user_assigned = true
       @donation.save
       return :user_assigned
