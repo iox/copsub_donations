@@ -1,5 +1,5 @@
 class DonorMailer < ActionMailer::Base
-  default :from => "info@copenhagensuborbitals.com"
+  default :from => "no-reply@copsub.com"
 
   def bank_donation_instructions(donor, repeating)
     @donor = donor
