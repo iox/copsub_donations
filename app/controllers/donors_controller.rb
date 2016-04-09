@@ -17,7 +17,8 @@ class DonorsController < ApplicationController
     donor.paymentid = "donor#{donor.id}"
     donor.save
 
-    DonorMailer.bank_donation_instructions(donor, params["repeating"]).deliver
+    repeating = params["repeating"] == "1"
+    DonorMailer.bank_donation_instructions(donor, repeating).deliver
 
     render text: donor.paymentid
   end
