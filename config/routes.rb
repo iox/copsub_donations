@@ -20,6 +20,8 @@ CopsubDonations::Application.routes.draw do
   post '/paypal_ipn' => 'paypal#ipn'
   get '/paypal_ipn' => 'paypal#ipn'
 
+  post '/api/new_bank_donor' => 'donors#new_bank_donor'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

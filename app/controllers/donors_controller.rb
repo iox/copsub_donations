@@ -4,6 +4,24 @@ class DonorsController < ApplicationController
 
   auto_actions :all
 
+  skip_before_filter :authenticate, :only => [:new_bank_donor]
+  protect_from_forgery :except => [:new_bank_donor]
+
+  def new_bank_donor
+    donor = Donor.find_by_user_email(params["email"]) || Donor.new(
+      user_email: params["email"],
+      user_login: params["email"],
+      role: "subscriber")
+    donor.save
+
+    donor.paymentid = "donor#{donor.id}"
+    donor.save
+
+    DonorMailer.bank_donation_instructions(donor, params["repeating"]).deliver
+
+    render text: donor.paymentid
+  end
+
   def index
     params[:search] ||= ""
     params[:sort] ||= "id"
