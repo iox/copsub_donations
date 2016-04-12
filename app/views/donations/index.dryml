@@ -4,13 +4,19 @@
     <else>List of donations</else>
   </heading:>
   <collection: replace>
-    <table-plus-with-filters with="&@donations" fields="this, email, donor_id, amount_in_dkk, donated_at, donation_method, other_income" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency, other_income, category">
+    <table-plus-with-filters with="&@donations" fields="this, email, donor_id, currency, amount_in_dkk, donated_at, donation_method, other_income" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency, other_income, category">
       <email-heading:>Email / Bank Reference</email-heading:>
       <email-view:><this/><%= this_parent.bank_reference%></email-view:>
       <other-income-view:>
         <div class="pull-left" style="margin-right:4px"><editor/></div>
         <div class="pull-left"><click-editor with="&this_parent" field="category"/></div>
       </other-income-view:>
+      <currency-view:><%= this.upcase if this %></currency-view:>
+      <append-amount-in-dkk-view:>
+        <% if this_parent.currency && this_parent.currency.downcase != 'dkk' %>
+          <%= "(#{this_parent.amount} #{this_parent.currency})" %>
+        <% end %>
+      </append-amount-in-dkk-view:>
 
       <donor-id-view:>
         <if>
