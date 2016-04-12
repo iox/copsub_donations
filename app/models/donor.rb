@@ -46,6 +46,10 @@ class Donor < ActiveRecord::Base
     return scope
   end
 
+  def update_amount_donated_last_year!
+    self.donated_last_year_in_dkk = donations.where("donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").sum(:amount_in_dkk)
+  end
+
 
 
 
