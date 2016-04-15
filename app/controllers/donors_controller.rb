@@ -59,6 +59,10 @@ class DonorsController < ApplicationController
       scope = scope.where("donated_last_year_in_dkk BETWEEN #{params[:last_year_from].to_i} AND #{params[:last_year_to].to_i}")
     end
 
+    if params[:first_donation] && !params[:first_donation_from].blank? && !params[:first_donation_to].blank?
+      scope = scope.where("first_donation BETWEEN ? AND ?", params[:first_donation_from].to_date, params[:first_donation_to].to_date)
+    end
+
     if !params[:role].blank?
       scope = scope.where("role LIKE ?", "%#{params[:role]}%")
     end

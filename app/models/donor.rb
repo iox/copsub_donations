@@ -16,6 +16,7 @@ class Donor < ActiveRecord::Base
     user_phone               :string
     donated_last_year_in_dkk :integer
     role                     :string
+    first_donation           :date
     timestamps
   end
   attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :donated_last_year_in_dkk, :role
@@ -48,6 +49,14 @@ class Donor < ActiveRecord::Base
 
   def update_amount_donated_last_year!
     self.donated_last_year_in_dkk = donations.where("donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").sum(:amount_in_dkk)
+
+    # Also update the first donation date
+    first_donation = self.donations.order(:donated_at).first
+    if first_donation && first_donation.donated_at
+      self.first_donation = first_donation.donated_at.to_date
+    end
+
+    self.save
   end
 
 
