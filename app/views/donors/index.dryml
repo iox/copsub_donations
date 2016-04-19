@@ -2,7 +2,7 @@
   <content-body:>
     <search-box/>
 
-    <% fields="id, user_email, user_login, display_name, city, country, paymentid, paypalid, first_donation, role, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, first_donation, role, mailchimp_status, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
     <p style="text-align:right" class="result-counter"><%= @donors.total_entries %> results. Page <%= @donors.current_page %> of <%= @donors.total_pages %></p>
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&fields" field-tag="highlighted-field">
@@ -31,11 +31,11 @@
 
 
 <def tag="search-box">
-  <div class="well header">
+  <div class="well header" style="padding-bottom: 0">
     <div style="" class="header" id="busqueda-normal">
       <div style="display:block" class="search">
-        <form method="get" class="pull-left form-horizontal search-form form-inline" action="">
-          <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text"/>
+        <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
+          <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text" style="width:100px"/>
           <select-input name="role" options="&Donor::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 5px; width: 150px"/>
 
 
@@ -51,9 +51,14 @@
             First donation
           </label>
           <input class="bootstrap-datepicker" type="text" name="first_donation_from" placeholder="From" value="&params[:first_donation_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
-          <input class="bootstrap-datepicker" type="text" name="first_donation_to" placeholder="To" value="&params[:first_donation_to]" style="width:75px" data-date-format="dd.mm.yyyy"/>
+          <input class="bootstrap-datepicker" type="text" name="first_donation_to" placeholder="To" value="&params[:first_donation_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
 
-          <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 20px"/>&nbsp;
+          <select name="mailchimp_status" style="width: 135px">
+            <option value="">Filter Mailchimp</option>
+            <%= options_for_select([ ["Subscribed", "subscribed"], ["Unsubscribed", "unsubscribed"], ["Not in Mailchimp", "not_present" ]], params["mailchimp_status"]) %>
+          </select>
+
+          <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 10px"/>&nbsp;
         </form>
       </div>
     </div>

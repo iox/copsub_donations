@@ -63,6 +63,10 @@ class DonorsController < ApplicationController
       scope = scope.where("first_donation BETWEEN ? AND ?", params[:first_donation_from].to_date, params[:first_donation_to].to_date)
     end
 
+    if params[:mailchimp_status].present?
+      scope = scope.where(mailchimp_status: params[:mailchimp_status])
+    end
+
     if !params[:role].blank?
       scope = scope.where("role LIKE ?", "%#{params[:role]}%")
     end

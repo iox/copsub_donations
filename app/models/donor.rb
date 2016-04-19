@@ -17,6 +17,7 @@ class Donor < ActiveRecord::Base
     donated_last_year_in_dkk :integer
     role                     :string
     first_donation           :date
+    mailchimp_status         :string, default: "not_present"
     timestamps
   end
   attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :donated_last_year_in_dkk, :role
