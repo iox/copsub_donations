@@ -2,8 +2,8 @@
   <content-body:>
     <div class="header content-header well">
       <h2 class="heading">Find duplicated donors</h2>
+      <p>This page shows donors whose user_email and paypalid attributes are duplicated</p>
     </div>
-    <p class="alert">This page shows donors whose user_email and paypalid attributes are duplicated</p>
 
     <h3>We have found <%= @duplicated_emails.size %> donors that are repeated in our database. Showing the first one.</h3>
 
@@ -12,7 +12,7 @@
       <id-view:><a href="/donors/#{this}"><this/></a></id-view:>
       <user-email-view:><%= highlight(this.to_s, @duplicated_emails.first) %></user-email-view:>
       <paypalid-view:><%= highlight(this.to_s, @duplicated_emails.first) %></paypalid-view:>
-      <actions-view:><a href="#" data-confirm="Are you sure? All donations will be autoassigned to the other user">Delete</a></actions-view:>
+      <actions-view:><a href="/delete_duplicated_donor/#{this_parent.id}?email=#{@duplicated_emails.first}" data-confirm="Are you sure? This donor will be deleted, and all his donations will be reassigned to the other donor.">Delete</a></actions-view:>
     </table>
   </content-body:>
 </page>

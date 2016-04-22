@@ -17,6 +17,7 @@ CopsubDonations::Application.routes.draw do
   post '/change_roles_assign' => 'donors#change_roles_assign'
 
   get '/find_duplicated_donors' => 'donors#find_duplicated_donors'
+  get '/delete_duplicated_donor/:id' => 'donors#delete_duplicated_donor'
 
 
   post '/paypal_ipn' => 'paypal#ipn'

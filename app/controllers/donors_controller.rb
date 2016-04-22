@@ -77,6 +77,20 @@ class DonorsController < ApplicationController
     end
   end
 
+  def delete_duplicated_donor
+    duplicated = Donor.find(params[:id])
+    other_donor = Donor.where("user_email LIKE ? OR paypalid LIKE ?", "%#{params[:email]}%", "%#{params[:email]}%").where("id != ?", params[:id]).first
+    duplicated.donations.update_all("donor_id = #{other_donor.id}")
+    other_donor.update_amount_donated_last_year!
+    if duplicated.destroy
+      flash[:notice] = "The duplicated donor #{duplicated.id} has been deleted, and all his donations have been assigned to the donor #{other_donor.id}. The common email was #{params[:email]}."
+      redirect_to '/find_duplicated_donors'
+    else
+      flash[:error] = "The donor #{duplicated.id} could not be deleted"
+      redirect_to '/find_duplicated_donors'
+    end
+  end
+
   private
 
   def donors_scope
