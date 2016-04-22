@@ -14,7 +14,7 @@ task :sync_mailchimp_status => :environment do
   while (offset < member_count)
     result = gibbon.lists(MAILCHIMP_LIST_ID).members.retrieve(params: {count: per_page, offset: offset})
     for member in result["members"]
-      donor = Donor.where(user_email: member["email_address"]).first
+      donor = Donor.where("user_email = ? OR paypalid = ?", member["email_address"], member["email_address"]).first
       if donor && member["status"] == 'subscribed'
         puts "OK. The mailchimp subscriber #{member["email_address"]} is in the donor list (id #{donor.id})"
         donor.update_attribute(:mailchimp_status, "subscribed")
