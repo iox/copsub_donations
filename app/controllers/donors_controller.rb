@@ -50,6 +50,33 @@ class DonorsController < ApplicationController
     redirect_to donors_path
   end
 
+  def find_duplicated_donors
+    emails = Hash.new
+    suspects = []
+    @duplicated_emails = []
+
+    for column in %w{user_email paypalid}
+      emails[column] = Donor.where("#{column} IS NOT NULL && #{column} != '' && #{column} != '0'").order(column.to_sym).pluck(column.to_sym).collect(&:strip).sort
+    end
+
+    for email in emails["user_email"]
+      suspects << email if (emails["user_email"].count(email) > 1) || emails["paypalid"].include?(email)
+    end
+
+    for email in emails["paypalid"]
+      suspects << email if (emails["paypalid"].count(email)   > 1) || emails["user_email"].include?(email)
+    end
+
+    for suspect in suspects.uniq
+      donors = Donor.where("user_email LIKE ? OR paypalid LIKE ?", "%#{suspect}%", "%#{suspect}%")
+      @duplicated_emails << suspect if donors.count > 1
+    end
+
+    if @duplicated_emails.size > 0
+      @first_duplicated_donors = Donor.where("user_email LIKE ? OR paypalid LIKE ?", "%#{@duplicated_emails.first}%", "%#{@duplicated_emails.first}%")
+    end
+  end
+
   private
 
   def donors_scope

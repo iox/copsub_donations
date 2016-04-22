@@ -1,0 +1,18 @@
+<page>
+  <content-body:>
+    <div class="header content-header well">
+      <h2 class="heading">Find duplicated donors</h2>
+    </div>
+    <p class="alert">This page shows donors whose user_email and paypalid attributes are duplicated</p>
+
+    <h3>We have found <%= @duplicated_emails.size %> donors that are repeated in our database. Showing the first one.</h3>
+
+    <% fields="id, user_email, user_login, display_name, city, country, paymentid, paypalid, role, donated_last_year_in_dkk, actions" %>
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@first_duplicated_donors" fields="&fields">
+      <id-view:><a href="/donors/#{this}"><this/></a></id-view:>
+      <user-email-view:><%= highlight(this.to_s, @duplicated_emails.first) %></user-email-view:>
+      <paypalid-view:><%= highlight(this.to_s, @duplicated_emails.first) %></paypalid-view:>
+      <actions-view:><a href="#" data-confirm="Are you sure? All donations will be autoassigned to the other user">Delete</a></actions-view:>
+    </table>
+  </content-body:>
+</page>
