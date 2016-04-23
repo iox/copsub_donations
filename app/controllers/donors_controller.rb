@@ -101,7 +101,7 @@ class DonorsController < ApplicationController
     end
 
     if params[:donated_total] && !params[:donated_total_from].blank? && !params[:donated_total_to].blank?
-      scope = scope.where("donated_total_in_dkk BETWEEN #{params[:donated_total_from].to_i} AND #{params[:donated_total_to].to_i}")
+      scope = scope.where("donated_total BETWEEN #{params[:donated_total_from].to_i} AND #{params[:donated_total_to].to_i}")
     end
 
     if params[:first_donated_at] && !params[:first_donated_at_from].blank? && !params[:first_donated_at_to].blank?
