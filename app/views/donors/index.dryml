@@ -2,7 +2,7 @@
   <content-body:>
     <search-box/>
 
-    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, first_donation, role, mailchimp_status, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, #{'first_donated_at, ' if params[:first_donated_at]} #{'last_donated_at, ' if params[:last_donated_at]} role, #{'mailchimp_status, ' if params[:mailchimp_status].present?} #{'donated_total, ' if params[:donated_total]} #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
     <p style="text-align:right" class="result-counter"><%= @donors.total_entries %> results. Page <%= @donors.current_page %> of <%= @donors.total_pages %></p>
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&fields" field-tag="highlighted-field">
@@ -36,30 +36,58 @@
     <div style="" class="header" id="busqueda-normal">
       <div style="display:block" class="search">
         <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
-          <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text" style="width:100px"/>
-          <select-input name="role" options="&Donor::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 5px; width: 150px"/>
+          <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text" style="width:282px"/>
 
 
           <label class="checkbox" style="margin-left: 20px">
             <input type="checkbox" name="donated_last_year" value="100" checked="&params[:donated_last_year]" style="margin-top:0; margin-left: 5px;"/>
             Donated last year
           </label>
-          <input class="span1" type="text" name="last_year_from" placeholder="From" value="&params[:last_year_from]"/>
-          <input class="span1" type="text" name="last_year_to" placeholder="To" value="&params[:last_year_to]"/>
+          <input class="span1" type="text" name="donated_last_year_from" placeholder="From" value="&params[:donated_last_year_from]"/>
+          <input class="span1" type="text" name="donated_last_year_to" placeholder="To" value="&params[:donated_last_year_to]"/>
 
           <label class="checkbox" style="margin-left: 20px">
-            <input type="checkbox" name="first_donation" value="100" checked="&params[:first_donation]" style="margin-top:0; margin-left: 5px;"/>
-            First donation
+            <input type="checkbox" name="donated_total" value="100" checked="&params[:donated_total]" style="margin-top:0; margin-left: 10px;"/>
+            Donated total
           </label>
-          <input class="bootstrap-datepicker" type="text" name="first_donation_from" placeholder="From" value="&params[:first_donation_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
-          <input class="bootstrap-datepicker" type="text" name="first_donation_to" placeholder="To" value="&params[:first_donation_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+          <input class="span1" type="text" name="donated_total_from" placeholder="From" value="&params[:donated_total_from]"/>
+          <input class="span1" type="text" name="donated_total_to" placeholder="To" value="&params[:donated_total_to]"/>
 
-          <select name="mailchimp_status" style="width: 135px">
+
+
+
+
+
+
+          <br/><br/>
+          <select-input name="role" options="&Donor::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 0px; width: 150px"/>
+
+          <select name="mailchimp_status" style="width: 135px; margin-left: 7px">
             <option value="">Filter Mailchimp</option>
             <%= options_for_select([ ["Subscribed", "subscribed"], ["Unsubscribed", "unsubscribed"], ["Not in Mailchimp", "not_present" ]], params["mailchimp_status"]) %>
           </select>
 
+
+
+          <label class="checkbox" style="">
+            <input type="checkbox" name="first_donated_at" value="100" checked="&params[:first_donated_at]" style="margin-top:0; margin-left: 25px;"/>
+            First donated
+          </label>
+          <input class="bootstrap-datepicker" type="text" name="first_donated_at_from" placeholder="From" value="&params[:first_donated_at_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
+          <input class="bootstrap-datepicker" type="text" name="first_donated_at_to" placeholder="To" value="&params[:first_donated_at_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+
+          <label class="checkbox" style="margin-left: 0px">
+            <input type="checkbox" name="last_donated_at" value="100" checked="&params[:last_donated_at]" style="margin-top:0; margin-left: 0px;"/>
+            Last donated
+          </label>
+          <input class="bootstrap-datepicker" type="text" name="last_donated_at_from" placeholder="From" value="&params[:last_donated_at_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
+          <input class="bootstrap-datepicker" type="text" name="last_donated_at_to" placeholder="To" value="&params[:last_donated_at_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+
+
+
           <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 10px"/>&nbsp;
+
+          <br/><br/>
         </form>
       </div>
     </div>

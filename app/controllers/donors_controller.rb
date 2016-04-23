@@ -96,12 +96,20 @@ class DonorsController < ApplicationController
   def donors_scope
     scope = Donor.fuzzy_search(params[:search])
 
-    if params[:donated_last_year] && !params[:last_year_from].blank? && !params[:last_year_to].blank?
-      scope = scope.where("donated_last_year_in_dkk BETWEEN #{params[:last_year_from].to_i} AND #{params[:last_year_to].to_i}")
+    if params[:donated_last_year] && !params[:donated_last_year_from].blank? && !params[:donated_last_year_to].blank?
+      scope = scope.where("donated_last_year_in_dkk BETWEEN #{params[:donated_last_year_from].to_i} AND #{params[:donated_last_year_to].to_i}")
     end
 
-    if params[:first_donation] && !params[:first_donation_from].blank? && !params[:first_donation_to].blank?
-      scope = scope.where("first_donation BETWEEN ? AND ?", params[:first_donation_from].to_date, params[:first_donation_to].to_date)
+    if params[:donated_total] && !params[:donated_total_from].blank? && !params[:donated_total_to].blank?
+      scope = scope.where("donated_total_in_dkk BETWEEN #{params[:donated_total_from].to_i} AND #{params[:donated_total_to].to_i}")
+    end
+
+    if params[:first_donated_at] && !params[:first_donated_at_from].blank? && !params[:first_donated_at_to].blank?
+      scope = scope.where("first_donated_at BETWEEN ? AND ?", params[:first_donated_at_from].to_date, params[:first_donated_at_to].to_date)
+    end
+
+    if params[:last_donated_at] && !params[:last_donated_at_from].blank? && !params[:last_donated_at_to].blank?
+      scope = scope.where("last_donated_at BETWEEN ? AND ?", params[:last_donated_at_from].to_date, params[:last_donated_at_to].to_date)
     end
 
     if params[:mailchimp_status].present?

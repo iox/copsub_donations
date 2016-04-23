@@ -2,6 +2,7 @@
   <form:>
     <field-list:>
       <role-view:><select-input options="&Donor::ROLES"/></role-view:>
+      <notes-view:><input style="width: 50%; height: 100px"/></notes-view:>
     </field-list:>
   </form:>
 </edit-page>

@@ -15,12 +15,15 @@ class Donor < ActiveRecord::Base
     alternativeid            :string
     user_phone               :string
     donated_last_year_in_dkk :integer
+    donated_total            :integer
     role                     :string
-    first_donation           :date
+    first_donated_at         :date
+    last_donated_at          :date
     mailchimp_status         :string, default: "not_present"
+    notes                    :text
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :donated_last_year_in_dkk, :role
+  attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
 
   has_many :donations
 
@@ -51,10 +54,19 @@ class Donor < ActiveRecord::Base
   def update_amount_donated_last_year!
     self.donated_last_year_in_dkk = donations.where("donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").sum(:amount_in_dkk)
 
-    # Also update the first donation date
+    # Update the absolute total too
+    self.donated_total = donations.sum(:amount_in_dkk)
+
+    # Update the first donation date
     first_donation = self.donations.order(:donated_at).first
     if first_donation && first_donation.donated_at
-      self.first_donation = first_donation.donated_at.to_date
+      self.first_donated_at = first_donation.donated_at.to_date
+    end
+
+    # Update the last donation date
+    last_donation = self.donations.order(:donated_at).last
+    if last_donation && last_donation.donated_at
+      self.last_donated_at = last_donation.donated_at.to_date
     end
 
     self.save
