@@ -121,7 +121,7 @@ class DonorsController < ApplicationController
     end
 
     if !params[:role].blank?
-      scope = scope.where("role LIKE ?", "%#{params[:role]}%")
+      scope = scope.where(role: params[:role])
     end
 
     return scope
