@@ -20,6 +20,7 @@ class Donor < ActiveRecord::Base
     first_donated_at         :date
     last_donated_at          :date
     mailchimp_status         :string, default: "not_present"
+    donation_method enum_string(:'bank', :'paypal')
     notes                    :text
     timestamps
   end
@@ -27,7 +28,7 @@ class Donor < ActiveRecord::Base
 
   has_many :donations
 
-  ROLES = [:supporter, :subscriber]
+  ROLES = [:supporter, :subscriber, :inactive_supporter]
 
   USER_FIELDS = %w{id user_email user_login display_name}
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}
@@ -67,6 +68,8 @@ class Donor < ActiveRecord::Base
     last_donation = self.donations.order(:donated_at).last
     if last_donation && last_donation.donated_at
       self.last_donated_at = last_donation.donated_at.to_date
+      # Update the donation method
+      self.donation_method = last_donation.donation_method
     end
 
     self.save

@@ -116,6 +116,10 @@ class DonorsController < ApplicationController
       scope = scope.where(mailchimp_status: params[:mailchimp_status])
     end
 
+    if params[:donation_method].present?
+      scope = scope.where(donation_method: params[:donation_method])
+    end
+
     if !params[:role].blank?
       scope = scope.where("role LIKE ?", "%#{params[:role]}%")
     end

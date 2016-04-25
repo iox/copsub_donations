@@ -2,7 +2,7 @@
   <content-body:>
     <search-box/>
 
-    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, #{'first_donated_at, ' if params[:first_donated_at]} #{'last_donated_at, ' if params[:last_donated_at]} role, #{'mailchimp_status, ' if params[:mailchimp_status].present?} #{'donated_total, ' if params[:donated_total]} #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, #{'first_donated_at, ' if params[:first_donated_at]} #{'last_donated_at, ' if params[:last_donated_at]} role, #{'mailchimp_status, ' if params[:mailchimp_status].present?} #{'donation_method, ' if params[:donation_method].present?} #{'donated_total, ' if params[:donated_total]} #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
     <p style="text-align:right" class="result-counter"><%= @donors.total_entries %> results. Page <%= @donors.current_page %> of <%= @donors.total_pages %></p>
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&fields" field-tag="highlighted-field">
@@ -36,7 +36,10 @@
     <div style="" class="header" id="busqueda-normal">
       <div style="display:block" class="search">
         <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
-          <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text" style="width:282px"/>
+          <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text" style="width:192px"/>
+
+          <select-input name="role" options="&Donor::ROLES" first-option="-Role-" first-value="" selected="&params[:role]" style="margin-left: 0px; width: 100px"/>
+
 
 
           <label class="checkbox" style="margin-left: 20px">
@@ -54,19 +57,17 @@
           <input class="span1" type="text" name="donated_total_to" placeholder="To" value="&params[:donated_total_to]"/>
 
 
-
-
-
-
-
           <br/><br/>
-          <select-input name="role" options="&Donor::ROLES" first-option="Filter by role" first-value="" selected="&params[:role]" style="margin-left: 0px; width: 150px"/>
 
-          <select name="mailchimp_status" style="width: 135px; margin-left: 7px">
-            <option value="">Filter Mailchimp</option>
+          <select name="mailchimp_status" style="width: 135px; margin-left: 0px">
+            <option value="">-Mailchimp-</option>
             <%= options_for_select([ ["Subscribed", "subscribed"], ["Unsubscribed", "unsubscribed"], ["Not in Mailchimp", "not_present" ]], params["mailchimp_status"]) %>
           </select>
 
+          <select name="donation_method" style="width: 165px; margin-left: 7px">
+            <option value="">-Donation Method-</option>
+            <%= options_for_select([ ["Bank", "bank"], ["PayPal", "paypal"]], params["donation_method"]) %>
+          </select>
 
 
           <label class="checkbox" style="">
