@@ -28,7 +28,7 @@ class Donor < ActiveRecord::Base
 
   has_many :donations
 
-  ROLES = [:supporter, :subscriber, :inactive_supporter]
+  ROLES = [:supporter, :subscriber, :inactive_supporter, :recurring_supporter]
 
   USER_FIELDS = %w{id user_email user_login display_name}
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}
@@ -70,6 +70,21 @@ class Donor < ActiveRecord::Base
       self.last_donated_at = last_donation.donated_at.to_date
       # Update the donation method
       self.donation_method = last_donation.donation_method
+    end
+
+    # Autoassign recurring_supporter role
+    # -----------------------------------
+    # Paypal donors, whose category id is not single donations
+    if self.donation_method == 'paypal' && last_donation && last_donation.category_id != 5
+      self.role = 'recurring_supporter'
+    end
+
+    # Bank donors, who have donated more than once in the last 6 months, with the same amount
+    if self.donation_method == 'bank' && last_donation
+      previous_donation = self.donations.where("id != ?", last_donation.id).order(:donated_at).last
+      if previous_donation && previous_donation.amount.to_i == last_donation.amount.to_i && previous_donation.donated_at > 6.months.ago
+        self.role = 'recurring_supporter'
+      end
     end
 
     self.save
