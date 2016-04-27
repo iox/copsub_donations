@@ -81,8 +81,9 @@ class Donor < ActiveRecord::Base
 
     # Bank donors, who have donated more than once in the last 6 months, with the same amount
     if self.donation_method == 'bank' && last_donation
-      previous_donation = self.donations.where("id != ?", last_donation.id).order(:donated_at).last
-      if previous_donation && previous_donation.amount.to_i == last_donation.amount.to_i && previous_donation.donated_at > 6.months.ago
+      previous_two_donations = self.donations.where("id != ?", last_donation.id).order(:donated_at).last(2)
+
+      if previous_two_donations.size == 2 && previous_two_donations.all?{|d| d.donated_at > 6.months.ago}
         self.role = 'recurring_supporter'
       end
     end
