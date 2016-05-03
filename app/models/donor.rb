@@ -53,6 +53,8 @@ class Donor < ActiveRecord::Base
   end
 
   def update_amount_donated_last_year!
+    log = ""
+
     self.donated_last_year_in_dkk = donations.where("donated_at > '#{(Date.today-1.year).to_time.to_s(:db)}'").sum(:amount_in_dkk)
 
     # Update the absolute total too
@@ -75,7 +77,8 @@ class Donor < ActiveRecord::Base
     # Autoassign recurring_supporter role
     # -----------------------------------
     # Paypal donors, whose category id is not single donations
-    if self.donation_method == 'paypal' && last_donation && last_donation.category_id != 5
+    if self.donation_method == 'paypal' && last_donation && last_donation.category_id != 5 && self.role != 'recurring_supporter'
+      log += "\n- Donor #{self.id}-#{self.user_email} has switched roles from #{self.role} to recurring_supporter, because his last paypal donation was not a Single Donation."
       self.role = 'recurring_supporter'
     end
 
@@ -83,12 +86,15 @@ class Donor < ActiveRecord::Base
     if self.donation_method == 'bank' && last_donation
       previous_two_donations = self.donations.where("id != ?", last_donation.id).order(:donated_at).last(2)
 
-      if previous_two_donations.size == 2 && previous_two_donations.all?{|d| d.donated_at > 6.months.ago}
+      if previous_two_donations.size == 2 && previous_two_donations.all?{|d| d.donated_at > 6.months.ago} && self.role != 'recurring_supporter'
+        log += "\n- Donor #{self.id}-#{self.user_email} has switched roles from #{self.role} to recurring_supporter, because he has donated 3 times in the last 6 months."
         self.role = 'recurring_supporter'
       end
     end
 
     self.save
+
+    return log
   end
 
 
