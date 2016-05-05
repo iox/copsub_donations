@@ -4,7 +4,7 @@
 
   <content:>
     <header class="content-header hero-unit">
-      <h1>Import Donations</h1>
+      <h1>Settings</h1>
       <br/><br/><br/>
       <div class="well">
         <a class="btn btn-primary" href="/import_donations_from_wordpress">Import Paypal Donations from Wordpress</a>

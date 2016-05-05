@@ -1,0 +1,87 @@
+<page title="Home">
+
+  <body: class="front-page"/>
+
+  <content:>
+    <header class="content-header hero-unit">
+      <h2>Documentation about automatic features</h2>
+    </header>
+
+    <section class="content-body">
+      <h3>Introduction</h3>
+      <p>This application runs several automatic processes, updating the donors and donations according to some rules. This page describes these rules.</p>
+
+      <br/>
+      <h3>Daily donor updates</h3>
+      <p><strong>Trigger:</strong><br/>Cron Job, every night.</p>
+      <p><strong>Short description:</strong><br/>Update the donors table, running some time intensive updates.</p>
+      <p><strong>Actions:</strong></p>
+      <ul>
+        <li>For each donor in our database:
+          <ul>
+            <li>Update the amount donated last year.</li>
+            <li>Update the amount donated in total.</li>
+            <li>Update the first donation date.</li>
+            <li>Update the last donation date.</li>
+            <li>Based on the last donation, update the donation_method of the user.</li>
+            <li>If the user donated last via Paypal and his last donation was not a "Single Donation", switch the role to 'recurring_supporter'.</li>
+            <li>If the user donated last via Bank, and he has donated 3 times in the last 6 months, switch the role to 'recurring_supporter'.</li>
+          </ul>
+        </li>
+        <li>Send a report via email.</li>
+      </ul>
+
+      <hr/><br/>
+      <h3>Mailchimp Sync</h3>
+      <p><strong>Trigger:</strong><br/>Cron Job, every night.</p>
+      <p><strong>Short description:</strong><br/>Connect to Mailchimp's API, update the donors mailchimp status.</p>
+      <p><strong>Actions:</strong></p>
+      <ul>
+        <li>Update all donors mailchimp_status to 'not_present'</li>
+        <li>Connect to the Mailchimp API</li>
+        <li>Retrieve all members from the list with ID <%= MAILCHIMP_LIST_ID %>, using pagination</li>
+        <li>For each member in Mailchimp, find a donor with matching user_email or paypalid</li>
+        <li>For each subscribed member in Mailchimp:
+          <ul>
+            <li>If the donor exists in the DB, update his mailchimp_status to 'subscribed'</li>
+            <li>If the donor does not exist yet, create a new donor with mailchimp_status 'subscribed'</li>
+          </ul>
+        </li>
+        <li>For each unsubscribed member in Mailchimp:
+          <ul>
+            <li>If the donor exists, update this mailchimp_status to 'unsubscribed'</li>
+            <li>If the donor does not exist, do nothing.</li>
+          </ul>
+        </li>
+      </ul>
+
+
+      <hr/><br/>
+      <h3>Paypal IPN Notification</h3>
+      <p><strong>Trigger:</strong><br/>Paypal sends us a notification of a payment.</p>
+      <p><strong>Short description:</strong><br/>Check the notification, create a new donation, try to autoassign it.</p>
+      <p><strong>Actions:</strong></p>
+      <ul>
+        <li>Acknowledge the notification with Paypal, to ensure it is not fake.</li>
+        <li>Create a new donation with the amount, currency, payer email and transaction id</li>
+        <li>Add the user to the sponsors list in the website, if it was not already there</li>
+        <li>Try to assign the user automatically (see section below)</li>
+      </ul>
+
+      <hr/><br/>
+      <h3>Assigning users automatically to donations</h3>
+      <p><strong>Trigger:</strong><br/>Paypal notification or importing a CSV from the bank.</p>
+      <p><strong>Short description:</strong><br/>Try to find a donor matching a donation, or create a new donor.</p>
+      <p><strong>Actions:</strong></p>
+      <ul>
+        <li>Check if there is a previously assigned donation with the same email or bank_reference. If it is, assign to the same donor.</li>
+        <li>If we have not found a donor yet, divide the bank_reference into words, and check if any of them matches the paymentid of a user.</li>
+        <li>If we have not found a donor yet, try to use the email from paypal to find a donor whose user_email of paypalid matches.</li>
+        <li>If we have not found a donor yet, create a new donor with the available information.</li>
+      </ul>
+
+      <br/><br/><br/><br/><br/>
+    </section>
+  </content:>
+
+</page>
