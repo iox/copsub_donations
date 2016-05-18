@@ -11,6 +11,9 @@ task :daily_donor_update => :environment do
     end
   end
 
+  log += "\n\n\n USD Exchange Rate: #{ExchangeRate.get('USD')}"
+  log += "\n EUR Exchange Rate: #{ExchangeRate.get('EUR')}"
+
   log += "\n\n\n That's all. Have a nice day!"
 
   DonorMailer.daily_report(log).deliver

@@ -33,11 +33,7 @@ class Donation < ActiveRecord::Base
   after_save :cache_amount_donated_last_year
 
   def convert_amount_to_dkk
-    self.amount_in_dkk ||= case self.currency
-      when 'USD' then self.amount * 7.0
-      when 'EUR' then self.amount * 7.4
-      else self.amount
-    end
+    self.amount_in_dkk ||= self.amount * ExchangeRate.get(self.currency)
     return true
   end
 
