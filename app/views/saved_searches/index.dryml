@@ -1,0 +1,6 @@
+<index-page>
+  <collection:>
+  <this-view:><a href="/#{this.path}"><%=this.name%></a></this-view:>
+  <path-view:><%= this.truncate(100) %></path-view:>
+  </collection:>
+  </index-page>

@@ -29,5 +29,6 @@
       <append-result-counter:>| Total: <%= number_to_currency(@total, :unit => '', :separator => ',', :delimiter => '.') %> DKK</append-result-counter:>
     </table-plus-with-filters>
     <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
+    <%= link_to "<i class='icon-hdd'></i> Save search".html_safe, "/saved_searches/new", class: 'btn pull-right', style: 'margin-right: 10px' %>
   </collection>
 </index-page>

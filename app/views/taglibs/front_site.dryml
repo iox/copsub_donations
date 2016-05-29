@@ -25,6 +25,7 @@
     <nav-item with="&Donor">Donors</nav-item>
     <nav-item href="/donations?q[other_income_eq]=t" name="other_income">Other Income</nav-item>
     <nav-item href="#{base_url}/import" if="&current_user.administrator?">Import</nav-item>
+    <nav-item href="/saved_searches" if="&current_user.administrator?">Saved Searches</nav-item>
   </navigation>
 </def>
 

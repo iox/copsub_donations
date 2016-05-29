@@ -19,7 +19,8 @@
         <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
         <if test="&current_user.administrator?">
           <%= link_to "<i class='icon-pencil'></i> Change roles".html_safe, change_roles_preview_path(params), class: 'btn pull-right', style: 'margin-right:10px' %>
-          <%= link_to "<i class='icon-warning-sign'></i> Find duplicated donors".html_safe, "/find_duplicated_donors", class: 'btn pull-right', style: 'margin-right:10px' %>
+          <%= link_to "<i class='icon-warning-sign'></i> Find duplicated".html_safe, "/find_duplicated_donors", class: 'btn pull-right', style: 'margin-right:10px' %>
+          <%= link_to "<i class='icon-hdd'></i> Save search".html_safe, "/saved_searches/new", class: 'btn pull-right', style: 'margin-right: 10px' %>
         </if>
       </div>
     </div>
