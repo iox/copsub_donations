@@ -15,6 +15,7 @@ class Donation < ActiveRecord::Base
     user_assigned :boolean, :default => false
     other_income :boolean, :default => false
     paypal_transaction_id :string
+    notes           :text
     timestamps
   end
 
@@ -25,7 +26,7 @@ class Donation < ActiveRecord::Base
   belongs_to :category
   belongs_to :donor
 
-  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id, :paypal_transaction_id, :donor, :donor_id
+  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id, :paypal_transaction_id, :donor, :donor_id, :notes
 
   # --- Hooks --- #
 
