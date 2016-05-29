@@ -25,7 +25,19 @@
     <nav-item with="&Donor">Donors</nav-item>
     <nav-item href="/donations?q[other_income_eq]=t" name="other_income">Other Income</nav-item>
     <nav-item href="#{base_url}/import" if="&current_user.administrator?">Import</nav-item>
-    <nav-item href="/saved_searches" if="&current_user.administrator?">Saved Searches</nav-item>
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        Saved Searches
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu">
+        <% for link in SavedSearch.all %>
+          <li><a href="/#{link.path}"><%= link.name %></a></li>
+        <% end %>
+        <li class="divider"></li>
+        <li><a href="/saved_searches">Manage Saved Searches</a></li>
+      </ul>
+    </li>
   </navigation>
 </def>
 
