@@ -4,7 +4,7 @@
     <else>List of donations</else>
   </heading:>
   <collection: replace>
-    <table-plus-with-filters with="&@donations" fields="this, email, donor_id, currency, amount_in_dkk, donated_at, donation_method, other_income" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, currency, other_income, category">
+    <table-plus-with-filters with="&@donations" fields="this, email, donor_id, currency, amount_in_dkk, donated_at, donation_method, other_income" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, other_income, category">
       <email-heading:>Email / Bank Reference</email-heading:>
       <email-view:><this/><%= this_parent.bank_reference%></email-view:>
       <other-income-view:>
