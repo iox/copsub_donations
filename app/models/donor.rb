@@ -77,7 +77,7 @@ class Donor < ActiveRecord::Base
     # Autoassign recurring_supporter role
     # -----------------------------------
     # Paypal donors, whose category id is not single donations
-    if self.donation_method == 'paypal' && last_donation && last_donation.category_id != 5 && self.role != 'recurring_supporter'
+    if self.donation_method == 'paypal' && last_donation && last_donation.category_id != 5 && self.role != 'recurring_supporter' && last_donation.donated_at > 1.month.ago
       log += "\n- Donor #{self.id}-#{self.user_email} has switched roles from #{self.role} to recurring_supporter, because his last paypal donation was not a Single Donation."
       self.role = 'recurring_supporter'
     end

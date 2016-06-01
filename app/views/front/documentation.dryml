@@ -24,7 +24,7 @@
             <li>Update the first donation date.</li>
             <li>Update the last donation date.</li>
             <li>Based on the last donation, update the donation_method of the user.</li>
-            <li>If the user donated last via Paypal and his last donation was not a "Single Donation", switch the role to 'recurring_supporter'.</li>
+            <li>If the user donated during the last month via Paypal and his last donation was not a "Single Donation", switch the role to 'recurring_supporter'.</li>
             <li>If the user donated last via Bank, and he has donated 3 times in the last 6 months, switch the role to 'recurring_supporter'.</li>
           </ul>
         </li>
