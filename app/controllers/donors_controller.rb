@@ -120,8 +120,12 @@ class DonorsController < ApplicationController
       scope = scope.where(donation_method: params[:donation_method])
     end
 
-    if !params[:role].blank?
+    if params[:role].present?
       scope = scope.where(role: params[:role])
+    end
+
+    if params[:donated_last_days].present?
+      scope = scope.where("last_donated_at > ?", Date.today - params[:donated_last_days].to_i)
     end
 
     return scope

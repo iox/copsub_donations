@@ -2,7 +2,7 @@
   <content-body:>
     <search-box/>
 
-    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, #{'first_donated_at, ' if params[:first_donated_at]} #{'last_donated_at, ' if params[:last_donated_at]} role, #{'mailchimp_status, ' if params[:mailchimp_status].present?} #{'donation_method, ' if params[:donation_method].present?} #{'donated_total, ' if params[:donated_total]} #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, #{'first_donated_at, ' if params[:first_donated_at]} #{'last_donated_at, ' if params[:last_donated_at] || params[:donated_last_days]} role, #{'mailchimp_status, ' if params[:mailchimp_status].present?} #{'donation_method, ' if params[:donation_method].present?} #{'donated_total, ' if params[:donated_total]} #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
     <p style="text-align:right" class="result-counter"><%= @donors.total_entries %> results. Page <%= @donors.current_page %> of <%= @donors.total_pages %></p>
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&fields" field-tag="highlighted-field">
@@ -37,6 +37,7 @@
     <div style="" class="header" id="busqueda-normal">
       <div style="display:block" class="search">
         <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
+          <input type="hidden" name="sort" value="&params[:sort]"/>
           <input type="search" value="&params[:search]" name="search" class="search" placeholder="Search by text" style="width:192px"/>
 
           <select-input name="role" options="&Donor::ROLES" first-option="-Role-" first-value="" selected="&params[:role]" style="margin-left: 0px; width: 100px"/>
@@ -56,6 +57,13 @@
           </label>
           <input class="span1" type="text" name="donated_total_from" placeholder="From" value="&params[:donated_total_from]"/>
           <input class="span1" type="text" name="donated_total_to" placeholder="To" value="&params[:donated_total_to]"/>
+
+
+          <label class="checkbox" style="margin-left: 20px">
+            
+            Donated last X days
+          </label>
+          <input class="span1" type="text" name="donated_last_days" placeholder="0" value="&params[:donated_last_days]"/>
 
 
           <br/><br/>
