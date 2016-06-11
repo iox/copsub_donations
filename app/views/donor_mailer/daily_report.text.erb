@@ -1,1 +1,42 @@
-<%= @log %>
+Daily report from the Copenhagen Suborbitals donations app
+==========================================================
+
+Hi,
+
+I just updated The following fields have been updated for all donors: donated_last_year_in_dkk, donated_total, first_donated_at, last_donated_at, donation_method.
+
+
+<% if @logs_from_role_switching.size > 0 %>
+Additionally, the following users have had their roles changed automatically:
+<% for log in @logs_from_role_switching %>
+  <%= log %>
+<% end %>
+<% end %>
+
+
+
+Currency exchange rates
+-----------------------
+USD Exchange Rate: <%= ExchangeRate.get('USD') %>
+EUR Exchange Rate: <%= ExchangeRate.get('EUR') %>
+
+
+
+Paypal IPN Events in the last 24 hours
+--------------------------------------
+- <%= @payments.count %> payments were received
+<% if @cancellations.count > 0 %>
+- <%= @cancellations.count %> cancelled subscriptions
+  <% for event in @cancellations %>
+    - <%= event.payer_email %> cancelled his subscription.
+  <% end %>
+<% end %>
+<% if @signups.count > 0 %>
+- <%= @signups.count %> cancelled subscriptions
+  <% for event in @signups %>
+    - <%= event.payer_email %> signed up for a regular donation.
+  <% end %>
+<% end %>
+
+
+That's all. Have a nice day!

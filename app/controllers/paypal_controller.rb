@@ -15,6 +15,8 @@ class PaypalController < ApplicationController
     log += notify.inspect.to_s
 
     if notify.acknowledge
+      store_paypal_event(notify)
+
       notify.complete? ? store_donation(notify) : (log += "\nNotification is not complete, please investigate".to_s)
     else
       log += "\nFailed to verify Paypal's notification, please investigate"
@@ -26,6 +28,10 @@ class PaypalController < ApplicationController
   end
 
   private
+
+  def store_paypal_event(notify)
+    PaypalEvent.create(params)
+  end
 
   def store_donation(notify)
     donation = Donation.new(

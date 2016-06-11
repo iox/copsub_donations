@@ -1,0 +1,3 @@
+<index-page>
+  <collection: fields="this, txn_type, payer_email, first_name, last_name, residence_country, created_at"/>
+</index-page>

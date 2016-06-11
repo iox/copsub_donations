@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160529070243) do
+ActiveRecord::Schema.define(version: 20160611130343) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -65,6 +65,39 @@ ActiveRecord::Schema.define(version: 20160529070243) do
     t.integer  "donated_total"
     t.date     "last_donated_at"
     t.string   "donation_method"
+  end
+
+  create_table "paypal_events", force: true do |t|
+    t.string   "txn_type"
+    t.string   "subscr_id"
+    t.string   "last_name"
+    t.string   "residence_country"
+    t.string   "item_name"
+    t.string   "mc_currency"
+    t.string   "business"
+    t.string   "verify_sign"
+    t.string   "payer_status"
+    t.string   "payer_email"
+    t.string   "first_name"
+    t.string   "receiver_email"
+    t.string   "payer_id"
+    t.string   "item_number"
+    t.string   "charset"
+    t.string   "notify_version"
+    t.string   "ipn_track_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "address_street"
+    t.string   "address_zip"
+    t.string   "address_country_code"
+    t.string   "address_name"
+    t.string   "address_city"
+    t.string   "address_state"
+    t.string   "address_country"
+    t.string   "txn_id"
+    t.string   "payment_type"
+    t.string   "payment_fee"
+    t.string   "transaction_subject"
   end
 
   create_table "saved_searches", force: true do |t|

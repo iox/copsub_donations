@@ -9,6 +9,8 @@
       <a class="btn" href="/categories">Categories</a>
       <br/><br/>
       <a class="btn" href="/documentation">Documentation about automatic features</a>
+      <br/><br/>
+      <a class="btn" href="/paypal_events">Paypal Events</a>
     </header>
 
     <section class="content-body">
