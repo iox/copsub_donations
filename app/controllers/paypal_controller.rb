@@ -30,7 +30,8 @@ class PaypalController < ApplicationController
   private
 
   def store_paypal_event(notify)
-    PaypalEvent.create(params)
+    clean_params = params.inject({}) { |h, (k, v)| h[k] = v.force_encoding('ISO-8859-1').encode('UTF-8'); h }
+    PaypalEvent.create(clean_params)
   end
 
   def store_donation(notify)
