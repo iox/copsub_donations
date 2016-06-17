@@ -10,9 +10,6 @@ class FrontController < ApplicationController
     end
   end
 
-  def settings
-  end
-
   def search
     if params[:query]
       site_search(params[:query])

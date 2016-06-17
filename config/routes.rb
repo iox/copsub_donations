@@ -25,7 +25,6 @@ CopsubDonations::Application.routes.draw do
 
   post '/api/new_bank_donor' => 'donors#new_bank_donor'
 
-  get '/settings' => 'front#settings'
   get '/documentation' => 'front#documentation'
 
   # The priority is based upon order of creation: first created -> highest priority.

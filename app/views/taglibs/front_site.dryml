@@ -46,7 +46,17 @@
   <old-page merge>
     <account-nav:>
       <logged-in-as: replace>
-        <li class="nav-item"><a if="&current_user.administrator" href="/settings">Settings</a></li>
+        <li class="dropdown" if="&current_user.administrator">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            Settings
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/paypal_events">Paypal Events</a></li>
+            <li><a href="/documentation">Documentation</a></li>
+          </ul>
+        </li>
       </logged-in-as:>
       <sign-up: replace/>
       <search: replace/>
