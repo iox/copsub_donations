@@ -3,10 +3,7 @@ task :sync_mailchimp_status => :environment do
   Donor.update_all("mailchimp_status = 'not_present'")
 
   gibbon = Gibbon::Request.new
-
   list_info = gibbon.lists(MAILCHIMP_LIST_ID).retrieve
-
-
   member_count = list_info["stats"]["member_count"]
   offset = 0
   per_page = 100
@@ -32,12 +29,15 @@ task :sync_mailchimp_status => :environment do
         donor.mailchimp_status = "subscribed"
         donor.donated_last_year_in_dkk = 0
         donor.save
-
-        puts "\n\n\n"
-        puts donor.inspect
-        puts "\n\n\n"
       else
         puts "MISSING. The mailchimp unsubscribed member #{member["email_address"]} is not in the donor list. Ignoring it."
+      end
+
+
+      # Sync role back to mailchimp
+      if donor && member['merge_fields']['MMERGE5'] != donor.role
+        puts "Switching #{member['email_address']}'s role from #{member['merge_fields']['MMERGE5']} to #{donor.role}"
+        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE5" => donor.role} })
       end
     end
 
