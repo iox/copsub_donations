@@ -53,6 +53,7 @@
             <li>If the donor does not exist, do nothing.</li>
           </ul>
         </li>
+        <li>For each member, update the "role" field from the donations app to mailchimp.</li>
       </ul>
 
 
@@ -66,6 +67,7 @@
         <li>Create a new donation with the amount, currency, payer email and transaction id</li>
         <li>Add the user to the sponsors list in the website, if it was not already there</li>
         <li>Try to assign the user automatically (see section below)</li>
+        <li>Store the complete event in the "paypal_events" table.</li>
       </ul>
 
       <hr/><br/>
