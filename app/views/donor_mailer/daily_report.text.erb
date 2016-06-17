@@ -24,18 +24,11 @@ EUR Exchange Rate: <%= ExchangeRate.get('EUR') %>
 
 Paypal IPN Events in the last 24 hours
 --------------------------------------
-- <%= @payments.count %> payments were received
-<% if @cancellations.count > 0 %>
-- <%= @cancellations.count %> cancelled subscriptions
-  <% for event in @cancellations %>
-    - <%= event.payer_email %> cancelled his subscription.
-  <% end %>
+<% for event, count in @paypal_events %>
+- <%= event %>: <%= count %>
+<% if event != 'subscr_payment' %>
+  <%= PaypalEvent.last_day.where(txn_type: event).all.map(&:payer_email).join(', ') %>
 <% end %>
-<% if @signups.count > 0 %>
-- <%= @signups.count %> cancelled subscriptions
-  <% for event in @signups %>
-    - <%= event.payer_email %> signed up for a regular donation.
-  <% end %>
 <% end %>
 
 

@@ -9,9 +9,7 @@ class DonorMailer < ActionMailer::Base
   end
 
   def daily_report(logs_from_role_switching)
-    @payments = PaypalEvent.last_day.where(txn_type: 'subscr_payment')
-    @cancellations = PaypalEvent.last_day.where(txn_type: 'subscr_cancel')
-    @signups = PaypalEvent.last_day.where(txn_type: 'subscr_signup')
+    @paypal_events = PaypalEvent.last_day.group(:txn_type).count
     @logs_from_role_switching = logs_from_role_switching
 
     mail( :subject => "Copenhagen Suborbitals - daily Donations App report",
