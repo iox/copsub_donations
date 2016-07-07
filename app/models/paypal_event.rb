@@ -43,6 +43,19 @@ class PaypalEvent < ActiveRecord::Base
     self.where("created_at > ?", Time.now - 24.hours)
   end
 
+  after_create :store_last_paypal_failure
+  def store_last_paypal_failure
+    if self.find_donor
+      if self.txn_type.in?['recurring_payment_suspended_due_to_max_failed_payment', 'subscr_eot', 'subscr_failed']
+        self.find_donor.update_attribute(:last_paypal_failure, self.created_at.to_date)
+      end
+
+      if self.txn_type.in?['subscr_payment', 'web_accept', 'subscr_signup']
+        self.find_donor.update_attribute(:last_paypal_failure, nil)
+      end
+    end
+  end
+
   # --- Permissions --- #
 
   def create_permitted?

@@ -21,6 +21,7 @@ class Donor < ActiveRecord::Base
     last_donated_at          :date
     mailchimp_status         :string, default: "not_present"
     donation_method enum_string(:'bank', :'paypal')
+    last_paypal_failure      :date
     notes                    :text
     timestamps
   end
