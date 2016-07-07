@@ -128,6 +128,10 @@ class DonorsController < ApplicationController
       scope = scope.where("last_donated_at > ?", Date.today - params[:donated_last_days].to_i)
     end
 
+    if params[:donation_date].in?(['first_donated_at', 'last_donated_at', 'last_paypal_failure'])  && !params[:donation_date_from].blank? && !params[:donation_date_to].blank?
+      scope = scope.where("#{params[:donation_date]} BETWEEN ? AND ?", params[:donation_date_from].to_date, params[:donation_date_to].to_date)
+    end
+
     return scope
   end
 

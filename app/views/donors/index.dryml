@@ -79,21 +79,14 @@
           </select>
 
 
-          <label class="checkbox" style="">
-            <input type="checkbox" name="first_donated_at" value="100" checked="&params[:first_donated_at]" style="margin-top:0; margin-left: 25px;"/>
-            First donated
+          <label class="checkbox" style="margin-left: 22px">
+            <select name="donation_date">
+              <option value="">-Donation Date-</option>
+              <%= options_for_select([ ["First donated", "first_donated_at"], ["Last donated", "last_donated_at"], ["Last paypal failure", 'last_paypal_failure']], params["donation_date"]) %>
+            </select>
           </label>
-          <input class="bootstrap-datepicker" type="text" name="first_donated_at_from" placeholder="From" value="&params[:first_donated_at_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
-          <input class="bootstrap-datepicker" type="text" name="first_donated_at_to" placeholder="To" value="&params[:first_donated_at_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
-
-          <label class="checkbox" style="margin-left: 0px">
-            <input type="checkbox" name="last_donated_at" value="100" checked="&params[:last_donated_at]" style="margin-top:0; margin-left: 0px;"/>
-            Last donated
-          </label>
-          <input class="bootstrap-datepicker" type="text" name="last_donated_at_from" placeholder="From" value="&params[:last_donated_at_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
-          <input class="bootstrap-datepicker" type="text" name="last_donated_at_to" placeholder="To" value="&params[:last_donated_at_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
-
-
+          <input class="bootstrap-datepicker" type="text" name="donation_date_from" placeholder="From" value="&params[:donation_date_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
+          <input class="bootstrap-datepicker" type="text" name="donation_date_to" placeholder="To" value="&params[:donation_date_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
 
           <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 10px"/>&nbsp;
 
