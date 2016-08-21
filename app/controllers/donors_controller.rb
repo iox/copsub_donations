@@ -50,6 +50,52 @@ class DonorsController < ApplicationController
     redirect_to donors_path
   end
 
+  def mailchimp_email_preview
+    gibbon = Gibbon::Request.new
+    @automations = gibbon.automations.retrieve["automations"]
+    automation_id = params[:automation_id] || @automations.first['id']
+    @emails = gibbon.automations(automation_id).emails.retrieve["emails"]
+
+
+    if request.xhr?
+      hobo_ajax_response
+      return
+    end
+
+    unless params[:search]
+      flash[:error] = "You need to filter the users before sending a mailchimp email"
+      redirect_to :back
+    end
+
+    @donors = donors_scope
+  end
+
+  def send_mailchimp_email
+    if params[:emails].blank?
+      flash[:error] = "No users were selected"
+      redirect_to :back and return
+    end
+
+    unless Rails.env.production?
+      flash[:notice] = "Emails to #{params[:emails].to_sentence} were not sent, because we are not running in production"
+      redirect_to :back and return
+    end
+
+    gibbon = Gibbon::Request.new
+    for email in params[:emails]
+      begin
+        gibbon.automations(params[:automation_id]).emails(params[:email_id]).queue.create(body: {email_address: email})
+        flash[:notice] ||= ""
+        flash[:notice] += "Email to #{email} sent via Mailchimp."
+      rescue => e
+        flash[:error] ||= ""
+        flash[:error] += "Mailchimp returned an error with email #{email}: " + e.detail.inspect
+      end
+    end
+
+    redirect_to :back
+  end
+
   def find_duplicated_donors
     emails = Hash.new
     suspects = []

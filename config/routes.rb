@@ -13,6 +13,9 @@ CopsubDonations::Application.routes.draw do
   get '/assign_donation' => 'donations#assign_donation'
   get '/unassign_donation' => 'donations#unassign_donation'
 
+  get '/mailchimp_email_preview' => 'donors#mailchimp_email_preview'
+  post '/send_mailchimp_email' => 'donors#send_mailchimp_email'
+
   get '/change_roles_preview' => 'donors#change_roles_preview'
   post '/change_roles_assign' => 'donors#change_roles_assign'
 
