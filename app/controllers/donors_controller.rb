@@ -85,10 +85,11 @@ class DonorsController < ApplicationController
     for email in params[:emails]
       begin
         gibbon.automations(params[:automation_id]).emails(params[:email_id]).queue.create(body: {email_address: email})
-        flash[:notice] ||= "Emails sent successfully via Mailchimp"
+        flash[:notice] ||= ""
+        flash[:notice] += " Email sent to #{email}."
       rescue => e
         flash[:error] ||= ""
-        flash[:error] += "#{email}: " + e.detail.inspect
+        flash[:error] += " Mailchimp returned an error with #{email}: " + e.detail.inspect
       end
     end
 

@@ -77,3 +77,6 @@ gem 'exception_notification'
 
 # Connect to Mailchimp
 gem 'gibbon'
+
+# Memcache client
+gem 'dalli'
