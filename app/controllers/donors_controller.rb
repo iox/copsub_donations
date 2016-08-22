@@ -53,8 +53,8 @@ class DonorsController < ApplicationController
   def mailchimp_email_preview
     gibbon = Gibbon::Request.new
     @automations = gibbon.automations.retrieve["automations"]
-    automation_id = params[:automation_id] || @automations.first['id']
-    @emails = gibbon.automations(automation_id).emails.retrieve["emails"]
+    @automation_id = params[:automation_id] || @automations.first['id']
+    @emails = gibbon.automations(@automation_id).emails.retrieve["emails"]
 
 
     if request.xhr?
@@ -77,7 +77,7 @@ class DonorsController < ApplicationController
     end
 
     unless Rails.env.production?
-      flash[:notice] = "Emails to #{params[:emails].to_sentence} were not sent, because we are not running in production"
+      flash[:notice] = "Emails were not sent, because we are not running in production"
       redirect_to :back and return
     end
 
@@ -85,11 +85,10 @@ class DonorsController < ApplicationController
     for email in params[:emails]
       begin
         gibbon.automations(params[:automation_id]).emails(params[:email_id]).queue.create(body: {email_address: email})
-        flash[:notice] ||= ""
-        flash[:notice] += "Email to #{email} sent via Mailchimp."
+        flash[:notice] ||= "Emails sent successfully via Mailchimp"
       rescue => e
         flash[:error] ||= ""
-        flash[:error] += "Mailchimp returned an error with email #{email}: " + e.detail.inspect
+        flash[:error] += "#{email}: " + e.detail.inspect
       end
     end
 

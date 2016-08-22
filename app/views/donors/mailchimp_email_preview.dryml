@@ -5,7 +5,40 @@
     </div>
     <p>Please mark the checkbox of the users you want to send an email to:</p>
 
-    <form action="&send_mailchimp_email_path" method="POST" class="form-horizontal">
+    <div class="form-horizontal">
+
+    <form action="&send_mailchimp_email_path">
+      <hot-input updates="#email-selection">
+
+      <div class="control-group">
+        <label class="control-label">Automation</label>
+        <div class="controls">
+          <select name="automation_id" class="span4">
+            <% for automation in @automations %>
+              <option value="#{automation['id']}"><%= automation["settings"]["title"] %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+    </hot-input>
+    </form>
+
+    <form action="&send_mailchimp_email_path" method="POST">
+
+      <do part="email-selection">
+        <input type="hidden" name="automation_id" value="&@automation_id" />
+        <div class="control-group">
+          <label class="control-label">Email</label>
+          <div class="controls">
+            <select name="email_id" class="span4">
+              <% for email in @emails %>
+                <option value="#{email['id']}"><%= email["settings"]["title"] %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </do>
 
       <% fields="checkbox, id, user_email, user_login, display_name, city, country, paymentid, paypalid, role, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
       <table style="font-size: 12px" class="table table-bordered table-rounded table-striped">
@@ -23,39 +56,12 @@
       <hr/>
 
 
-      <hot-input updates="#email-selection">
-
-        <div class="control-group">
-          <label class="control-label">Automation</label>
-          <div class="controls">
-            <select name="automation_id" class="span4">
-              <% for automation in @automations %>
-                <option value="#{automation['id']}"><%= automation["settings"]["title"] %></option>
-              <% end %>
-            </select>
-          </div>
-        </div>
-
-      </hot-input>
-
-      <do part="email-selection">
-        <div class="control-group">
-          <label class="control-label">Email</label>
-          <div class="controls">
-            <select name="email_id" class="span4">
-              <% for email in @emails %>
-                <option value="#{email['id']}"><%= email["settings"]["title"] %></option>
-              <% end %>
-            </select>
-          </div>
-        </div>
-      </do>
-
       <div class="control-group">
         <div class="controls">
           <submit class="btn-danger btn-large" value="Send email" style="margin-left:10px" data-confirm="Are you sure that you want to send an email to the selected users?"/>
         </div>
       </div>
     </form>
+    </div>
   </content-body:>
 </page>
