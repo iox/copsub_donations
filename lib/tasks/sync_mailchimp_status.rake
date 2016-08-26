@@ -17,6 +17,7 @@ task :sync_mailchimp_status => :environment do
       if donor && member["status"] == 'subscribed'
         puts "OK. The mailchimp subscriber #{member["email_address"]} is in the donor list (id #{donor.id})"
         donor.update_attribute(:mailchimp_status, "subscribed")
+        donor.update_attribute(:role, 'subscriber') if donor.role == 'inactive_subscriber'
 
       elsif donor
         puts "OK BUT UNSUBSCRIBED. The mailchimp unsubscribed member #{member["email_address"]} is in the donor list (id #{donor.id})"
