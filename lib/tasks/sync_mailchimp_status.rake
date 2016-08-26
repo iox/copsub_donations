@@ -12,12 +12,19 @@ task :sync_mailchimp_status => :environment do
     result = gibbon.lists(MAILCHIMP_LIST_ID).members.retrieve(params: {count: per_page, offset: offset})
     for member in result["members"]
       donor = Donor.where("user_email = ? OR paypalid = ?", member["email_address"], member["email_address"]).first
+
+      # A. Mailchimp subscriber known in our donations app
       if donor && member["status"] == 'subscribed'
         puts "OK. The mailchimp subscriber #{member["email_address"]} is in the donor list (id #{donor.id})"
         donor.update_attribute(:mailchimp_status, "subscribed")
+
       elsif donor
         puts "OK BUT UNSUBSCRIBED. The mailchimp unsubscribed member #{member["email_address"]} is in the donor list (id #{donor.id})"
         donor.update_attribute(:mailchimp_status, "unsubscribed")
+        donor.update_attribute(:role, 'inactive_subscriber') if donor.role == 'subscriber'
+
+
+      # B. Mailchimp subscriber known in our donations app
       elsif member["status"] == 'subscribed'
         puts "MISSING. The mailchimp subscriber #{member["email_address"]} is not in the donor list. Creating it."
         donor = Donor.new
@@ -29,6 +36,7 @@ task :sync_mailchimp_status => :environment do
         donor.mailchimp_status = "subscribed"
         donor.donated_last_year_in_dkk = 0
         donor.save
+
       else
         puts "MISSING. The mailchimp unsubscribed member #{member["email_address"]} is not in the donor list. Ignoring it."
       end

@@ -8,6 +8,18 @@
     </header>
 
     <section class="content-body">
+      <h3>Donor Roles</h3>
+      <p>Our donors are assigned to one of the following roles:</p>
+
+      <ul>
+        <li><strong>Subscriber</strong>: subscribed to our newsletter</li>
+        <li><strong>Inactive subscriber</strong>: was previously subscribed to our newsletter, but unsubscribed</li>
+        <li><strong>Supporter</strong>: donates to the project</li>
+        <li><strong>Inactive supporter</strong>: has donated in the past, but not recently</li>
+        <li><strong>Recurring supporter</strong>: donates regularly every month</li>
+      </ul>
+
+      <hr/><br/>
       <h3>Introduction</h3>
       <p>This application runs several automatic processes, updating the donors and donations according to some rules. This page describes these rules.</p>
 
@@ -44,12 +56,13 @@
         <li>For each subscribed member in Mailchimp:
           <ul>
             <li>If the donor exists in the DB, update his mailchimp_status to 'subscribed'</li>
-            <li>If the donor does not exist yet, create a new donor with mailchimp_status 'subscribed'</li>
+            <li>If the donor does not exist yet, create a new donor with mailchimp_status 'subscribed' and role 'subscriber'</li>
           </ul>
         </li>
         <li>For each unsubscribed member in Mailchimp:
           <ul>
             <li>If the donor exists, update this mailchimp_status to 'unsubscribed'</li>
+            <li>If the donor exists and has a 'subscriber' role, update his role to "inactive_subscriber"</li>
             <li>If the donor does not exist, do nothing.</li>
           </ul>
         </li>
