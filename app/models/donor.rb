@@ -29,7 +29,7 @@ class Donor < ActiveRecord::Base
 
   has_many :donations
 
-  ROLES = [:supporter, :subscriber, :inactive_supporter, :recurring_supporter]
+  ROLES = [:supporter, :subscriber, :inactive_supporter, :recurring_supporter, :inactive_subscriber]
 
   USER_FIELDS = %w{id user_email user_login display_name}
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}
