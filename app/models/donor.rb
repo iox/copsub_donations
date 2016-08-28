@@ -28,6 +28,7 @@ class Donor < ActiveRecord::Base
   attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
 
   has_many :donations
+  has_many :role_changes
 
   ROLES = [:single_supporter, :subscriber, :inactive_supporter, :recurring_supporter, :inactive_subscriber]
 
@@ -35,6 +36,26 @@ class Donor < ActiveRecord::Base
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']
+
+
+  def role=(val)
+    # Store the previous role temporarily when assigned to new value
+    @previous_role = self.role unless val == self.role
+    write_attribute(:role, val)
+  end
+
+  after_save :record_role_changes
+  def record_role_changes
+    if @previous_role
+      RoleChange.create(donor: self, previous_role: @previous_role, new_role: self.role)
+      @previous_role = nil
+    end
+  end
+
+  after_create :store_first_role_change
+  def store_first_role_change
+    RoleChange.create(donor: self, previous_role: '-', new_role: self.role)
+  end
 
 
   # This scope method allows to search for users using several fields, for example "Donor.fuzzy_search('ignacio')"

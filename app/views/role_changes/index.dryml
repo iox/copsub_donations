@@ -1,0 +1,49 @@
+<index-page>
+  <content-body:>
+    <search-box/>
+
+    <% fields="id, donor, previous_role, new_role, created_at" %>
+    <p style="text-align:right" class="result-counter"><%= @role_changes.total_entries %> results. Page <%= @role_changes.current_page %> of <%= @role_changes.total_pages %></p>
+
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@role_changes" fields="&fields"/>
+
+    <div class="row">
+      <div class="span6">
+        <page-nav/>
+      </div>
+    </div>
+
+  </content-body:>
+</index-page>
+
+
+
+
+
+<def tag="search-box">
+  <div class="well header" style="padding-bottom: 0">
+    <div style="" class="header" id="busqueda-normal">
+      <div style="display:block" class="search">
+        <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
+          <input type="hidden" name="sort" value="&params[:sort]"/>
+
+
+
+
+          <label class="checkbox" style="margin-left: 20px">
+            <input type="checkbox" name="created_at" value="100" checked="&params[:created_at]" style="margin-top:0; margin-left: 5px;"/>
+            Filter by date
+          </label>
+          
+          <input class="bootstrap-datepicker" type="text" name="created_at_from" placeholder="From" value="&params[:created_at_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
+          <input class="bootstrap-datepicker" type="text" name="created_at_to" placeholder="To" value="&params[:created_at_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+
+          <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 10px"/>&nbsp;
+
+          <br/><br/>
+        </form>
+      </div>
+    </div>
+  </div>
+</def>
+

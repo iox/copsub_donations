@@ -12,5 +12,14 @@
         </table>
       </div>
     </div>
+
+    <br/><br/>
+
+    <div class="well" unless="&this.role_changes.blank?">
+      <h4>Role Changes</h4>
+      <div class="table-plus">
+        <table class="table" with="&this.role_changes.order('created_at desc')" fields="created_at, previous_role, new_role"/>
+      </div>
+    </div>
   </append-content-body:>
 </show-page>

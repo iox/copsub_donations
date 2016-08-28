@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160707170144) do
+ActiveRecord::Schema.define(version: 20160828102759) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -100,6 +100,16 @@ ActiveRecord::Schema.define(version: 20160707170144) do
     t.string   "payment_fee"
     t.string   "transaction_subject"
   end
+
+  create_table "role_changes", force: true do |t|
+    t.string   "previous_role"
+    t.string   "new_role"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "donor_id"
+  end
+
+  add_index "role_changes", ["donor_id"], name: "index_role_changes_on_donor_id", using: :btree
 
   create_table "saved_searches", force: true do |t|
     t.string   "name"
