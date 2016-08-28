@@ -40,7 +40,7 @@ class AssignUserAutomatically
     # Step 4: If we have not had luck yet, create a new user
     if @donation.donor_id.blank? && !@donation.email.blank?
       user = Donor.new(user_email: @donation.email, display_name: @display_name)
-      user.role = "supporter"
+      user.role = "single_supporter"
       user.save
       @donation.donor_id = user.id
     end

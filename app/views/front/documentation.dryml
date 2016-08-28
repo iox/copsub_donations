@@ -14,7 +14,7 @@
       <ul>
         <li><strong>Subscriber</strong>: subscribed to our newsletter</li>
         <li><strong>Inactive subscriber</strong>: was previously subscribed to our newsletter, but unsubscribed</li>
-        <li><strong>Supporter</strong>: donates to the project</li>
+        <li><strong>Single supporter</strong>: donates to the project, not regularly</li>
         <li><strong>Inactive supporter</strong>: has donated in the past, but not recently</li>
         <li><strong>Recurring supporter</strong>: donates regularly every month</li>
       </ul>
