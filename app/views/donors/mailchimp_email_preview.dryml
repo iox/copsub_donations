@@ -40,7 +40,7 @@
         </div>
       </do>
 
-      <% fields="checkbox, id, user_email, user_login, display_name, city, country, paymentid, paypalid, role, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+      <% fields="checkbox, id, user_email, display_name, city, country, paymentid, paypalid, role, #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
       <table style="font-size: 12px" class="table table-bordered table-rounded table-striped">
       <tr><th></th><th>ID</th><th>Email</th><th>Display Name</th></tr>
         <% for donor in @donors %>

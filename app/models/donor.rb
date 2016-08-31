@@ -5,7 +5,6 @@ class Donor < ActiveRecord::Base
   fields do
     wordpress_id             :integer
     user_email               :string
-    user_login               :string
     display_name             :string
     user_adress              :text
     city                     :string
@@ -25,14 +24,14 @@ class Donor < ActiveRecord::Base
     notes                    :text
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :user_login, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
+  attr_accessible :wordpress_id, :user_email, :display_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
 
   has_many :donations
   has_many :role_changes
 
   ROLES = [:single_supporter, :subscriber, :inactive_supporter, :recurring_supporter, :inactive_subscriber]
 
-  USER_FIELDS = %w{id user_email user_login display_name}
+  USER_FIELDS = %w{id user_email display_name}
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}
 
   ALL_FIELDS = USER_FIELDS + USERMETA_FIELDS + ['role']

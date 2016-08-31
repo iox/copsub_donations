@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160828102759) do
+ActiveRecord::Schema.define(version: 20160831082957) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -46,7 +46,6 @@ ActiveRecord::Schema.define(version: 20160828102759) do
   create_table "donors", force: true do |t|
     t.integer  "wordpress_id"
     t.string   "user_email"
-    t.string   "user_login"
     t.string   "display_name"
     t.text     "user_adress"
     t.string   "city"

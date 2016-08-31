@@ -10,7 +10,6 @@ class DonorsController < ApplicationController
   def new_bank_donor
     donor = Donor.find_by_user_email(params["email"]) || Donor.new(
       user_email: params["email"],
-      user_login: params["email"],
       role: "subscriber")
     donor.save
 

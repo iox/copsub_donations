@@ -9,7 +9,6 @@ task :clone_wordpress_users => :environment do
     donor = Donor.where(wordpress_id: wpuser.id).first || Donor.new
     donor.wordpress_id = wpuser.id
     donor.user_email = wpuser.user_email
-    donor.user_login = wpuser.user_login
     donor.display_name = wpuser.display_name
     donor.user_adress = wpuser.user_adress
     donor.city = wpuser.city
