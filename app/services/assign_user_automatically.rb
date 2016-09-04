@@ -1,10 +1,11 @@
 class AssignUserAutomatically
   # This service tries to find a user to a new donation
 
-  def initialize(donation, subscriber=false, display_name=nil)
+  def initialize(donation, subscriber=false, first_name=nil, last_name=nil)
     @donation = donation
     @subscriber = subscriber
-    @display_name = display_name
+    @first_name = first_name
+    @last_name = last_name
   end
 
   # This methods returns :user_assigned, :no_user_found or :multiple_users_found
@@ -39,7 +40,7 @@ class AssignUserAutomatically
 
     # Step 4: If we have not had luck yet, create a new user
     if @donation.donor_id.blank? && !@donation.email.blank?
-      user = Donor.new(user_email: @donation.email, display_name: @display_name)
+      user = Donor.new(user_email: @donation.email, first_name: @first_name, last_name: @last_name)
       user.role = "single_supporter"
       user.save
       @donation.donor_id = user.id

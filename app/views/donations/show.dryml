@@ -46,7 +46,7 @@
           <%= @user.user_email %>
         </a>
       </h4>
-      <p>Display Name: <%= @user.display_name %></p>
+      <p>Name: <%= @user.first_name %> <%= @user.last_name %></p>
       <p>User Email: <%= @user.user_email %></p>
       <p>Donor ID: <%= @user.id %></p>
     </div>

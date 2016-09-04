@@ -7,7 +7,7 @@
 
     <h3>We have found <%= @duplicated_emails.size %> donors that are repeated in our database. Showing the first one.</h3>
 
-    <% fields="id, user_email, display_name, city, country, paymentid, paypalid, role, donated_last_year_in_dkk, actions" %>
+    <% fields="id, user_email, first_name, last_name, city, country, paymentid, paypalid, role, donated_last_year_in_dkk, actions" %>
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@first_duplicated_donors" fields="&fields">
       <id-view:><a href="/donors/#{this}"><this/></a></id-view:>
       <user-email-view:><%= highlight(this.to_s, @duplicated_emails.first) %></user-email-view:>

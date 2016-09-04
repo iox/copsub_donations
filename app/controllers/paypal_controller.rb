@@ -70,7 +70,7 @@ class PaypalController < ApplicationController
 
     # Try to assign the donation to a user automatically
     if donation.save
-      AssignUserAutomatically.new(donation, params['subscr_id'].present?, "#{first_name} #{last_name}").try_to_assign_user
+      AssignUserAutomatically.new(donation, params['subscr_id'].present?, first_name, last_name).try_to_assign_user
     else
       logger.info "Error while creating donation: #{donation.errors.inspect}"
     end

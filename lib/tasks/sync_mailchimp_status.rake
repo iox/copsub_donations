@@ -32,7 +32,8 @@ task :sync_mailchimp_status => :environment do
         donor.role = "subscriber"
         donor.user_email = member["email_address"]
         if member["merge_fields"]
-          donor.display_name = "#{member["merge_fields"]["FNAME"]} #{member["merge_fields"]["LNAME"]}"
+          donor.first_name = "#{member["merge_fields"]["FNAME"]}"
+          donor.last_name = "#{member["merge_fields"]["LNAME"]}"
         end
         donor.mailchimp_status = "subscribed"
         donor.donated_last_year_in_dkk = 0

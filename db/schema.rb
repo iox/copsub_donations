@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160831082957) do
+ActiveRecord::Schema.define(version: 20160904201948) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -46,7 +46,6 @@ ActiveRecord::Schema.define(version: 20160831082957) do
   create_table "donors", force: true do |t|
     t.integer  "wordpress_id"
     t.string   "user_email"
-    t.string   "display_name"
     t.text     "user_adress"
     t.string   "city"
     t.string   "country"
@@ -65,6 +64,8 @@ ActiveRecord::Schema.define(version: 20160831082957) do
     t.date     "last_donated_at"
     t.string   "donation_method"
     t.date     "last_paypal_failure"
+    t.string   "first_name"
+    t.string   "last_name"
   end
 
   create_table "paypal_events", force: true do |t|
