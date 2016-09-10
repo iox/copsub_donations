@@ -1,8 +1,11 @@
 <edit-page>
   <form:>
-    <field-list:>
+    <field-list: skip="paypalid, alternativeid">
       <role-view:><select-input options="&Donor::ROLES"/></role-view:>
       <notes-view:><input style="width: 50%; height: 100px"/></notes-view:>
+      <paymentid-view:>
+        <input/> <input with="&this_parent" field="paypalid"/> <input with="&this_parent" field="alternativeid"/>
+      </paymentid-view:>
     </field-list:>
   </form:>
 </edit-page>

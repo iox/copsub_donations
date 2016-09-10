@@ -1,4 +1,11 @@
 <show-page>
+
+  <field-list: skip="paypalid, alternativeid">
+    <paymentid-view:>
+      <view/> / <view with="&this_parent" field="paypalid"/> / <view with="&this_parent" field="alternativeid"/>
+    </paymentid-view:>
+  </field-list:>
+
   <append-content-body:>
     <div class="well" unless="&this.donations.blank?">
       <h4>Donations made by this donor</h4>
