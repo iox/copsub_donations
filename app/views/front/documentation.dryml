@@ -82,6 +82,13 @@
         <li>Try to assign the user automatically (see section below)</li>
         <li>Store the complete event in the "paypal_events" table.</li>
       </ul>
+      <p><strong>URLs receiving IPN notifications from Paypal:</strong></p>
+      <ul>
+        <li>http://copenhagensuborbitals.com:3000/paypal_ipn <i> - This is the current URL, to which the rest of calls are redirected to</i></li>
+        <li>http://copenhagensuborbitals.com/wp-content/plugins/cs-donations/dgx-donate-paypalstd-ipn.php <i> - Old URL, nginx responds with 301 and redirects to the current URL. 80% of IPN calls.</i></li>
+        <li>http://copenhagensuborbitals.com/wp_blog/wp_content/plugins/seamless-donations-modified/dgx-donate-paypalstd-ipn.php <i> - Old URL, nginx responds with 301 and redirects to the current URL. 10% of IPN calls.</i></li>
+        <li>http://copenhagensuborbitals.com//wp-content/plugins/seamless-donations-modified/dgx-donate-paypalstd-ipn.php</li> <i> - Old URL, nginx responds with 301 and redirects to the current URL. 10% of IPN calls.</i></li>
+      </ul>
 
       <hr/><br/>
       <h3>Assigning users automatically to donations</h3>
