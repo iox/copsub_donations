@@ -57,25 +57,67 @@ class DonationsController < ApplicationController
   end
 
   def index
-    # By default we only show donations and hide all the income marked as "other_income"
-    params[:q] = Hash.new if !params[:q]
-    if params[:q].blank? || !params[:q][:other_income_eq].blank?
-      params[:q][:other_income_eq] == 'f'
-    end
+    params[:search] ||= ""
+    params[:sort] ||= "id"
+    params[:direction] ||= "desc"
+    params[:other_income] ||= "no"
 
-    # Workaround for bug in Hobo metasearch, clear the key in the search hash if it's empty or nil
-    if params[:q] && params[:q][:category_id_eq].blank?
-      params[:q].delete(:category_id_eq)
-    end
-
-    @search = Donation.search(params[:q])
-    @total = @search.result.sum(:amount_in_dkk)
-    @donations = @search.result.paginate(:page => params[:page])
+    scope = donations_scope
+    @donations = scope.order("#{params[:sort]} #{params[:direction]}").paginate(:page => params[:page])
+    @total = scope.sum(:amount_in_dkk)
 
     respond_to do |format|
       format.html
-      format.text { render csv: @search.result }
+      format.text { render csv: scope.all }
     end
+  end
+
+  private
+
+  def donations_scope
+    scope = Donation
+
+    if params[:email].present?
+      scope = scope.where("email LIKE ?", "%#{params[:email]}%")
+    end
+
+    if params[:bank_reference].present?
+      scope = scope.where("bank_reference LIKE ?", "%#{params[:bank_reference]}%")
+    end
+
+    if params[:currency].present?
+      scope = scope.where(currency: params[:currency])
+    end
+
+    if params[:donation_method].present?
+      scope = scope.where(donation_method: params[:donation_method])
+    end
+
+    if params[:amount_in_dkk] && !params[:amount_in_dkk_from].blank? && !params[:amount_in_dkk_to].blank?
+      scope = scope.where("amount_in_dkk BETWEEN #{params[:amount_in_dkk_from].to_i} AND #{params[:amount_in_dkk_to].to_i}")
+    end
+
+    if params[:role].present?
+      scope = scope.joins(:donor).where("donors.role = ?", params[:role])
+    end
+
+    if params[:user_assigned].present?
+      scope = scope.where(user_assigned: params[:user_assigned] == 'yes')
+    end
+
+    if params[:other_income].present?
+      scope = scope.where(other_income: params[:other_income] == 'yes')
+    end
+
+    if params[:category_id].present?
+      scope = scope.where(category_id: params[:category_id])
+    end
+
+    if params[:donated_at] && !params[:donated_at_from].blank? && !params[:donated_at_to].blank?
+      scope = scope.where("donated_at BETWEEN ? AND ?", params[:donated_at_from].to_date, params[:donated_at_to].to_date)
+    end
+
+    return scope
   end
 
 end

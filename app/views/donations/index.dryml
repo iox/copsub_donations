@@ -1,10 +1,25 @@
 <index-page>
   <heading:>
-    <if test="&params[:q][:other_income_eq] == 't'">Other Income</if>
+    <if test="&params[:other_income] == 'true'">Other Income</if>
     <else>List of donations</else>
   </heading:>
+
+  <before-heading:>
+    <div class="pull-right">
+      <%= @donations.total_entries %> results. Page <%= @donations.current_page %> of <%= @donations.total_pages %> | Total: <%= number_to_currency(@total, :unit => '', :separator => ',', :delimiter => '.') %> DKK
+    </div>
+  </before-heading:>
+
   <collection: replace>
-    <table-plus-with-filters with="&@donations" fields="this, email, donor_id, currency, amount_in_dkk, donated_at, donation_method, other_income" filters="email, bank_reference, currency, donation_method, user_assigned, donated_at, amount_in_dkk, other_income, category">
+
+    <search-box/>
+
+    <% fields="id, email, donor_id, currency, amount_in_dkk, donated_at, donation_method, other_income" %>
+
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donations" fields="&fields">
+      <field-heading-row:><sorting-row fields="&fields"/></field-heading-row:>
+      <id-view:><a href="/donation/#{this}"><view/></a></id-view:>
+
       <email-heading:>Email / Bank Reference</email-heading:>
       <email-view:><this/><%= this_parent.bank_reference%></email-view:>
       <other-income-view:>
@@ -26,9 +41,105 @@
           Not assigned
         </else>
       </donor-id-view:>
-      <append-result-counter:>| Total: <%= number_to_currency(@total, :unit => '', :separator => ',', :delimiter => '.') %> DKK</append-result-counter:>
-    </table-plus-with-filters>
-    <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
-    <%= link_to "<i class='icon-hdd'></i> Save search".html_safe, "/saved_searches/new", class: 'btn pull-right', style: 'margin-right: 10px' %>
+
+      <pagination: replace/>
+
+    </table>
+
+    <div class="row">
+      <div class="span6">
+        <page-nav/>
+      </div>
+      <div class="span6">
+        <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
+        <if test="&current_user.administrator?">
+          <%= link_to "<i class='icon-hdd'></i> Save search".html_safe, "/saved_searches/new", class: 'btn pull-right', style: 'margin-right: 10px' %>
+        </if>
+      </div>
+    </div>
+
   </collection>
+
+
+  <bottom-page-nav: replace/>
 </index-page>
+
+
+
+
+
+<def tag="search-box">
+  <div class="well header" style="padding-bottom: 0">
+    <div style="" class="header" id="busqueda-normal">
+      <div style="display:block" class="search">
+        <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
+          <input type="hidden" name="sort" value="&params[:sort]"/>
+
+          <input type="search" value="&params[:email]" name="email" class="search" placeholder="Email" style="width:140px"/>
+          <input type="search" value="&params[:bank_reference]" name="bank_reference" class="search" placeholder="Bank reference" style="width:140px; margin-left: 20px"/>
+
+          <select-input name="currency" options="&['DKK','EUR','USD']" first-option="-Currency-" first-value="" selected="&params[:currency]" style="margin-left: 20px; width: 100px"/>
+
+          <select-input name="donation_method" options="&['bank','paypal']" first-option="-Method-" first-value="" selected="&params[:donation_method]" style="margin-left: 10px; width: 100px"/>
+
+          <label class="checkbox" style="margin-left: 10px">
+            <input type="checkbox" name="amount_in_dkk" value="100" checked="&params[:amount_in_dkk]" style="margin-top:0; margin-left: 5px;"/>
+            Amount in DKK
+          </label>
+          <input class="span1" type="text" name="amount_in_dkk_from" placeholder="From" value="&params[:amount_in_dkk_from]"/>
+          <input class="span1" type="text" name="amount_in_dkk_to" placeholder="To" value="&params[:amount_in_dkk_to]"/>
+
+          <label class="checkbox" style="margin-left: 30px">Donor Role</label>
+          <select-input name="role" options="&Donor::ROLES" first-option="-Role-" first-value="" selected="&params[:role]" style="margin-left: 0px; width: 100px"/>
+
+          <br/><br/>
+
+          <label class="checkbox" style="margin-left: 0px">User assigned</label>
+          <select-input name="user_assigned" options="&['yes','no']" first-option="-" first-value="" selected="&params[:user_assigned]" style="margin-left: 0px; width: 60px"/>
+
+          <label class="checkbox" style="margin-left: 20px">Other income</label>
+          <select-input name="other_income" options="&['yes','no']" first-option="-" first-value="" selected="&params[:other_income]" style="margin-left: 0px; width: 60px"/>
+
+
+          <label class="checkbox" style="margin-left: 20px">Category</label>
+          <select-input name="category_id" options="&Category.all.map{|c|[c.to_s, c.id]}" first-option="-" first-value="" selected="&params[:category_id]" style="margin-left: 0px; width: 150px"/>
+
+          <label class="checkbox" style="margin-left: 10px">
+            <input type="checkbox" name="donated_at" value="100" checked="&params[:donated_at]" style="margin-top:0; margin-left: 5px;"/>
+            Donated At
+          </label>
+          <input class="bootstrap-datepicker" type="text" name="donated_at_from" placeholder="From" value="&params[:donated_at_from]" style="width:77px" data-date-format="dd.mm.yyyy"/>
+          <input class="bootstrap-datepicker" type="text" name="donated_at_to" placeholder="To" value="&params[:donated_at_to]" style="width:77px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+
+          <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 0px"/>&nbsp;
+
+          <br/><br/>
+        </form>
+      </div>
+    </div>
+  </div>
+</def>
+
+
+
+
+
+
+<def tag="sorting-row" attrs="fields">
+  <% for field in fields.split(', ') %>
+    <% link_text = field == 'email' ? "Email / Bank Reference" : field.humanize %>
+    <% direction = 'asc' %>
+    <% if params[:sort] == field %>
+      <% if params[:direction] == 'asc' %>
+        <% link_text += " ▲" %>
+        <% direction = 'desc' %>
+      <% else %>
+        <% link_text += " ▼" %>
+      <% end %>
+    <% end %>
+    <th>
+      <% url = donations_path(params.merge({sort: field, direction: direction})) %>
+      <%= link_to link_text, url %>
+    </th>
+  <% end %>
+</def>
