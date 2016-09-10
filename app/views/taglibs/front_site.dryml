@@ -54,6 +54,7 @@
           <ul class="dropdown-menu">
             <li><a href="/categories">Categories</a></li>
             <li><a href="/paypal_events">Paypal Events</a></li>
+            <li><a href="/email_logs">Email Logs</a></li>
             <li><a href="/role_changes">Role Changes</a></li>
             <li><a href="/documentation">Documentation</a></li>
           </ul>

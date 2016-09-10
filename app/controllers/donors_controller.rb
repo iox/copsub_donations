@@ -81,11 +81,15 @@ class DonorsController < ApplicationController
     end
 
     gibbon = Gibbon::Request.new
+    email_details = gibbon.automations(params[:automation_id]).emails(params[:email_id]).retrieve
+    email_subject = (email_details && email_details["settings"]) ? email_details["settings"]["title"] : nil
+
     for email in params[:emails]
       begin
         gibbon.automations(params[:automation_id]).emails(params[:email_id]).queue.create(body: {email_address: email})
         flash[:notice] ||= ""
         flash[:notice] += " Email sent to #{email}."
+        EmailLog.create(email: email, subject: email_subject) if email_subject
       rescue => e
         flash[:error] ||= ""
         flash[:error] += " Mailchimp returned an error with #{email}: " + e.detail.inspect

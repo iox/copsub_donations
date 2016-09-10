@@ -2,9 +2,11 @@ class DonorMailer < ActionMailer::Base
   default :from => "no-reply@copsub.com"
 
   def bank_donation_instructions(donor, repeating)
+    subject = "Copenhagen Suborbitals - instructions for bank donations"
+    EmailLog.create(email: donor.user_email, subject: subject)
     @donor = donor
     @repeating = repeating
-    mail( :subject => "Copenhagen Suborbitals - instructions for bank donations",
+    mail( :subject => subject,
           :to      => donor.user_email, :bcc => "ignacio@ihuerta.net" )
   end
 

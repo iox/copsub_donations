@@ -1,0 +1,3 @@
+<index-page>
+  <collection: fields="id, email, subject, created_at"/>
+</index-page>
