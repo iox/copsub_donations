@@ -68,7 +68,7 @@ class AssignUserAutomatically
   def search_for_similar_assigned_donation
     scope = Donation.where("donor_id IS NOT NULL")
     if !@donation.bank_reference.blank?
-      if @donation.back_reference.to_s.downcase.strip.in?(@bank_reference_blacklist)
+      if @donation.bank_reference.to_s.downcase.strip.in?(@bank_reference_blacklist)
         return nil
       else
         scope.where(:bank_reference => @donation.bank_reference).first
