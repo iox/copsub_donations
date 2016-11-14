@@ -28,5 +28,12 @@
         <table class="table" with="&this.role_changes.order('created_at desc')" fields="created_at, previous_role, new_role"/>
       </div>
     </div>
+
+    <div class="well" unless="&this.paypal_events.blank?">
+      <h4>Paypal Events possibly connected to this donor</h4>
+      <div class="table-plus">
+        <table class="table" with="&this.paypal_events.order('created_at desc')" fields="this, txn_type, payer_email, first_name, last_name, residence_country, created_at"/>
+      </div>
+    </div>
   </append-content-body:>
 </show-page>

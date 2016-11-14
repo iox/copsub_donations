@@ -58,6 +58,16 @@ class Donor < ActiveRecord::Base
   end
 
 
+  def paypal_events
+    last_paypal_email = self.donations.last.try(:email)
+    if last_paypal_email
+      PaypalEvent.where("txn_type != 'subscr_payment'").where("payer_email = ?", last_paypal_email)
+    else
+      return []
+    end
+  end
+
+
   # This scope method allows to search for users using several fields, for example "Donor.fuzzy_search('ignacio')"
   def self.fuzzy_search(search)
     # Build a string like: "ID LIKE :search OR user_email LIKE :search ..."
