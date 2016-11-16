@@ -6,9 +6,6 @@ class AssignUserAutomatically
     @subscriber = subscriber
     @first_name = first_name
     @last_name = last_name
-
-    # Keywords that should never be matched
-    @bank_reference_blacklist = ['overførsel']
   end
 
   # This methods returns :user_assigned, :no_user_found or :multiple_users_found
@@ -68,7 +65,7 @@ class AssignUserAutomatically
   def search_for_similar_assigned_donation
     scope = Donation.where("donor_id IS NOT NULL")
     if !@donation.bank_reference.blank?
-      if @donation.bank_reference.to_s.downcase.strip.in?(@bank_reference_blacklist)
+      if @donation.bank_reference.to_s.downcase.strip.in?(BANK_REFERENCE_BLACKLIST)
         return nil
       else
         scope.where(:bank_reference => @donation.bank_reference).first
