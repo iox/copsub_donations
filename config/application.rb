@@ -6,6 +6,9 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Keywords that should never be matched automatically
+BANK_REFERENCE_BLACKLIST = ['overførsel']
+
 module CopsubDonations
   class Application < Rails::Application
     # Hobo: the admin subsite loads admin.css & admin.js
@@ -16,9 +19,6 @@ module CopsubDonations
     config.hobo.dryml_only_templates = true
     # Hobo: the front subsite loads front.css & front.js
     config.assets.precompile += %w(front.css front.js)
-
-    # Keywords that should never be matched automatically
-    BANK_REFERENCE_BLACKLIST = ['overførsel']
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
