@@ -8,8 +8,10 @@ class UnassignUser
   def unassign
     for donation in related_assigned_donations
       donation.update_attribute(:donor_id, nil)
+      donation.update_attribute(:user_assigned, false)
     end
     @donation.update_attribute(:donor_id, nil)
+    @donation.update_attribute(:user_assigned, false)
   end
 
   # This method returns a list of assigned donations which are similar to this one (made by the same user via Paypal or via Bank)
