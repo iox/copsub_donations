@@ -28,6 +28,15 @@ class DonorsController < ApplicationController
     params[:direction] ||= "asc"
 
     @donors = donors_scope.order("#{params[:sort]} #{params[:direction]}").paginate(:page => params[:page])
+    @fields = "id, user_email, first_name, last_name, city, country, paymentid, paypalid, "
+    @fields += 'first_donated_at, ' if params[:donation_date] == 'first_donated_at'
+    @fields += 'last_donated_at, ' if params[:donation_date] == 'last_donated_at' || params[:donated_last_days].present?
+    @fields += 'last_paypal_failure, ' if params[:donation_date] == 'last_paypal_failure'
+    @fields += "role, "
+    @fields += 'mailchimp_status, ' if params[:mailchimp_status].present?
+    @fields += 'donation_method, ' if params[:donation_method].present?
+    @fields += 'donated_total, ' if params[:donated_total]
+    @fields += 'donated_last_year_in_dkk' if params[:donated_last_year]
 
     respond_to do |format|
       format.html

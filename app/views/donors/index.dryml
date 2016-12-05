@@ -3,11 +3,11 @@
   <content-body:>
     <search-box/>
 
-    <% fields="id, user_email, first_name, last_name, city, country, paymentid, paypalid, #{'first_donated_at, ' if params[:donation_date] == 'first_donated_at'} #{'last_donated_at, ' if params[:donation_date] == 'last_donated_at' || params[:donated_last_days].present?} role, #{'mailchimp_status, ' if params[:mailchimp_status].present?} #{'donation_method, ' if params[:donation_method].present?} #{'donated_total, ' if params[:donated_total]} #{'donated_last_year_in_dkk' if params[:donated_last_year]}" %>
+
     <p style="text-align:right" class="result-counter"><%= @donors.total_entries %> results. Page <%= @donors.current_page %> of <%= @donors.total_pages %></p>
 
-    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&fields" field-tag="highlighted-field">
-      <field-heading-row:><sorting-row fields="&fields"/></field-heading-row:>
+    <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&@fields" field-tag="highlighted-field">
+      <field-heading-row:><sorting-row fields="&@fields"/></field-heading-row:>
       <id-view:><a href="/donors/#{this}"><highlighted-field/></a></id-view:>
       <first-donation-view:><%= l(this) if this %></first-donation-view:>
     </table>
