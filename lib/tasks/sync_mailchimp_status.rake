@@ -1,4 +1,7 @@
 task :sync_mailchimp_status => :environment do
+  # TIP: How to debug with the console
+  # gibbon = Gibbon::Request.new
+  # member = gibbon.lists(MAILCHIMP_LIST_ID).members(Digest::MD5.hexdigest("email@domain.dk")).retrieve
 
   Donor.update_all("mailchimp_status = 'not_present'")
 
@@ -48,6 +51,12 @@ task :sync_mailchimp_status => :environment do
       if donor && member['merge_fields']['MMERGE5'] != donor.role
         puts "Switching #{member['email_address']}'s role from #{member['merge_fields']['MMERGE5']} to #{donor.role}"
         gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE5" => donor.role} })
+      end
+
+      # Sync last paypal failure date to Mailchimp
+      if donor && donor.last_paypal_failure && member['merge_fields']['MMERGE7'] != donor.last_paypal_failure
+        puts "Setting #{member['email_address']}'s last paypal failure date from #{member['merge_fields']['MMERGE7']} to #{donor.last_paypal_failure.to_s}"
+        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE7" => donor.last_paypal_failure.to_s} })
       end
     end
 
