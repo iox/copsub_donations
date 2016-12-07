@@ -58,6 +58,12 @@ task :sync_mailchimp_status => :environment do
         puts "Setting #{member['email_address']}'s last paypal failure date from #{member['merge_fields']['MMERGE7']} to #{donor.last_paypal_failure.to_s}"
         gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE7" => donor.last_paypal_failure.to_s} })
       end
+
+      # Sync last paypal failure txn_type to Mailchimp
+      if donor && donor.last_paypal_failure && member['merge_fields']['MMERGE6'] != donor.last_paypal_failure
+        puts "Setting #{member['email_address']}'s last paypal failure type from #{member['merge_fields']['MMERGE6']} to #{donor.last_paypal_failure_type}"
+        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE6" => donor.last_paypal_failure_type} })
+      end
     end
 
     offset += per_page

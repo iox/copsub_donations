@@ -48,10 +48,12 @@ class PaypalEvent < ActiveRecord::Base
     if self.find_donor
       if self.txn_type.in?(['recurring_payment_suspended_due_to_max_failed_payment', 'subscr_eot', 'subscr_failed'])
         self.find_donor.update_attribute(:last_paypal_failure, self.created_at.to_date)
+        self.find_donor.update_attribute(:last_paypal_failure_type, self.txn_type)
       end
 
       if self.txn_type.in?(['subscr_payment', 'web_accept', 'subscr_signup'])
         self.find_donor.update_attribute(:last_paypal_failure, nil)
+        self.find_donor.update_attribute(:last_paypal_failure_type, nil)
       end
     end
   end
