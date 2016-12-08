@@ -68,6 +68,14 @@
           </ul>
         </li>
         <li>For each member, update the "role" field from the donations app to mailchimp.</li>
+        <li>For each member, update the "last paypal failure" fields from the donations app to mailchimp. Paypal txn_type error messages are translated to numeric codes:
+          <ul>
+            <li><strong>1</strong> => 'recurring_payment_suspended_due_to_max_failed_payment'</li>
+            <li><strong>2</strong> => 'subscr_eot'</li>
+            <li><strong>3</strong> => 'subscr_failed'</li>
+            <li><strong>4</strong> => 'subscr_cancel'</li>
+          </ul>
+        </li>
       </ul>
 
 
