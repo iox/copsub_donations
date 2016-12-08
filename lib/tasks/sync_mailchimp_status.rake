@@ -70,6 +70,12 @@ task :sync_mailchimp_status => :environment do
         puts "Setting #{member['email_address']}'s last paypal failure code from #{member['merge_fields']['MMERGE8']} to #{donor.last_paypal_failure_code}"
         gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE8" => donor.last_paypal_failure_code} })
       end
+
+      # If a donor has fixed his paypal subscription, reset his fields
+      if donor && donor.last_paypal_failure.blank? && member['merge_fields']['MMERGE7'].present?
+        puts "Resetting #{member['email_address']} last paypal failure columns"
+        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE6" => nil, :"MMERGE7" => nil, :"MMERGE8" => 0} })
+      end
     end
 
     offset += per_page

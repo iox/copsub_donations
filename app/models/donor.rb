@@ -79,7 +79,7 @@ class Donor < ActiveRecord::Base
     when 'subscr_cancel'
       4
     else
-      nil
+      0
     end
   end
 
