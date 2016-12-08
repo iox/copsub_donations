@@ -60,9 +60,15 @@ task :sync_mailchimp_status => :environment do
       end
 
       # Sync last paypal failure txn_type to Mailchimp
-      if donor && donor.last_paypal_failure && member['merge_fields']['MMERGE6'] != donor.last_paypal_failure
+      if donor && donor.last_paypal_failure && member['merge_fields']['MMERGE6'] != donor.last_paypal_failure_type
         puts "Setting #{member['email_address']}'s last paypal failure type from #{member['merge_fields']['MMERGE6']} to #{donor.last_paypal_failure_type}"
         gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE6" => donor.last_paypal_failure_type} })
+      end
+
+      # Sync last paypal failure type, as a numeric code to Mailchimp
+      if donor && donor.last_paypal_failure && member['merge_fields']['MMERGE8'] != donor.last_paypal_failure_code
+        puts "Setting #{member['email_address']}'s last paypal failure code from #{member['merge_fields']['MMERGE8']} to #{donor.last_paypal_failure_code}"
+        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE8" => donor.last_paypal_failure_code} })
       end
     end
 

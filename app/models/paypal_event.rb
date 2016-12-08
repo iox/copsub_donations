@@ -46,7 +46,7 @@ class PaypalEvent < ActiveRecord::Base
   after_create :store_last_paypal_failure
   def store_last_paypal_failure
     if self.find_donor
-      if self.txn_type.in?(['recurring_payment_suspended_due_to_max_failed_payment', 'subscr_eot', 'subscr_failed'])
+      if self.txn_type.in?(['recurring_payment_suspended_due_to_max_failed_payment', 'subscr_eot', 'subscr_failed', 'subscr_cancel'])
         self.find_donor.update_attribute(:last_paypal_failure, self.created_at.to_date)
         self.find_donor.update_attribute(:last_paypal_failure_type, self.txn_type)
       end

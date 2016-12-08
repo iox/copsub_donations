@@ -68,6 +68,21 @@ class Donor < ActiveRecord::Base
     end
   end
 
+  def last_paypal_failure_code
+    case last_paypal_failure_type
+    when 'recurring_payment_suspended_due_to_max_failed_payment'
+      1
+    when 'subscr_eot'
+      2
+    when 'subscr_failed'
+      3
+    when 'subscr_cancel'
+      4
+    else
+      nil
+    end
+  end
+
 
   # This scope method allows to search for users using several fields, for example "Donor.fuzzy_search('ignacio')"
   def self.fuzzy_search(search)
