@@ -37,6 +37,7 @@ class DonorsController < ApplicationController
     @fields += 'donation_method, ' if params[:donation_method].present?
     @fields += 'donated_total, ' if params[:donated_total]
     @fields += 'donated_last_year_in_dkk' if params[:donated_last_year]
+    @fields += 'number_of_donations' if params[:number_of_donations]
 
     respond_to do |format|
       format.html
@@ -188,6 +189,10 @@ class DonorsController < ApplicationController
 
     if params[:donation_date].in?(['first_donated_at', 'last_donated_at', 'last_paypal_failure'])  && !params[:donation_date_from].blank? && !params[:donation_date_to].blank?
       scope = scope.where("#{params[:donation_date]} BETWEEN ? AND ?", params[:donation_date_from].to_date, params[:donation_date_to].to_date)
+    end
+
+    if params[:number_of_donations]
+      scope = scope.where("number_of_donations >= ?", params[:number_of_donations])
     end
 
     return scope

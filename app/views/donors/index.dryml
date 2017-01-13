@@ -62,7 +62,6 @@
 
 
           <label class="checkbox" style="margin-left: 20px">
-            
             Donated last X days
           </label>
           <input class="span1" type="text" name="donated_last_days" placeholder="0" value="&params[:donated_last_days]"/>
@@ -89,6 +88,13 @@
           </label>
           <input class="bootstrap-datepicker" type="text" name="donation_date_from" placeholder="From" value="&params[:donation_date_from]" style="width:75px" data-date-format="dd.mm.yyyy"/>
           <input class="bootstrap-datepicker" type="text" name="donation_date_to" placeholder="To" value="&params[:donation_date_to]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+
+
+
+          <label class="checkbox" style="margin-left: 10px">
+            # of donations
+          </label>
+          <input class="span1" type="text" name="number_of_donations" placeholder="0" value="&params[:number_of_donations]"/>
 
           <input type="submit" value="Search" class="btn btn-primary button submit-button search-button search-submit" style="margin-left: 10px"/>&nbsp;
 
