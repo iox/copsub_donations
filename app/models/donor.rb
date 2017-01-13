@@ -24,6 +24,7 @@ class Donor < ActiveRecord::Base
     last_paypal_failure      :date
     last_paypal_failure_type :string
     notes                    :text
+    number_of_donations      :integer
     timestamps
   end
   attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
@@ -146,6 +147,9 @@ class Donor < ActiveRecord::Base
         self.role = 'recurring_supporter'
       end
     end
+
+    # Count the number of donations
+    self.number_of_donations = donations.count
 
     self.save
 
