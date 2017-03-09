@@ -80,3 +80,6 @@ gem 'gibbon'
 
 # Memcache client
 gem 'dalli'
+
+# Connect to Stripe
+gem 'stripe'

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170113103407) do
+ActiveRecord::Schema.define(version: 20170309140835) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 20170113103407) do
     t.datetime "updated_at"
     t.string   "alternativeid"
     t.date     "first_donated_at"
-    t.string   "mailchimp_status",         default: "not_present"
+    t.string   "mailchimp_status",            default: "not_present"
     t.text     "notes"
     t.integer  "donated_total"
     t.date     "last_donated_at"
@@ -68,6 +68,10 @@ ActiveRecord::Schema.define(version: 20170113103407) do
     t.string   "last_name"
     t.string   "last_paypal_failure_type"
     t.integer  "number_of_donations"
+    t.string   "selected_donor_type"
+    t.integer  "selected_amount"
+    t.string   "stripe_customer_id"
+    t.date     "stripe_card_expiration_date"
   end
 
   create_table "email_logs", force: true do |t|

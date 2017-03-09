@@ -13,4 +13,11 @@ class ApplicationController < ActionController::Base
       redirect_to '/login'
     end
   end
+
+
+  def override_cors_limitations
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
+    headers['Access-Control-Request-Method'] = '*'
+  end
 end

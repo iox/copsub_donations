@@ -20,11 +20,15 @@ class Donor < ActiveRecord::Base
     first_donated_at         :date
     last_donated_at          :date
     mailchimp_status         :string, default: "not_present"
-    donation_method enum_string(:'bank', :'paypal')
+    donation_method enum_string(:'bank', :'paypal', :'stripe')
     last_paypal_failure      :date
     last_paypal_failure_type :string
     notes                    :text
     number_of_donations      :integer
+    selected_donor_type      :string
+    selected_amount          :integer
+    stripe_customer_id       :string
+    stripe_card_expiration_date :date
     timestamps
   end
   attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
@@ -157,7 +161,12 @@ class Donor < ActiveRecord::Base
   end
 
 
-
+  def create_stripe_customer
+    if self.stripe_customer_id.blank?
+      customer = Stripe::Customer.create(:email => self.user_email)
+      self.update_attribute(:stripe_customer_id, customer.id)
+    end
+  end
 
   # --- Permissions --- #
 
