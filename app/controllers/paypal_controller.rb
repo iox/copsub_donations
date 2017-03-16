@@ -1,7 +1,14 @@
 class PaypalController < ApplicationController
 
+
+
   skip_before_filter :authenticate
   protect_from_forgery :except => [:ipn]
+  before_filter :override_cors_limitations
+
+
+    # require 'paypal-sdk-rest'
+    include PayPal::SDK::REST
 
   include OffsitePayments::Integrations
   require 'money'
@@ -26,6 +33,143 @@ class PaypalController < ApplicationController
     ActionMailer::Base.mail(from: 'no-reply@copsub.com', to: 'rasmusagdestein.e9187@m.evernote.com', subject: 'Donations app received a Paypal IPN @CopSub_Log', body: log).deliver
     head 200
   end
+  
+  
+  
+  
+  
+  
+  def generate_payment_token
+    
+    PayPal::SDK::REST.set_config(
+      :mode => "sandbox", # "sandbox" or "live"
+      :client_id => "AdvlojC9PCoHlc57G9CRXdqrLkDTyOMuahwm5pWhLBLYXF3YybigM1E1vFAfOYYesmNrS-QDLdTAMcRK",
+      :client_secret => "ELixA3D_qAmB97EaiMnxt7-TQZwmMxL57SwERllGCfgmLoxPdV3z5AK7VTDFt17m2-p65YIY4d3AL4Pu")
+    
+    plan = Plan.new({
+      "name" => "T-Shirt of the Month Club Plan",
+      "description" => "Template creation.",
+      "type" => "fixed",
+      "payment_definitions" => [
+          {
+              "name" => "Regular Payments",
+              "type" => "REGULAR",
+              "frequency" => "MONTH",
+              "frequency_interval" => "2",
+              "amount" => {
+                  "value" => "100",
+                  "currency" => "USD"
+              },
+              "cycles" => "12",
+              "charge_models" => [
+                  {
+                      "type" => "SHIPPING",
+                      "amount" => {
+                          "value" => "10",
+                          "currency" => "USD"
+                      }
+                  },
+                  {
+                      "type" => "TAX",
+                      "amount" => {
+                          "value" => "12",
+                          "currency" => "USD"
+                      }
+                  }
+              ]
+          }
+      ],
+      "merchant_preferences" => {
+          "setup_fee" => {
+              "value" => "1",
+              "currency" => "USD"
+          },
+          "return_url" => "http://www.return.com",
+          "cancel_url" => "http://www.cancel.com",
+          "auto_bill_amount" => "YES",
+          "initial_fail_amount_action" => "CONTINUE",
+          "max_fail_attempts" => "0"
+      }
+    })
+    
+    plan.create
+    
+    
+    patch = PayPal::SDK::REST::Patch.new
+    patch.op = "replace"
+    patch.path = "/"
+    patch.value = { :state => "ACTIVE" }
+    plan.update(patch)
+        
+    
+    
+    agreement = Agreement.new({
+      "name" => "T-Shirt of the Month Club Plan",
+      "description" => "Template creation.",
+      "start_date" => (Time.now + 30.minutes).iso8601,
+      "payer" => {
+          "payment_method" => "paypal"
+      },
+    })
+    agreement.plan =  Plan.new( :id => plan.id )
+    
+    if agreement.create
+      render json: {
+        agreement_id: agreement.links.find { |l| l.rel == 'approval_url' }.href.split("token=")[1],     # Agreement Id
+        plan_id: plan.id}
+    else
+      render json: agreement.error, status: 500  # Error Hash
+    end
+    
+    
+    # # Build Payment object for single donation
+    # @payment = Payment.new({
+    #   :intent => "sale",
+    #   :redirect_urls => {
+    #     :return_url => "http://example.com/your_redirect_url.html",
+    #     :cancel_url => "http://example.com/your_cancel_url.html"
+    #   },
+    #   :payer => {
+    #     :payment_method => "paypal"
+    #   },
+    #   :transactions => [{
+    #     :item_list => {
+    #       :items => [{
+    #         :name => "item",
+    #         :sku => "item",
+    #         :price => "1",
+    #         :currency => "USD",
+    #         :quantity => 1 }]},
+    #     :amount => {
+    #       :total => "1.00",
+    #       :currency => "USD" },
+    #     :description => "This is the payment transaction description." }]})
+    
+    
+    
+    # # Create Payment and return the status(true or false)
+    # if @payment.create
+    #   render json: @payment.id     # Payment Id
+    # else
+    #   render json: @payment.error, status: 500  # Error Hash
+    # end
+    
+    
+    
+    
+  end
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   private
 

@@ -72,6 +72,9 @@ gem 'thin'
 # Handle Paypal IPN
 gem 'offsite_payments'
 
+# Connect to Paypal's API to generate Payment Tokens
+gem 'paypal-sdk-rest'
+
 # Send an email when an error occurs
 gem 'exception_notification'
 

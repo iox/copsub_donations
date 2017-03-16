@@ -1,25 +1,12 @@
 Dear <%= @donor.user_email %><br/>
 <br/>
-Thank you for becoming a Copenhagen Suborbitals supporter - we are proud to have you aboard!<br/>
-<br/>
-Our effort to put a man in space depends entirely on donations from our supporters, so we are thrilled that you have chosen to be one of the extraordinary people who will help us reach our goal.<br/>
-<br/>
-<br/>
-You have selected to pay via bank.
 <% if @repeating %>
-Please set up an automatic monthly transfer to our bank account:<br/>
+  Thank you for becoming a Copenhagen Suborbitals supporter - we are proud to have you aboard!<br/>
 <% else %>
-Please send your transfer to our bank account:<br/>
+  Thank you for donating to Copenhagen Suborbitals - we are proud to have you aboard!<br/>
 <% end %>
 <br/>
-Bank: Nordea<br/>
-Registration number: 2102<br/>
-Account Number: 0713648507<br/>
-<br/>
-IBAN: DK0520000713648507<br/>
-SWIFT: NDEADKKK<br/>
-<br/>
-Please make sure to include your personal payment id: <strong><%= @donor.paymentid %></strong> in all transfers so we can keep track of your payments automatically.<br/>
+Our effort to put a man in space depends entirely on donations from our supporters, so we are thrilled that you have chosen to be one of the extraordinary people who will help us reach our goal.<br/>
 <br/>
 <br/>
 Your contribution makes all the difference! We simply could not do this without the help of supporters like you, and our gratitude is enormous. We will work hard to ensure that you get news and information continuously:<br/>
