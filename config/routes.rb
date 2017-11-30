@@ -25,8 +25,14 @@ CopsubDonations::Application.routes.draw do
 
   post '/paypal_ipn' => 'paypal#ipn'
   get '/paypal_ipn' => 'paypal#ipn'
+  post '/paypal/generate_payment_token'
+  post '/paypal/execute_billing_agreement'
 
-  post '/api/new_bank_donor' => 'donors#new_bank_donor'
+  post '/api/new_donor' => 'donors#new_donor'
+  post '/api/new_bank_donor' => 'donors#new_bank_donor' # OLD API, TO BE DELETED
+
+  post '/api/stripe/subscribe' => 'stripe#subscribe'
+  post '/api/stripe/donate' => 'stripe#donate'
 
   get '/documentation' => 'front#documentation'
 

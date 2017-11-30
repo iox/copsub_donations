@@ -4,9 +4,11 @@ class DonorsController < ApplicationController
 
   auto_actions :all
 
-  skip_before_filter :authenticate, :only => [:new_bank_donor]
-  protect_from_forgery :except => [:new_bank_donor]
+  skip_before_filter :authenticate, :only => [:new_bank_donor, :new_donor]
+  protect_from_forgery :except => [:new_bank_donor, :new_donor]
 
+  # POST /api/new_bank_donor
+  # TODO: Remove this method, after the new website is online
   def new_bank_donor
     donor = Donor.find_by_user_email(params["email"]) || Donor.new(
       user_email: params["email"],
@@ -20,6 +22,43 @@ class DonorsController < ApplicationController
     DonorMailer.bank_donation_instructions(donor, repeating).deliver
 
     render text: donor.paymentid
+  end
+
+  # POST /api/new_donor
+  # This endpoint receives the data from the donations flow, creates a new donor and return its donor ID
+  def new_donor
+    override_cors_limitations
+
+    donor = Donor.find_by_user_email(params["email"]) || Donor.create(
+      first_name: params["name"].split(' ',2)[0],
+      last_name: params["name"].split(' ',2)[1],
+      user_email: params["email"],
+      # They are just subscribers, until a payment has been registered
+      role: "subscriber",
+      country: params["country"],
+      donation_method: params[:donation_method]
+    )
+
+    donor.paymentid = "donor#{donor.id}"
+    # "supporter" or "one_time", depending on what the donor selected in the donations flow
+    donor.selected_donor_type = params[:selected_donor_type]
+    # we store how much the donor wished to donate, in case something fails and we need to send a reminder
+    donor.selected_amount = params[:selected_amount].to_i
+
+    if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
+      donor.subscribe_to_mailchimp_list
+      donor.mailchimp_status = "subscribed"
+    else
+      donor.mailchimp_status = "unsubscribed"
+    end
+
+    donor.save
+
+    if params[:donation_method] == 'bank'
+      DonorMailer.bank_donation_instructions(donor, params[:selected_donor_type] == 'supporter').deliver
+    end
+
+    render text: donor.id
   end
 
   def index

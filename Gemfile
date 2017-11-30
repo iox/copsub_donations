@@ -72,6 +72,9 @@ gem 'thin'
 # Handle Paypal IPN
 gem 'offsite_payments'
 
+# Connect to Paypal's API to generate Payment Tokens
+gem 'paypal-sdk-rest'
+
 # Send an email when an error occurs
 gem 'exception_notification'
 
@@ -80,3 +83,9 @@ gem 'gibbon'
 
 # Memcache client
 gem 'dalli'
+
+# Connect to Stripe
+gem 'stripe'
+
+# Load .env files
+gem 'dotenv-rails'
