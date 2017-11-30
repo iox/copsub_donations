@@ -30,6 +30,8 @@ class DonorsController < ApplicationController
     override_cors_limitations
 
     donor = Donor.find_by_user_email(params["email"]) || Donor.create(
+      first_name: params["name"].split(' ',2)[0],
+      last_name: params["name"].split(' ',2)[1],
       user_email: params["email"],
       # They are just subscribers, until a payment has been registered
       role: "subscriber",
@@ -43,10 +45,17 @@ class DonorsController < ApplicationController
     # we store how much the donor wished to donate, in case something fails and we need to send a reminder
     donor.selected_amount = params[:selected_amount].to_i
 
+    if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
+      donor.subscribe_to_mailchimp_list
+      donor.mailchimp_status = "subscribed"
+    else
+      donor.mailchimp_status = "unsubscribed"
+    end
+
     donor.save
 
     if params[:donation_method] == 'bank'
-      DonorMailer.bank_donation_instructions(donor, repeating).deliver
+      DonorMailer.bank_donation_instructions(donor, params[:selected_donor_type] == 'supporter').deliver
     end
 
     render text: donor.id

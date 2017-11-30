@@ -15,7 +15,8 @@ class StripeController < ApplicationController
       :source => params["id"]
     )
     
-    DonorMailer.thank_you(donor, true).deliver
+    # DonorMailer.thank_you(donor, true).deliver
+    donor.send_thank_you_mailchimp_email
 
     render status: 200, json: "OK".to_json
   end

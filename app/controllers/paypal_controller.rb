@@ -3,12 +3,11 @@ class PaypalController < ApplicationController
 
 
   skip_before_filter :authenticate
-  protect_from_forgery :except => [:ipn]
+  protect_from_forgery :except => [:ipn, :execute_billing_agreement]
   before_filter :override_cors_limitations
 
 
-    # require 'paypal-sdk-rest'
-    include PayPal::SDK::REST
+  include PayPal::SDK::REST
 
   include OffsitePayments::Integrations
   require 'money'
@@ -41,49 +40,24 @@ class PaypalController < ApplicationController
   
   def generate_payment_token
     
-    PayPal::SDK::REST.set_config(
-      :mode => "sandbox", # "sandbox" or "live"
-      :client_id => "AdvlojC9PCoHlc57G9CRXdqrLkDTyOMuahwm5pWhLBLYXF3YybigM1E1vFAfOYYesmNrS-QDLdTAMcRK",
-      :client_secret => "ELixA3D_qAmB97EaiMnxt7-TQZwmMxL57SwERllGCfgmLoxPdV3z5AK7VTDFt17m2-p65YIY4d3AL4Pu")
-    
     plan = Plan.new({
-      "name" => "T-Shirt of the Month Club Plan",
-      "description" => "Template creation.",
-      "type" => "fixed",
+      "name" => "Copenhagen Suborbitals Support Group - #{params['plan'].upcase}",
+      "description" => "Copenhagen Suborbitals Support Group - #{params['plan'].upcase}",
+      "type" => "INFINITE",
       "payment_definitions" => [
           {
               "name" => "Regular Payments",
               "type" => "REGULAR",
               "frequency" => "MONTH",
-              "frequency_interval" => "2",
+              "frequency_interval" => "1",
               "amount" => {
-                  "value" => "100",
-                  "currency" => "USD"
+                  "value" => "#{params['selected_amount']}",
+                  "currency" => "EUR"
               },
-              "cycles" => "12",
-              "charge_models" => [
-                  {
-                      "type" => "SHIPPING",
-                      "amount" => {
-                          "value" => "10",
-                          "currency" => "USD"
-                      }
-                  },
-                  {
-                      "type" => "TAX",
-                      "amount" => {
-                          "value" => "12",
-                          "currency" => "USD"
-                      }
-                  }
-              ]
+              "cycles" => "0",
           }
       ],
       "merchant_preferences" => {
-          "setup_fee" => {
-              "value" => "1",
-              "currency" => "USD"
-          },
           "return_url" => "http://www.return.com",
           "cancel_url" => "http://www.cancel.com",
           "auto_bill_amount" => "YES",
@@ -104,8 +78,8 @@ class PaypalController < ApplicationController
     
     
     agreement = Agreement.new({
-      "name" => "T-Shirt of the Month Club Plan",
-      "description" => "Template creation.",
+      "name" => "Copenhagen Suborbitals Support Group - #{params['plan'].upcase}",
+      "description" => "Copenhagen Suborbitals Support Group - #{params['plan'].upcase}",
       "start_date" => (Time.now + 30.minutes).iso8601,
       "payer" => {
           "payment_method" => "paypal"
@@ -157,6 +131,14 @@ class PaypalController < ApplicationController
     
     
     
+  end
+  
+  
+  
+  def execute_billing_agreement
+    agreement = PayPal::SDK::REST::Agreement.new(token: params[:token])
+    agreement.execute
+    render json: agreement
   end
   
   

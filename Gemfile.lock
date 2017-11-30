@@ -59,6 +59,10 @@ GEM
     daemons (1.1.9)
     dalli (2.7.6)
     debug_inspector (0.0.2)
+    dotenv (2.2.1)
+    dotenv-rails (2.2.1)
+      dotenv (= 2.2.1)
+      railties (>= 3.2, < 5.2)
     dryml (2.1.1)
       actionpack (~> 4.0.2)
       hobo_support (= 2.1.1)
@@ -222,6 +226,7 @@ DEPENDENCIES
   charlock_holmes
   coffee-rails (~> 4.0.0)
   dalli
+  dotenv-rails
   exception_notification
   gibbon
   hobo (= 2.1.1)

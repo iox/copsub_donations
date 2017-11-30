@@ -16,7 +16,7 @@ CopsubDonations::Application.configure do
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.raise_delivery_errors = true
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -32,8 +32,8 @@ CopsubDonations::Application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  BetterErrors::Middleware.allow_ip! '10.0.3.1'
+  BetterErrors::Middleware.allow_ip! '80.167.164.26'
 
-  Rails.application.routes.default_url_options[:host] = 'localhost:3016'
+  Rails.application.routes.default_url_options[:host] = 'copsub_donations.dev.ihuerta.net:3016'
   PREFIX = "cy3su_"
 end

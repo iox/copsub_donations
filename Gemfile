@@ -86,3 +86,6 @@ gem 'dalli'
 
 # Connect to Stripe
 gem 'stripe'
+
+# Load .env files
+gem 'dotenv-rails'
