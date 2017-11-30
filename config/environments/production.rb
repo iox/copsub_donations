@@ -87,5 +87,18 @@ CopsubDonations::Application.configure do
     :sender_address => %{"no-reply" <no-reply@copsub.com>},
     :exception_recipients => %w{ignacio@ihuerta.net}
   }
+  
+  ActionMailer::Base.delivery_method = :smtp
+  ActionMailer::Base.smtp_settings = {
+   :address               => "send.one.com",
+   :port                  => 465,
+   :domain                => "copenhagensuborbitals.com",
+   :user_name             => ENV['SMTP_USER'],
+   :password              => ENV['SMTP_PASSWORD'],
+   :authentication        => :plain,
+   :enable_starttls_auto  => false,
+   :ssl                   => true
+  }
+
 
 end
