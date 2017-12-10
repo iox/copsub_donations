@@ -8,6 +8,8 @@ class AddToSponsorsList
   end
 
   def call
+    return false # This feature has been temporarily disabled by Ignacio
+    
     if sponsor_already_exists?
       Rails.logger.info "Sponsor #{@first_name} #{@last_name} is already in the DB, doing nothing"
       return false

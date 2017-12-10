@@ -138,6 +138,12 @@ class PaypalController < ApplicationController
   def execute_billing_agreement
     agreement = PayPal::SDK::REST::Agreement.new(token: params[:token])
     agreement.execute
+    
+    # TODO: If the execution of the agreement worked fine, it means that the user has started a regular donation
+    # In this case, we need to send him or her an a welcome email
+    # donor = Donor.where(email: agreement.email)
+    # donor.send_thank_you_mailchimp_email if donor
+    
     render json: agreement
   end
   

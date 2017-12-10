@@ -181,6 +181,7 @@ class Donor < ActiveRecord::Base
   
   def send_thank_you_mailchimp_email
     begin
+      #TODO: This automation does not seem to be working at the moment
       gibbon = Gibbon::Request.new
       gibbon.automations("998bb9f4fc").emails("1cc5f6e19a").queue.create(body: {email_address: self.user_email})
     rescue
