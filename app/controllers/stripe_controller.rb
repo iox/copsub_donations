@@ -44,35 +44,37 @@ class StripeController < ApplicationController
   
   
   def webhook
-    payload = request.body.read
-    sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    event = nil
-  
-    begin
-      event = Stripe::Webhook.construct_event(
-        payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET']
-      )
-    rescue JSON::ParserError => e
-      # Invalid payload
-      render plain: 'INVALID PAYLOAD', status: 400
-      return
-    rescue Stripe::SignatureVerificationError => e
-      # Invalid signature
-      render plain: 'INVALID SIGNATURE', status: 400
-      return
-    end
-  
-    # Do something with event
+    # TODO: webhook is disabled temporarily. For now, we use a rake task to import Stripe payments
     
-    logger.info "Stripe Event received"
-    logger.info event.inspect.to_s
+    # payload = request.body.read
+    # sig_header = request.env['HTTP_STRIPE_SIGNATURE']
+    # event = nil
+  
+    # begin
+    #   event = Stripe::Webhook.construct_event(
+    #     payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET']
+    #   )
+    # rescue JSON::ParserError => e
+    #   # Invalid payload
+    #   render plain: 'INVALID PAYLOAD', status: 400
+    #   return
+    # rescue Stripe::SignatureVerificationError => e
+    #   # Invalid signature
+    #   render plain: 'INVALID SIGNATURE', status: 400
+    #   return
+    # end
+  
+    # # Do something with event
     
-    if event.type == 'invoice.payment_succeeded'
-      logger.info event.inspect
+    # logger.info "Stripe Event received"
+    # logger.info event.inspect.to_s
+    
+    # if event.type == 'invoice.payment_succeeded'
+    #   logger.info event.inspect
       
-      customer = Stripe::Customer.retrieve(event.data.object.customer)
-      logger.info customer.inspect
-    end
+    #   customer = Stripe::Customer.retrieve(event.data.object.customer)
+    #   logger.info customer.inspect
+    # end
     
   
     render text: 'SUCCESS ' + event.inspect.to_s

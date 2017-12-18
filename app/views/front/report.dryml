@@ -25,8 +25,8 @@
       <div class="row">
         <div class="span6">
           <div style="padding-right: 20px">
-            <h4>New regular donors</h4>
-            <h1 style="color: #14892C">+<%= @new_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i %>kr<small> / month</small></h1>
+            <h4>Gained recurring supporters</h4>
+            <h1 style="color: #14892C">+<%= number_with_delimiter(@new_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i) %> kr<small> / month</small></h1>
             <table class="table">
               <% for donor in @new_regular_donors %>
                 <tr>
@@ -38,7 +38,7 @@
                        
                     <% end %>
                   </td>
-                  <td>+<%= donor.donations.last.amount_in_dkk %>kr</td>
+                  <td>+<%= donor.donations.last.amount_in_dkk.round %> kr</td>
                   <td><%= donor.donation_method %></td>
                 </tr>
               <% end %>
@@ -48,8 +48,8 @@
         </div>
         <div class="span6">
           <div style="padding-left: 20px">
-            <h4>Lost regular donors</h4>
-            <h1 style="color: #D04437">-<%= @lost_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i %>kr<small> / month</small></h1>
+            <h4>Lost recurring supporters</h4>
+            <h1 style="color: #D04437">-<%= number_with_delimiter(@lost_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i) %> kr<small> / month</small></h1>
             <table class="table">
               <% for donor in @lost_regular_donors %>
                 <tr>
@@ -58,7 +58,7 @@
                     <a href="/donors/#{donor.id}"><%=donor.full_name %></a>
                     <% if donor.notes.present? %><i class=" icon-info-sign" title="#{donor.notes}"></i><% end %>
                   </td>
-                  <td>-<%= donor.donations.last.amount_in_dkk %>kr</td>
+                  <td>-<%= donor.donations.last.amount_in_dkk.round %> kr</td>
                   <td>
                     <%= donor.donation_method %>
                     <% if donor.donation_method == 'paypal' %>
@@ -81,10 +81,11 @@
       <div class="row">
         <div class="span6">
           <div style="padding-right: 20px">
-            <h4>Current monthly income from regular donors</h4>
-            <h1 style=""><%= @current_monthly_income_regular_donors.to_i %>kr<small> / month</small></h1>
-            
-            
+            <h4>Current monthly income from recurring supporters</h4>
+            <h1 style=""><%= number_with_delimiter(@current_monthly_income_regular_donors.sum{|d| d.donations.last.amount_in_dkk}.to_i) %> kr<small> / month</small></h1>
+            <% all_amounts = @current_monthly_income_regular_donors.map{|d| d.donations.last.amount_in_dkk} %>
+            <% average = all_amounts.reduce(:+) / all_amounts.size.to_f %>
+            <h2><small>from <%= @current_monthly_income_regular_donors.count %> recurring supporters, with an average donation of <%= average.round %> kr</small></h2>
           </div>
         </div>
         
@@ -92,11 +93,11 @@
         <div class="span6">
           <div style="padding-left: 20px">
             <h4>One time donations</h4>
-            <h2 style="color: #0D397F">+<%= @onetime_donations.sum(&:amount_in_dkk).to_i %>kr<small></small></h2>
+            <h2 style="color: #0D397F">+<%= number_with_delimiter(@onetime_donations.sum(&:amount_in_dkk).to_i) %> kr<small></small></h2>
             
             <table class="table">
               <% for donation in @onetime_donations %>
-                <tr><td><%= l(donation.donated_at.to_date) %></td><td><a href="/donors/#{donation.donor_id}"><%=donation.donor.try(:full_name) %></a></td><td>+<%=donation.amount_in_dkk%>kr</td><td><%= donation.donation_method%></td></tr>
+                <tr><td><%= l(donation.donated_at.to_date) %></td><td><a href="/donors/#{donation.donor_id}"><%=donation.donor.try(:full_name) %></a></td><td>+<%=donation.amount_in_dkk.round %> kr</td><td><%= donation.donation_method%></td></tr>
               <% end %>
             </table>
           </div>
@@ -118,7 +119,7 @@
             <h4>Evolution of income - Recurring donations</h4>
             <table class="table">
               <% for month, value in @regular_donations_monthly %>
-                <tr><td><%= month %></td><td style="text-align:right"><%= value %>kr</td></tr>
+                <tr><td><%= month %></td><td style="text-align:right"><%= value.round %> kr</td></tr>
               <% end %>
             </table>
           </div>
@@ -129,7 +130,7 @@
             <h4>Evolution of income - One time donations</h4>
             <table class="table">
               <% for month, value in @onetime_donations_monthly %>
-                <tr><td><%= month %></td><td style="text-align:right"><%= value %>kr</td></tr>
+                <tr><td><%= month %></td><td style="text-align:right"><%= value.round %> kr</td></tr>
               <% end %>
             </table>
           </div>
