@@ -33,10 +33,13 @@ CopsubDonations::Application.routes.draw do
 
   post '/api/stripe/subscribe' => 'stripe#subscribe'
   post '/api/stripe/donate' => 'stripe#donate'
+  post '/api/stripe/webhook' => 'stripe#webhook'
 
   get '/documentation' => 'front#documentation'
 
   get '/role_changes' => 'role_changes#index'
+  
+  get '/report' => 'front#report'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

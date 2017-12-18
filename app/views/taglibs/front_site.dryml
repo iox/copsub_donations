@@ -35,6 +35,7 @@
         <% end %>
         <li class="divider"></li>
         <li><a href="/saved_searches">Manage Saved Searches</a></li>
+        <li><a href="/report">Donations Report</a></li>
       </ul>
     </li>
   </navigation>

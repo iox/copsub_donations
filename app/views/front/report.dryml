@@ -1,0 +1,163 @@
+<page title="Home">
+
+  <body: class="front-page"/>
+
+  <content:>
+    <header class="content-header hero-unit">
+      <h2>Donations Report<br/></h2>
+      
+      
+      
+      <form method="get" class="form-horizontal search-form form-inline" action="" style="margin: 0">
+        <input class="bootstrap-datepicker" type="text" name="start_date" placeholder="From" value="&params[:start_date]" style="width:75px" data-date-format="dd.mm.yyyy"/>
+        <input class="bootstrap-datepicker" type="text" name="end_date" placeholder="To" value="&params[:end_date]" style="width:75px; margin-right: 20px" data-date-format="dd.mm.yyyy"/>
+        <input type="submit" value="Search" class="btn button submit-button search-button search-submit" style="margin-left: 0px"/>&nbsp;
+      </form>
+      
+    </header>
+
+    <section class="content-body">
+      <% if @alert %>
+        <div class="alert alert-notice">    <a class="close" data-dismiss="alert" href="#">×</a>
+          <span><%= @alert %></span>
+        </div>
+      <% end %>
+      <div class="row">
+        <div class="span6">
+          <div style="padding-right: 20px">
+            <h4>New regular donors</h4>
+            <h1 style="color: #14892C">+<%= @new_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i %>kr<small> / month</small></h1>
+            <table class="table">
+              <% for donor in @new_regular_donors %>
+                <tr>
+                  <td><%= l(donor.last_donated_at) %></td>
+                  <td>
+                    <a href="/donors/#{donor.id}"><%=donor.full_name %></a>
+                    <% if donor.donations.count > 1 %>
+                       <i class=" icon-star" title="Donor recovered! han havde ikke doneret for #{distance_of_time_in_words(donor.donations.last.donated_at, donor.donations.last(2).first.donated_at)}"></i>
+                       
+                    <% end %>
+                  </td>
+                  <td>+<%= donor.donations.last.amount_in_dkk %>kr</td>
+                  <td><%= donor.donation_method %></td>
+                </tr>
+              <% end %>
+              
+            </table>
+          </div>
+        </div>
+        <div class="span6">
+          <div style="padding-left: 20px">
+            <h4>Lost regular donors</h4>
+            <h1 style="color: #D04437">-<%= @lost_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i %>kr<small> / month</small></h1>
+            <table class="table">
+              <% for donor in @lost_regular_donors %>
+                <tr>
+                  <td><%= l(donor.stopped_regular_donations_date) %></td>
+                  <td>
+                    <a href="/donors/#{donor.id}"><%=donor.full_name %></a>
+                    <% if donor.notes.present? %><i class=" icon-info-sign" title="#{donor.notes}"></i><% end %>
+                  </td>
+                  <td>-<%= donor.donations.last.amount_in_dkk %>kr</td>
+                  <td>
+                    <%= donor.donation_method %>
+                    <% if donor.donation_method == 'paypal' %>
+                      <% last_paypal_events = donor.paypal_events.last(5).map{|event| "#{I18n.l(event.created_at.to_date)} - #{event.txn_type}"}.join("\n") %>
+                      <i class=" icon-info-sign" title="#{last_paypal_events}"></i>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      
+      <br/><hr/><br/>
+      
+      
+      
+      <div class="row">
+        <div class="span6">
+          <div style="padding-right: 20px">
+            <h4>Current monthly income from regular donors</h4>
+            <h1 style=""><%= @current_monthly_income_regular_donors.to_i %>kr<small> / month</small></h1>
+            
+            
+          </div>
+        </div>
+        
+        
+        <div class="span6">
+          <div style="padding-left: 20px">
+            <h4>One time donations</h4>
+            <h2 style="color: #0D397F">+<%= @onetime_donations.sum(&:amount_in_dkk).to_i %>kr<small></small></h2>
+            
+            <table class="table">
+              <% for donation in @onetime_donations %>
+                <tr><td><%= l(donation.donated_at.to_date) %></td><td><a href="/donors/#{donation.donor_id}"><%=donation.donor.try(:full_name) %></a></td><td>+<%=donation.amount_in_dkk%>kr</td><td><%= donation.donation_method%></td></tr>
+              <% end %>
+            </table>
+          </div>
+         
+        </div>
+        
+        
+      </div>
+      
+      
+      
+      <br/><hr/><br/>
+      
+      
+      <div class="row">
+        
+        <div class="span6">
+          <div style="padding-left: 20px">
+            <h4>Evolution of income - Recurring donations</h4>
+            <table class="table">
+              <% for month, value in @regular_donations_monthly %>
+                <tr><td><%= month %></td><td style="text-align:right"><%= value %>kr</td></tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+        
+        <div class="span6">
+          <div style="padding-left: 20px">
+            <h4>Evolution of income - One time donations</h4>
+            <table class="table">
+              <% for month, value in @onetime_donations_monthly %>
+                <tr><td><%= month %></td><td style="text-align:right"><%= value %>kr</td></tr>
+              <% end %>
+            </table>
+          </div>
+         
+        </div>
+        
+        
+        <!--<div class="span6">-->
+        <!--  <div style="padding-left: 20px">-->
+        <!--    <h4>Website traffic</h4>-->
+        <!--    <h1 style="">47<small> / unique visitors to Support Us page</small></h1>-->
+            
+        <!--    <table class="table">-->
+        <!--      <tr><td>Unique visits to website</td><td>456</td></tr>-->
+        <!--      <tr><td>Unique visits to Support Us page</td><td>47</td></tr>-->
+        <!--      <tr><td>Unique visits to Payment page</td><td>12</td></tr>-->
+        <!--      <tr><td>Conversion rate from Support Us page</td><td>3,5%</td></tr>-->
+        <!--      <tr><td>Conversion rate from home page</td><td>0,34%</td></tr>-->
+        <!--    </table>-->
+        <!--  </div>-->
+         
+        <!--</div>-->
+        
+      </div>
+      
+      
+      <br/><br/><br/><br/><br/>
+    </section>
+  </content:>
+
+</page>

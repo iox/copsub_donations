@@ -10,11 +10,12 @@ class Donation < ActiveRecord::Base
     bank_reference :string
     email          :string
     seamless_donation_id :integer
-    donation_method enum_string(:'bank', :'paypal')
+    donation_method enum_string(:'bank', :'paypal', :'stripe')
     wordpress_user_id :integer
     user_assigned :boolean, :default => false
     other_income :boolean, :default => false
     paypal_transaction_id :string
+    stripe_charge_id :string
     notes           :text
     timestamps
   end
@@ -26,7 +27,7 @@ class Donation < ActiveRecord::Base
   belongs_to :category
   belongs_to :donor
 
-  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id, :paypal_transaction_id, :donor, :donor_id, :notes
+  attr_accessible :amount, :currency, :donated_at, :bank_reference, :email, :seamless_donation_id, :amount_in_dkk, :donation_method, :wordpress_user_id, :other_income, :category, :category_id, :paypal_transaction_id, :donor, :donor_id, :notes, :stripe_charge_id
 
   # --- Hooks --- #
 
@@ -39,7 +40,7 @@ class Donation < ActiveRecord::Base
   end
 
   def cache_amount_donated_last_year
-    if wordpress_user_id && user
+    if user
       user.update_amount_donated_last_year!
     end
   end
@@ -51,11 +52,11 @@ class Donation < ActiveRecord::Base
   def default_search_value
     return email if email
 
-    only_numbers_bank_reference = bank_reference.gsub(/[^0-9]/, '')
+    only_numbers_bank_reference = bank_reference ? bank_reference.gsub(/[^0-9]/, '') : ""
     if only_numbers_bank_reference.size > 2
       only_numbers_bank_reference
     else
-      bank_reference.split.join(" ") # Remove extra spaces
+      bank_reference ? bank_reference.split.join(" ") : "" # Remove extra spaces
     end
   end
 

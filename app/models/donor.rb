@@ -29,9 +29,10 @@ class Donor < ActiveRecord::Base
     selected_amount          :integer
     stripe_customer_id       :string
     stripe_card_expiration_date :date
+    stopped_regular_donations_date :date
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes
+  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date
 
   has_many :donations
   has_many :role_changes
@@ -154,6 +155,16 @@ class Donor < ActiveRecord::Base
 
     # Count the number of donations
     self.number_of_donations = donations.count
+    
+    
+    # Update stopped_regular_donations_date
+    # Only applies to donors who have been a recurring supporter at some point, and who have not donated in the last month
+    if self.donations.count > 3 && last_donation.donated_at < 35.days.ago && (self.donations.count - self.donations.map(&:amount).uniq.size) > 2
+      # We estimate that the "stopped_regular_donations_date" is the last donation date + 35 days. That is when we realised that this donor is not donating any more
+      self.stopped_regular_donations_date = last_donation.donated_at.to_date + 1.month
+    else
+      self.stopped_regular_donations_date = nil
+    end
 
     self.save
 
@@ -186,6 +197,16 @@ class Donor < ActiveRecord::Base
       gibbon.automations("998bb9f4fc").emails("1cc5f6e19a").queue.create(body: {email_address: self.user_email})
     rescue
       Rails.logger.info "The thank you email could not be sent via Mailchimp."
+    end
+  end
+  
+  def full_name
+    if first_name.present? || last_name.present?
+      "#{first_name} #{last_name}"
+    elsif user_email.present?
+      user_email
+    else
+      "Donor #{id}"
     end
   end
 

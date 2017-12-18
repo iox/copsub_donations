@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170309140835) do
+ActiveRecord::Schema.define(version: 20171218135942) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20170309140835) do
     t.string   "paypal_transaction_id"
     t.integer  "donor_id"
     t.text     "notes"
+    t.string   "stripe_charge_id"
   end
 
   add_index "donations", ["category_id"], name: "index_donations_on_category_id", using: :btree
@@ -58,7 +59,7 @@ ActiveRecord::Schema.define(version: 20170309140835) do
     t.datetime "updated_at"
     t.string   "alternativeid"
     t.date     "first_donated_at"
-    t.string   "mailchimp_status",            default: "not_present"
+    t.string   "mailchimp_status",               default: "not_present"
     t.text     "notes"
     t.integer  "donated_total"
     t.date     "last_donated_at"
@@ -72,6 +73,7 @@ ActiveRecord::Schema.define(version: 20170309140835) do
     t.integer  "selected_amount"
     t.string   "stripe_customer_id"
     t.date     "stripe_card_expiration_date"
+    t.date     "stopped_regular_donations_date"
   end
 
   create_table "email_logs", force: true do |t|

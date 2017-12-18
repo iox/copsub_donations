@@ -1,7 +1,7 @@
 class StripeController < ApplicationController
 
   skip_before_filter :authenticate
-  protect_from_forgery :except => [:donation]
+  protect_from_forgery :except => [:donation, :webhook]
   before_filter :override_cors_limitations
 
   def subscribe
@@ -40,5 +40,41 @@ class StripeController < ApplicationController
     DonorMailer.thank_you(donor, false).deliver
 
     render status: 200, json: "OK".to_json
+  end
+  
+  
+  def webhook
+    payload = request.body.read
+    sig_header = request.env['HTTP_STRIPE_SIGNATURE']
+    event = nil
+  
+    begin
+      event = Stripe::Webhook.construct_event(
+        payload, sig_header, ENV['STRIPE_ENDPOINT_SECRET']
+      )
+    rescue JSON::ParserError => e
+      # Invalid payload
+      render plain: 'INVALID PAYLOAD', status: 400
+      return
+    rescue Stripe::SignatureVerificationError => e
+      # Invalid signature
+      render plain: 'INVALID SIGNATURE', status: 400
+      return
+    end
+  
+    # Do something with event
+    
+    logger.info "Stripe Event received"
+    logger.info event.inspect.to_s
+    
+    if event.type == 'invoice.payment_succeeded'
+      logger.info event.inspect
+      
+      customer = Stripe::Customer.retrieve(event.data.object.customer)
+      logger.info customer.inspect
+    end
+    
+  
+    render text: 'SUCCESS ' + event.inspect.to_s
   end
 end
