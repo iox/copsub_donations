@@ -84,27 +84,10 @@
       
       
       <div class="row">
+        
+        
         <div class="span6">
           <div style="padding-right: 20px">
-            <h4>Last month's income from recurring supporters</h4>
-            <h1 style=""><%= number_with_delimiter(@last_month_recurring_donations.sum(&:amount_in_dkk).to_i) %> kr<small> in <%= @last_month_recurring_donations.first.donated_at.strftime("%B %Y") %></small></h1>
-            <% all_amounts = @last_month_recurring_donations.map(&:amount_in_dkk) %>
-            
-            <% average = all_amounts.reduce(:+) / all_amounts.size.to_f %>
-            
-            <h2>
-              <small>
-                from <%= @last_month_recurring_donations.map(&:donor_id).uniq.count %> supporters<br/>
-                in <%= @last_month_recurring_donations.count %> donations<br/>
-                with an average donation of <%= average.round %> kr<br/>
-              </small>
-            </h2>
-          </div>
-        </div>
-        
-        
-        <div class="span6">
-          <div style="padding-left: 20px">
             <h4>One time donations</h4>
             <h2 style="color: #0D397F">+<%= number_with_delimiter(@onetime_donations.sum(&:amount_in_dkk).to_i) %> kr<small></small></h2>
             
@@ -122,20 +105,71 @@
       
       
       
-      <br/><br/><br/>
+      <br/><br/><hr/><br/><br/>
+      
+      
+      <div class="row">
+        <div class="span6">
+          <div style="padding-right: 20px">
+            <h4>Last month's income from recurring supporters</h4>
+            <h1 style=""><%= number_with_delimiter(@last_month_recurring_donations.sum(&:amount_in_dkk).to_i) %> kr<small> in <%= @last_month_recurring_donations.first.donated_at.strftime("%B %Y") %></small></h1>
+            <% all_amounts = @last_month_recurring_donations.map(&:amount_in_dkk) %>
+            
+            <% average = all_amounts.reduce(:+) / all_amounts.size.to_f %>
+            
+            <h2>
+              <small>
+                from <%= @last_month_recurring_donations.map(&:donor_id).uniq.count %> supporters<br/>
+                in <%= @last_month_recurring_donations.count %> donations<br/>
+                with an average donation of <%= average.round %> kr<br/>
+              </small>
+            </h2>
+          </div>
+        </div>
+      </div>
+      
+      
+      <br/><br/><hr/><br/><br/>
       
       
       <div class="row">
         <div class="span12">
+          <h4>Evolution of recurring supporters</h4>
+          <div id="highchart-recurring-supporters"></div>
+          <table class="table highchart" data-graph-container="#highchart-recurring-supporters" data-graph-type="line" data-graph-color-1="#14892C" data-graph-color-2="#D04437" data-graph-color-3="#E2B9E6">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th style="text-align:right">Gained recurring supporters</th>
+                <th style="text-align:right">Lost recurring supporters</th>
+                <th data-graph-type="area" style="text-align:right">Net change</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for month, value in @started_donating_monthly %>
+                <tr>
+                  <td><%= month %></td>
+                  <td style="text-align:right; color: #14892C">+<%= value.round %> kr</td>
+                  <td style="text-align:right; color: #D04437">-<%= @stopped_donating_monthly[month].round %>kr</td>
+                  <% net_change = value.round - @stopped_donating_monthly[month].round %>
+                  <% color = net_change > 0 ? '#14892C' : '#D04437' %>
+                  <td style="text-align:right; color: #{color}"><%= net_change %>kr</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        
+          <br/><br/><br/><br/><br/><br/><br/><br/>
+        
           <h4>Evolution of income</h4>
-          <div id="highchart-container"></div>
-            <table class="table highchart" data-graph-container="#highchart-container" data-graph-type="line">
+            <div id="highchart-container"></div>
+            <table class="table highchart" data-graph-container="#highchart-container" data-graph-type="line" data-graph-color-1="#14892C" data-graph-color-2="#0D397F" data-graph-color-3="#E2B9E6">
               <thead>
                 <tr>
                   <th>Month</th>
                   <th style="text-align:right">Recurring donations</th>
                   <th style="text-align:right">One time donations</th>
-                  <th style="text-align:right">Total donations</th>
+                  <th data-graph-type="area" style="text-align:right">Total donations</th>
                 </tr>
               </thead>
               <tbody>

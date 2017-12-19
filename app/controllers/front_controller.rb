@@ -35,6 +35,8 @@ class FrontController < ApplicationController
     
     @regular_donations_monthly = Donation.where(other_income: false).where("category_id != 5").where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
     @onetime_donations_monthly = Donation.where(other_income: false).where("category_id  = 5").where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
+    @started_donating_monthly = Donation.where(other_income: false).where(first_donation_in_series: true).where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
+    @stopped_donating_monthly = Donation.where(other_income: false).where(last_donation_in_series: true).where("stopped_donating_date >= ?", (@start_date - 1.year).beginning_of_month).where("stopped_donating_date < ?", Time.now.beginning_of_month).order("stopped_donating_date").group("date_format(stopped_donating_date, '%M %Y')").sum(:amount_in_dkk)
     
     @onetime_donations = Donation.where(other_income: false).where(category_id: 5).where("donated_at >= ? AND donated_at <= ?", @start_date, @end_date).order("donated_at desc")
   end
