@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171218135942) do
+ActiveRecord::Schema.define(version: 20171219122047) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(version: 20171218135942) do
   end
 
   create_table "donations", force: true do |t|
-    t.decimal  "amount",                precision: 8, scale: 2
-    t.decimal  "amount_in_dkk",         precision: 8, scale: 2
+    t.decimal  "amount",                   precision: 8, scale: 2
+    t.decimal  "amount_in_dkk",            precision: 8, scale: 2
     t.string   "currency"
     t.datetime "donated_at"
     t.string   "bank_reference"
@@ -32,13 +32,16 @@ ActiveRecord::Schema.define(version: 20171218135942) do
     t.integer  "seamless_donation_id"
     t.string   "donation_method"
     t.integer  "wordpress_user_id"
-    t.boolean  "user_assigned",                                 default: false
-    t.boolean  "other_income",                                  default: false
+    t.boolean  "user_assigned",                                    default: false
+    t.boolean  "other_income",                                     default: false
     t.integer  "category_id"
     t.string   "paypal_transaction_id"
     t.integer  "donor_id"
     t.text     "notes"
     t.string   "stripe_charge_id"
+    t.boolean  "first_donation_in_series",                         default: false
+    t.boolean  "last_donation_in_series",                          default: false
+    t.date     "stopped_donating_date"
   end
 
   add_index "donations", ["category_id"], name: "index_donations_on_category_id", using: :btree

@@ -21,7 +21,7 @@
     <div class="well" unless="&this.donations.blank?">
       <h4>Donations made by this donor</h4>
       <div class="table-plus">
-        <table class="table" with="&this.donations.order('donated_at desc')" fields="this, email, bank_reference, donated_at, amount_in_dkk">
+        <table class="table" with="&this.donations.order('donated_at desc')" fields="this, email, bank_reference, donated_at, amount_in_dkk, first_donation_in_series, last_donation_in_series, stopped_donating_date">
           <tfoot:>
           <th colspan="3"></th>
           <th>Total</th>

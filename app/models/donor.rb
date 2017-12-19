@@ -167,7 +167,7 @@ class Donor < ActiveRecord::Base
     end
 
     self.save
-
+    
     return log
   end
   
@@ -186,7 +186,7 @@ class Donor < ActiveRecord::Base
   def donation_interval
     if donations.where(amount: most_typical_amount).count > 2
       span_secs = donations.maximum(:donated_at) - donations.minimum(:donated_at)
-      avg_secs = span_secs / (donations.count - 1)
+      avg_secs = span_secs / (donations.where(amount: most_typical_amount).count - 1)
       (avg_secs / (24 * 60 * 60)).round
     else
       30

@@ -17,6 +17,9 @@ class Donation < ActiveRecord::Base
     paypal_transaction_id :string
     stripe_charge_id :string
     notes           :text
+    first_donation_in_series :boolean, :default => false
+    last_donation_in_series :boolean, :default => false
+    stopped_donating_date :date
     timestamps
   end
 
@@ -32,6 +35,7 @@ class Donation < ActiveRecord::Base
   # --- Hooks --- #
 
   before_save :convert_amount_to_dkk, :set_default_category
+  after_create :set_series_flags
   after_save :cache_amount_donated_last_year
 
   def convert_amount_to_dkk
@@ -47,6 +51,27 @@ class Donation < ActiveRecord::Base
 
   def set_default_category
     self.category ||= Category.where(default: true).first
+  end
+  
+  def set_series_flags
+    return if self.category_id == 5 || self.donor.blank?
+    
+    if donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at < ?", self.donated_at).count == 0
+      first_donation_in_series = true
+    else
+      first_donation_in_series = false
+    end
+    
+    if donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at > ?", self.donated_at).count == 0
+      last_donation_in_series = true
+      stopped_donating_date = self.donated_at.to_date + donor.donation_interval + 5.days
+    else
+      last_donation_in_series = false
+      stopped_donating_date = nil
+    end
+    
+    # Save attributes without invoking callbacks
+    Donation.where(id: self.id).update_all(first_donation_in_series: first_donation_in_series, last_donation_in_series: last_donation_in_series, stopped_donating_date: stopped_donating_date)
   end
 
   def default_search_value

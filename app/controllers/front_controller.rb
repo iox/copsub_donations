@@ -27,10 +27,9 @@ class FrontController < ApplicationController
     if @end_date > last_bank_donation_date
       @alert = "Warning: The last registered bank donation occurred on #{I18n.l(last_bank_donation_date)}. This means that no bank statements have been imported into the donations app since then. This report could show incorrect lost regular donors. Please import the latest bank statement to update this report."
     end
-    #
-    @new_regular_donors = Donor.where("((role = 'recurring_supporter' OR selected_donor_type = 'supporter') AND first_donated_at >= ? AND first_donated_at <= ?) OR (role = 'inactive_supporter' AND last_donated_at >= ? AND last_donated_at <= ?)", @start_date, @end_date, @start_date, @end_date).order("last_donated_at desc")
-
-    @lost_regular_donors = Donor.where("stopped_regular_donations_date IS NOT NULL AND stopped_regular_donations_date >= ? AND stopped_regular_donations_date <= ?", @start_date, @end_date).order("stopped_regular_donations_date desc")
+    
+    @started_donating = Donation.where(first_donation_in_series: true).where("donated_at >= ? AND donated_at <= ?", @start_date, @end_date)
+    @stopped_donating = Donation.where(last_donation_in_series: true).where("stopped_donating_date >= ? AND stopped_donating_date <= ?", @start_date, @end_date)
     
     @last_month_recurring_donations = Donation.where(other_income: false).where("category_id != 5").where("donated_at >= ? AND donated_at <= ?", (Time.now - 1.month).beginning_of_month, (Time.now - 1.month).end_of_month)
     

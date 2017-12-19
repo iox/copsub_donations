@@ -26,20 +26,22 @@
         <div class="span6">
           <div style="padding-right: 20px">
             <h4>Gained recurring supporters</h4>
-            <h1 style="color: #14892C">+<%= number_with_delimiter(@new_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i) %> kr<small> / month</small></h1>
+            <h1 style="color: #14892C">+<%= number_with_delimiter(@started_donating.sum(&:amount_in_dkk).round) %> kr<small> / month</small></h1>
             <table class="table">
-              <% for donor in @new_regular_donors %>
+              <% for donation in @started_donating %>
                 <tr>
-                  <td><%= l(donor.last_donated_at) %></td>
+                  <td><%= l(donation.donated_at) %></td>
                   <td>
-                    <a href="/donors/#{donor.id}"><%=donor.full_name %></a>
-                    <% if donor.donations.count > 1 %>
-                       <i class=" icon-star" title="Donor recovered! han havde ikke doneret for #{distance_of_time_in_words(donor.donations.last.donated_at, donor.donations.last(2).first.donated_at)}"></i>
-                       
+                    <a href="/donors/#{donation.donor_id}"><%=donation.donor.full_name %></a>
+                    <% if donation.donor.donations.where("donated_at < ?", donation.donated_at).count > 0 %>
+                      <i class=" icon-star" title="Donor had donated in the past, we have recovered a donor!"></i>
                     <% end %>
+                    <% if @stopped_donating.map(&:donor_id).include?(donation.donor_id) %><i class=" icon-random" title="This donor is in both lists, maybe he changed the amount?"></i><% end %>
                   </td>
-                  <td>+<%= donor.donations.last.amount_in_dkk.round %> kr</td>
-                  <td><%= donor.donation_method %></td>
+                  <td>
+                    +<%= donation.amount_in_dkk.round %> kr
+                  </td>
+                  <td><%= donation.donation_method %></td>
                 </tr>
               <% end %>
               
@@ -49,20 +51,23 @@
         <div class="span6">
           <div style="padding-left: 20px">
             <h4>Lost recurring supporters</h4>
-            <h1 style="color: #D04437">-<%= number_with_delimiter(@lost_regular_donors.sum{|d| d.most_typical_amount_in_dkk }.to_i) %> kr<small> / month</small></h1>
+            <h1 style="color: #D04437">-<%= number_with_delimiter(@stopped_donating.sum(&:amount_in_dkk).round) %> kr<small> / month</small></h1>
             <table class="table">
-              <% for donor in @lost_regular_donors %>
+              <% for donation in @stopped_donating %>
                 <tr>
-                  <td><%= l(donor.stopped_regular_donations_date) %></td>
+                  <td><%= l(donation.stopped_donating_date) %></td>
                   <td>
-                    <a href="/donors/#{donor.id}"><%=donor.full_name %></a>
-                    <% if donor.notes.present? %><i class=" icon-info-sign" title="#{donor.notes}"></i><% end %>
+                    <a href="/donors/#{donation.donor_id}"><%=donation.donor.full_name %></a>
+                    <% if donation.donor.notes.present? %><i class=" icon-info-sign" title="#{donation.donor.notes}"></i><% end %>
+                    <% if @started_donating.map(&:donor_id).include?(donation.donor_id) %><i class=" icon-random" title="This donor is in both lists, maybe he changed the amount?"></i><% end %>
                   </td>
-                  <td>-<%= donor.most_typical_amount_in_dkk.round %> kr</td>
                   <td>
-                    <%= donor.donation_method %>
-                    <% if donor.donation_method == 'paypal' %>
-                      <% last_paypal_events = donor.paypal_events.last(5).map{|event| "#{I18n.l(event.created_at.to_date)} - #{event.txn_type}"}.join("\n") %>
+                    -<%= donation.amount_in_dkk.round %> kr
+                  </td>
+                  <td>
+                    <%= donation.donation_method %>
+                    <% if donation.donation_method == 'paypal' %>
+                      <% last_paypal_events = donation.donor.paypal_events.last(5).map{|event| "#{I18n.l(event.created_at.to_date)} - #{event.txn_type}"}.join("\n") %>
                       <i class=" icon-info-sign" title="#{last_paypal_events}"></i>
                     <% end %>
                   </td>
