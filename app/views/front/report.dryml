@@ -109,55 +109,56 @@
       
       
       
-      <br/><hr/><br/>
+      <br/><br/><br/>
       
       
       <div class="row">
-        
-        <div class="span6">
-          <div style="padding-left: 20px">
-            <h4>Evolution of income - Recurring donations</h4>
-            <table class="table">
-              <% for month, value in @regular_donations_monthly %>
-                <tr><td><%= month %></td><td style="text-align:right"><%= value.round %> kr</td></tr>
-              <% end %>
+        <div class="span12">
+          <h4>Evolution of income</h4>
+          <div id="highchart-container"></div>
+            <table class="table highchart" data-graph-container="#highchart-container" data-graph-type="line">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th style="text-align:right">Recurring donations</th>
+                  <th style="text-align:right">One time donations</th>
+                  <th style="text-align:right">Total donations</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for month, value in @regular_donations_monthly %>
+                  <tr>
+                    <td><%= month %></td>
+                    <td style="text-align:right"><%= value.round %> kr</td>
+                    <td style="text-align:right"><%= @onetime_donations_monthly[month].round %> kr</td>
+                    <td style="text-align:right"><%= (value + @onetime_donations_monthly[month]).round %> kr</td>
+                  </tr>
+                <% end %>
+              </tbody>
             </table>
-          </div>
         </div>
         
-        <div class="span6">
-          <div style="padding-left: 20px">
-            <h4>Evolution of income - One time donations</h4>
-            <table class="table">
-              <% for month, value in @onetime_donations_monthly %>
-                <tr><td><%= month %></td><td style="text-align:right"><%= value.round %> kr</td></tr>
-              <% end %>
-            </table>
-          </div>
-         
+        
+        <div class="span12">
+
         </div>
         
         
-        <!--<div class="span6">-->
-        <!--  <div style="padding-left: 20px">-->
-        <!--    <h4>Website traffic</h4>-->
-        <!--    <h1 style="">47<small> / unique visitors to Support Us page</small></h1>-->
-            
-        <!--    <table class="table">-->
-        <!--      <tr><td>Unique visits to website</td><td>456</td></tr>-->
-        <!--      <tr><td>Unique visits to Support Us page</td><td>47</td></tr>-->
-        <!--      <tr><td>Unique visits to Payment page</td><td>12</td></tr>-->
-        <!--      <tr><td>Conversion rate from Support Us page</td><td>3,5%</td></tr>-->
-        <!--      <tr><td>Conversion rate from home page</td><td>0,34%</td></tr>-->
-        <!--    </table>-->
-        <!--  </div>-->
-         
-        <!--</div>-->
+
         
       </div>
       
       
       <br/><br/><br/><br/><br/>
+      
+      <script src="/highcharts.js"></script> 
+      <script src="/jquery.highchartTable-min.js"></script>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          $('table.highchart').highchartTable();
+        });
+      </script>
+
     </section>
   </content:>
 
