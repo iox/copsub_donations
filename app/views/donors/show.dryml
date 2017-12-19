@@ -1,4 +1,15 @@
 <show-page>
+  
+  <heading:>
+    Donor <%= @donor.id %>: <%= @donor.full_name %><br/>
+    <% total_amount_ranking = Donation.where(other_income: false).group(:donor_id).order("sum_amount_in_dkk desc").sum(:amount_in_dkk).keys.compact %>
+    <% number_of_donations_ranking = Donation.where(other_income: false).order("count_all desc").group(:donor_id).count.keys.compact %>
+    <small if="&@donor.donations.count > 0">
+      <br/>
+      This donor is <strong>#<%= total_amount_ranking.index(@donor.id)+1%></strong> in the <a href="/donors?direction=desc&donated_total=100&sort=donated_total">total donated amount ranking</a>, with <%= number_with_delimiter(@donor.donations.sum(:amount_in_dkk).round) %>kr donated<br/>
+      This donor is <strong>#<%= number_of_donations_ranking.index(@donor.id)+1%></strong> in the <a href="/donors?sort=-number_of_donations&donated_total=100&number_of_donations=">number of donations ranking</a>, with <%= @donor.donations.count %> donations
+    </small>
+  </heading:>
 
   <field-list: skip="paypalid, alternativeid">
     <paymentid-view:>
