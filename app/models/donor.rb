@@ -159,7 +159,7 @@ class Donor < ActiveRecord::Base
     
     # Update stopped_regular_donations_date
     # Only applies to donors who have been a recurring supporter at some point, and who have not donated in the last month
-    if self.donations.count > 3 && last_donation.donated_at < 35.days.ago && (self.donations.count - self.donations.map(&:amount).uniq.size) > 2
+    if self.donations.count > 3 && last_donation.donated_at < (donation_interval+5).days.ago && (self.donations.count - self.donations.map(&:amount).uniq.size) > 2
       # We estimate that the "stopped_regular_donations_date" is the last donation date + 35 days. That is when we realised that this donor is not donating any more
       self.stopped_regular_donations_date = last_donation.donated_at.to_date + 1.month
     else
@@ -169,6 +169,28 @@ class Donor < ActiveRecord::Base
     self.save
 
     return log
+  end
+  
+  # This methods returns the "most typical amount" a user donates
+  def most_typical_amount
+    amounts = donations.map(&:amount)
+    freq = amounts.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+    amounts.sort_by { |v| freq[v] }.last
+  end
+  
+  def most_typical_amount_in_dkk
+    most_typical_amount * ExchangeRate.get(donations.where(amount: most_typical_amount).last.currency)
+  end
+  
+  # Most donors donate monthly, but some donate every 3 or 6 months. This method estimates this interval
+  def donation_interval
+    if donations.where(amount: most_typical_amount).count > 2
+      span_secs = donations.maximum(:donated_at) - donations.minimum(:donated_at)
+      avg_secs = span_secs / (donations.count - 1)
+      (avg_secs / (24 * 60 * 60)).round
+    else
+      30
+    end
   end
 
 

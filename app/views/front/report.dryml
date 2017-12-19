@@ -49,7 +49,7 @@
         <div class="span6">
           <div style="padding-left: 20px">
             <h4>Lost recurring supporters</h4>
-            <h1 style="color: #D04437">-<%= number_with_delimiter(@lost_regular_donors.sum{|d| d.donations.last.amount_in_dkk }.to_i) %> kr<small> / month</small></h1>
+            <h1 style="color: #D04437">-<%= number_with_delimiter(@lost_regular_donors.sum{|d| d.most_typical_amount_in_dkk }.to_i) %> kr<small> / month</small></h1>
             <table class="table">
               <% for donor in @lost_regular_donors %>
                 <tr>
@@ -58,7 +58,7 @@
                     <a href="/donors/#{donor.id}"><%=donor.full_name %></a>
                     <% if donor.notes.present? %><i class=" icon-info-sign" title="#{donor.notes}"></i><% end %>
                   </td>
-                  <td>-<%= donor.donations.last.amount_in_dkk.round %> kr</td>
+                  <td>-<%= donor.most_typical_amount_in_dkk.round %> kr</td>
                   <td>
                     <%= donor.donation_method %>
                     <% if donor.donation_method == 'paypal' %>
