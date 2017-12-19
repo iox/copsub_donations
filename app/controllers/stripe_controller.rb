@@ -77,6 +77,6 @@ class StripeController < ApplicationController
     # end
     
   
-    render text: 'SUCCESS ' + event.inspect.to_s
+    render text: 'SUCCESS'
   end
 end

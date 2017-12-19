@@ -34,10 +34,10 @@ class FrontController < ApplicationController
     
     @current_monthly_income_regular_donors = Donor.where("role = 'recurring_supporter'")
     
-    @regular_donations_monthly = Donation.where("category_id != 5").where("donated_at > ?", @start_date - 1.year).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
-    @onetime_donations_monthly = Donation.where("category_id  = 5").where("donated_at > ?", @start_date - 1.year).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
+    @regular_donations_monthly = Donation.where(other_income: false).where("category_id != 5").where("donated_at > ?", @start_date - 1.year).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
+    @onetime_donations_monthly = Donation.where(other_income: false).where("category_id  = 5").where("donated_at > ?", @start_date - 1.year).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
     
-    @onetime_donations = Donation.where(category_id: 5).where("donated_at >= ? AND donated_at <= ?", @start_date, @end_date)
+    @onetime_donations = Donation.where(other_income: false).where(category_id: 5).where("donated_at >= ? AND donated_at <= ?", @start_date, @end_date)
   end
 
 end
