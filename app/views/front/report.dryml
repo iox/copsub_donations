@@ -81,11 +81,11 @@
       <div class="row">
         <div class="span6">
           <div style="padding-right: 20px">
-            <h4>Current monthly income from recurring supporters</h4>
-            <h1 style=""><%= number_with_delimiter(@current_monthly_income_regular_donors.sum{|d| d.donations.last.amount_in_dkk}.to_i) %> kr<small> / month</small></h1>
-            <% all_amounts = @current_monthly_income_regular_donors.map{|d| d.donations.last.amount_in_dkk} %>
+            <h4>Last month's income from recurring supporters</h4>
+            <h1 style=""><%= number_with_delimiter(@last_month_recurring_donations.sum(&:amount_in_dkk).to_i) %> kr<small> in <%= @last_month_recurring_donations.first.donated_at.strftime("%B %Y") %></small></h1>
+            <% all_amounts = @last_month_recurring_donations.map(&:amount_in_dkk) %>
             <% average = all_amounts.reduce(:+) / all_amounts.size.to_f %>
-            <h2><small>from <%= @current_monthly_income_regular_donors.count %> recurring supporters, with an average donation of <%= average.round %> kr</small></h2>
+            <h2><small>from <%= @last_month_recurring_donations.count %> recurring supporters<br/> with an average donation of <%= average.round %> kr</small></h2>
           </div>
         </div>
         
