@@ -54,8 +54,6 @@ class Donation < ActiveRecord::Base
   end
   
   def set_series_flags
-    return if self.category_id == 5 || self.donor.blank?
-    
     if donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at < ?", self.donated_at).count == 0
       first_donation_in_series = true
     else
@@ -66,6 +64,12 @@ class Donation < ActiveRecord::Base
       last_donation_in_series = true
       stopped_donating_date = self.donated_at.to_date + donor.donation_interval + 5.days
     else
+      last_donation_in_series = false
+      stopped_donating_date = nil
+    end
+    
+    if self.category_id == 5 || self.donor.blank?
+      first_donation_in_series = false
       last_donation_in_series = false
       stopped_donating_date = nil
     end
