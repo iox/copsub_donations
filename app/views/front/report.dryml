@@ -30,7 +30,7 @@
             <table class="table">
               <% for donation in @started_donating %>
                 <tr>
-                  <td><%= l(donation.donated_at) %></td>
+                  <td><%= l(donation.donated_at.to_date) %></td>
                   <td>
                     <a href="/donors/#{donation.donor_id}"><%=donation.donor.full_name %></a>
                     <% if donation.donor.donations.where("donated_at < ?", donation.donated_at).count > 0 %>
