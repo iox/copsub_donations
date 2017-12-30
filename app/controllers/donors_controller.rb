@@ -230,7 +230,7 @@ class DonorsController < ApplicationController
       scope = scope.where("#{params[:donation_date]} BETWEEN ? AND ?", params[:donation_date_from].to_date, params[:donation_date_to].to_date)
     end
 
-    if params[:number_of_donations]
+    if params[:number_of_donations].present?
       scope = scope.where("number_of_donations >= ?", params[:number_of_donations])
     end
 

@@ -24,7 +24,7 @@ class Donor < ActiveRecord::Base
     last_paypal_failure      :date
     last_paypal_failure_type :string
     notes                    :text
-    number_of_donations      :integer
+    number_of_donations      :integer, default: 0
     selected_donor_type      :string
     selected_amount          :integer
     stripe_customer_id       :string

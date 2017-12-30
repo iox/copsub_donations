@@ -101,6 +101,21 @@
         </div>
         
         
+        <div class="span6">
+          <div style="padding-right: 20px">
+            <h4>Donors who almost donated</h4>
+            <h2 style="color: #0D397F; line-height: 15px"><small>They entered their payment details in the support us page, but their donation has not been registered</small></h2>
+            
+            <table class="table">
+              <% for donor in @almost_donated %>
+                <tr><td><%= l(donor.updated_at.to_date) %></td><td><a href="/donors/#{donor.id}"><%=donor.try(:full_name) %></a></td><td>+<%=donor.selected_amount %> USD</td><td><%= donor.selected_donor_type %></td></tr>
+              <% end %>
+            </table>
+          </div>
+         
+        </div>
+        
+        
       </div>
       
       

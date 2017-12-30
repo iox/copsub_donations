@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171219122047) do
+ActiveRecord::Schema.define(version: 20171230141859) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -71,7 +71,7 @@ ActiveRecord::Schema.define(version: 20171219122047) do
     t.string   "first_name"
     t.string   "last_name"
     t.string   "last_paypal_failure_type"
-    t.integer  "number_of_donations"
+    t.integer  "number_of_donations",            default: 0
     t.string   "selected_donor_type"
     t.integer  "selected_amount"
     t.string   "stripe_customer_id"
