@@ -114,10 +114,18 @@
                     <a href="/donors/#{donor.id}"><%=donor.try(:full_name) %>
                     <% if donor.notes.present? %><i class=" icon-info-sign" title="#{donor.notes}"></i><% end %></a>
                   </td>
-                  <td>+<%=donor.selected_amount %> USD</td><td><%= donor.selected_donor_type %></td>
+                  <td><small><%= donor.selected_donor_type %>/<%=donor.selected_amount %>$</small></td>
+                  <td>
+                    <%= donor.donation_method %>
+                  </td>
+                  <td>
+                    <a href="#{donor.almost_donated_mailto_template}"><i class=" icon-envelope" title="Send email"></i></a>
+
+                  </td>
                 </tr>
               <% end %>
             </table>
+            <a target="_blank" href="mailto:ignacio@ihuerta.net?Subject=Test%20My%20Friend&Body=asdadsa%0A%0Adsdsds">linkText</a>
           </div>
          
         </div>
