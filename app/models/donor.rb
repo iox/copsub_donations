@@ -231,6 +231,12 @@ class Donor < ActiveRecord::Base
       "Donor #{id}"
     end
   end
+  
+  def almost_donated_mailto_template
+    subject = URI.encode "Donation to Copenhagen Suborbitals"
+    body = URI.encode "Hi #{first_name}, \n\nI can see that you signed up as a Copenhagen Suborbitals Supporter on #{I18n.l(updated_at.to_date, format: :long)}, however we haven’t registered your payment yet?\n\nWe have recently implemented a new system for managing our donors so it might be a system error during the payment.\n\nDid you have any trouble while donating? Is there anything I can help you with?\n\nMads Wilson, Copenhagen Suborbitals"
+    "mailto:#{user_email}?subject=#{subject}&body=#{body}"
+  end
 
   # --- Permissions --- #
 
