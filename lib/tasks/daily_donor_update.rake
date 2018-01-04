@@ -11,7 +11,7 @@ task :daily_donor_update => :environment do
   for donation in Donation.where("created_at > ?", 2.days.ago)
     # Update the "last_donation_in_series" flag for donations made by donors who donated in the last couple of days
     if donation.donor
-      donation.donor.donations.where("donated_at > ?", 13.months.ago).to_a.each(&:set_series_flags)
+      donation.donor.donations.last(3).to_a.each(&:set_series_flags)
     end
   end
 

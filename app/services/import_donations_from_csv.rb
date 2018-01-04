@@ -32,6 +32,12 @@ class ImportDonationsFromCSV
 
     if donation.save
       status = AssignUserAutomatically.new(donation).try_to_assign_user
+      
+      # Update the "last_donation_in_series" flag for donations made by this donor
+      donation.reload
+      if donation.donor
+        donation.donor.donations.last(3).to_a.each(&:set_series_flags)
+      end
       @result[status] << donation
     else
       logger.info donation.errors.inspect

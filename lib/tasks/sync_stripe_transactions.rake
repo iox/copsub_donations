@@ -47,6 +47,13 @@ task :sync_stripe_transactions => :environment do
     # Try to assign the donation to a user automatically
     if donation.save!
       AssignUserAutomatically.new(donation, charge.source.customer.present?, first_name, last_name).try_to_assign_user
+      
+      # Update the "last_donation_in_series" flag for donations made by this donor
+      donation.reload
+      if donation.donor
+        donation.donor.donations.last(3).to_a.each(&:set_series_flags)
+      end
+      
     else
       raise "Error - donation could not be saved: #{donation.inspect}"
     end
