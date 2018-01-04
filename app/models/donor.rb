@@ -30,6 +30,7 @@ class Donor < ActiveRecord::Base
     stripe_customer_id       :string
     stripe_card_expiration_date :date
     stopped_regular_donations_date :date
+    filled_donation_form_date :date
     timestamps
   end
   attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date

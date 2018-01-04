@@ -26,6 +26,7 @@ class DonorsController < ApplicationController
 
   # POST /api/new_donor
   # This endpoint receives the data from the donations flow, creates a new donor and return its donor ID
+  # It is called for all donation methods except Paypal. Paypal uses paypal#generate_payment_token
   def new_donor
     override_cors_limitations
 
@@ -35,15 +36,19 @@ class DonorsController < ApplicationController
       user_email: params["email"],
       # They are just subscribers, until a payment has been registered
       role: "subscriber",
-      country: params["country"],
-      donation_method: params[:donation_method]
+      country: params["country"]
     )
+    
 
     donor.paymentid = "donor#{donor.id}"
     # "supporter" or "one_time", depending on what the donor selected in the donations flow
     donor.selected_donor_type = params[:selected_donor_type]
     # we store how much the donor wished to donate, in case something fails and we need to send a reminder
     donor.selected_amount = params[:selected_amount].to_i
+
+    # Store the donation method and the date when the user filled in the donation form    
+    donor.donation_method = params[:donation_method]
+    donor.filled_donation_form_date = Date.today
 
     if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
       donor.subscribe_to_mailchimp_list
