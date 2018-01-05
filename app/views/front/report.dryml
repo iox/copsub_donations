@@ -109,7 +109,7 @@
             <table class="table">
               <% for donor in @almost_donated %>
                 <tr>
-                  <td><%= l(donor.filled_donation_form_date) %></td>
+                  <td><%= l(donor.filled_donation_form_date) if donor.filled_donation_form_date %></td>
                   <td>
                     <a href="/donors/#{donor.id}"><%=donor.try(:full_name) %>
                     <% if donor.notes.present? %><i class=" icon-info-sign" title="#{donor.notes}"></i><% end %></a>
