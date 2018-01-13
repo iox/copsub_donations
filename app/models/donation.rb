@@ -26,6 +26,10 @@ class Donation < ActiveRecord::Base
   def user
     Donor.where(:id => self.donor_id).first
   end
+  
+  def self.donor_assigned
+    self.where(other_income: false).where("donor_id IS NOT NULL")
+  end
 
   belongs_to :category
   belongs_to :donor
