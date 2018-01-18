@@ -8,11 +8,10 @@ task :daily_donor_update => :environment do
     end
   end
   
-  for donation in Donation.where("created_at > ?", 2.days.ago)
-    # Update the "last_donation_in_series" flag for donations made by donors who donated in the last couple of days
-    if donation.donor
-      donation.donor.donations.last(3).to_a.each(&:set_series_flags)
-    end
+  donors_that_need_updating = Donation.where("updated_at > ?", 2.days.ago).map(&:donor).uniq.compact
+  for donor in donors_that_need_updating
+    # Update the "last_donation_in_series" and "first_donation_in_series" flags for the last 3 donations of donors who have had activity recently
+    donor.donations.last(3).to_a.each(&:set_series_flags)
   end
 
   DonorMailer.daily_report(@logs_from_role_switching).deliver
