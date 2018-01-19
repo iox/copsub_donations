@@ -218,7 +218,7 @@ class PaypalController < ApplicationController
     end
 
     # Autoassign Single Donations to Single Donations category
-    if params['subscr_id'].blank?
+    if params['subscr_id'].blank? && params['recurring_payment_id'].blank? && params['txn_type'] != 'recurring_payment'
       donation.category = Category.where(id: 5).first
     end
 
