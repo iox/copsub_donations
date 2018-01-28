@@ -200,7 +200,7 @@ class PaypalController < ApplicationController
     donation = Donation.new(
       :paypal_transaction_id => notify.transaction_id,
       :amount => notify.amount,
-      :donated_at => notify.received_at,
+      :donated_at => notify.received_at || Time.now,
       :currency => notify.currency,
       :email => params['payer_email'],
       :donation_method => 'paypal'
