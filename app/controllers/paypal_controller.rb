@@ -197,10 +197,17 @@ class PaypalController < ApplicationController
   end
 
   def store_donation(notify)
+    begin
+      donated_at = DateTime.strptime(params["payment_date"], "%H:%M:%S %b %e, %Y %Z").new_offset(0)
+    rescue
+      donated_at = Time.now
+    end
+    
+    
     donation = Donation.new(
       :paypal_transaction_id => notify.transaction_id,
       :amount => notify.amount,
-      :donated_at => notify.received_at || Time.now,
+      :donated_at => donated_at,
       :currency => notify.currency,
       :email => params['payer_email'],
       :donation_method => 'paypal'
