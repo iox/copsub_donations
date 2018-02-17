@@ -33,7 +33,7 @@ class Donor < ActiveRecord::Base
     filled_donation_form_date :date
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date
+  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date, :filled_donation_form_date
 
   has_many :donations
   has_many :role_changes
