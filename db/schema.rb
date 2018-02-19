@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180104150616) do
+ActiveRecord::Schema.define(version: 20180219195544) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 20180104150616) do
     t.date     "stripe_card_expiration_date"
     t.date     "stopped_regular_donations_date"
     t.date     "filled_donation_form_date"
+    t.integer  "custom_donation_interval"
   end
 
   create_table "email_logs", force: true do |t|

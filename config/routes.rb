@@ -18,6 +18,8 @@ CopsubDonations::Application.routes.draw do
 
   get '/change_roles_preview' => 'donors#change_roles_preview'
   post '/change_roles_assign' => 'donors#change_roles_assign'
+  
+  post '/refresh_series_flags/:id' => 'donors#refresh_series_flags'
 
   get '/find_duplicated_donors' => 'donors#find_duplicated_donors'
   get '/delete_duplicated_donor/:id' => 'donors#delete_duplicated_donor'

@@ -30,6 +30,9 @@ class DonorsController < ApplicationController
   def new_donor
     override_cors_limitations
 
+    # TODO: Create a smarter way of finding users.
+    # 1. Search not only in the user_email column, but in the paymentid, paypalid, and alternativeid
+    # 2. If there are several matches, select the one who has donated more
     donor = Donor.find_by_user_email(params["email"]) || Donor.create(
       first_name: params["name"].split(' ',2)[0],
       last_name: params["name"].split(' ',2)[1],
@@ -192,6 +195,13 @@ class DonorsController < ApplicationController
       flash[:error] = "The donor #{duplicated.id} could not be deleted"
       redirect_to '/find_duplicated_donors'
     end
+  end
+  
+  def refresh_series_flags
+    donor = Donor.find(params[:id])
+    donor.donations.last(10).each(&:set_series_flags)
+    flash[:notice] = "The series flags (first_donation_in_series/last_donation_in_series) of the last 10 donations have been updated."
+    redirect_to donor
   end
 
   private

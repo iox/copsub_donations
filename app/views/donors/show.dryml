@@ -19,7 +19,12 @@
 
   <append-content-body:>
     <div class="well" unless="&this.donations.blank?">
-      <h4>Donations made by this donor</h4>
+      <h4>
+        Donations made by this donor
+        <form class="pull-right" action="/refresh_series_flags/#{@donor.id}">
+          <input type="submit" class="btn" value="Refresh series flags"/>
+        </form>
+      </h4>
       <div class="table-plus">
         <table class="table" with="&this.donations.order('donated_at desc')" fields="this, email, bank_reference, donated_at, amount_in_dkk, first_donation_in_series, last_donation_in_series, stopped_donating_date">
           <tfoot:>

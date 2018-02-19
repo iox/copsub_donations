@@ -31,9 +31,10 @@ class Donor < ActiveRecord::Base
     stripe_card_expiration_date :date
     stopped_regular_donations_date :date
     filled_donation_form_date :date
+    custom_donation_interval :integer
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date, :filled_donation_form_date
+  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date, :filled_donation_form_date, :custom_donation_interval
 
   has_many :donations
   has_many :role_changes
@@ -185,6 +186,11 @@ class Donor < ActiveRecord::Base
   
   # Most donors donate monthly, but some donate every 3 or 6 months. This method estimates this interval
   def donation_interval
+    # Some donors can have a custom donation interval
+    if custom_donation_interval.present?
+      return custom_donation_interval
+    end
+    
     if donations.where(amount: most_typical_amount).count > 2
       span_secs = donations.maximum(:donated_at) - donations.minimum(:donated_at)
       avg_secs = span_secs / (donations.where(amount: most_typical_amount).count - 1)
