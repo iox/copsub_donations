@@ -48,9 +48,9 @@ task :sync_mailchimp_status => :environment do
 
 
       # Sync role back to mailchimp
-      if donor && member['merge_fields']['MMERGE5'] != donor.role
-        puts "Switching #{member['email_address']}'s role from #{member['merge_fields']['MMERGE5']} to #{donor.role}"
-        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"MMERGE5" => donor.role} })
+      if donor && member['merge_fields']['SROLE'] != donor.role
+        puts "Switching #{member['email_address']}'s role from #{member['merge_fields']['SROLE']} to #{donor.role}"
+        gibbon.lists(MAILCHIMP_LIST_ID).members(member["id"]).update(body: { merge_fields: {:"SROLE" => donor.role} })
       end
 
       # Sync last paypal failure date to Mailchimp
