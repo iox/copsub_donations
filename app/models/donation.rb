@@ -58,13 +58,16 @@ class Donation < ActiveRecord::Base
   end
   
   def set_series_flags
-    if donor.present? && donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at < ?", self.donated_at).count == 0
+    # When setting first_donation_in_series, we take into account donors who have taken a long pause, by checking whether they have donated in the last X days. With X days being twice their regular interval.
+    reasonable_date_range_past = self.donated_at - (donor.donation_interval*2).days
+    if donor.present? && donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at < ?", self.donated_at).where("donated_at > ?", reasonable_date_range_past).count == 0
       first_donation_in_series = true
     else
       first_donation_in_series = false
     end
     
-    if donor.present? && donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at > ?", self.donated_at).count == 0
+    reasonable_date_range_future = self.donated_at + (donor.donation_interval*2).days
+    if donor.present? && donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at > ?", self.donated_at).where("donated_at < ?", reasonable_date_range_future).count == 0
       last_donation_in_series = true
       stopped_donating_date = self.donated_at.to_date + donor.donation_interval + 5.days
     else
