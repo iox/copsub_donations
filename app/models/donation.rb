@@ -58,27 +58,23 @@ class Donation < ActiveRecord::Base
   end
   
   def set_series_flags
-    # When setting first_donation_in_series, we take into account donors who have taken a long pause, by checking whether they have donated in the last X days. With X days being twice their regular interval.
-    reasonable_date_range_past = self.donated_at - (donor.donation_interval*2).days
-    if donor.present? && donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at < ?", self.donated_at).where("donated_at > ?", reasonable_date_range_past).count == 0
-      first_donation_in_series = true
-    else
-      first_donation_in_series = false
-    end
+    first_donation_in_series = false
+    last_donation_in_series = false
+    stopped_donating_date = nil
+
+    # Only do further checks if the category is not Single Donations, and a donor has been set for this donation
+    if self.category_id != 5 && self.donor.present?
+      # When setting first_donation_in_series, we take into account donors who have taken a long pause, by checking whether they have donated in the last X days. With X days being twice their regular interval.
+      reasonable_date_range_past = self.donated_at - (donor.donation_interval*2).days
+      if donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at < ?", self.donated_at).where("donated_at > ?", reasonable_date_range_past).count == 0
+        first_donation_in_series = true
+      end
     
-    reasonable_date_range_future = self.donated_at + (donor.donation_interval*2).days
-    if donor.present? && donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at > ?", self.donated_at).where("donated_at < ?", reasonable_date_range_future).count == 0
-      last_donation_in_series = true
-      stopped_donating_date = self.donated_at.to_date + donor.donation_interval + 5.days
-    else
-      last_donation_in_series = false
-      stopped_donating_date = nil
-    end
-    
-    if self.category_id == 5 || self.donor.blank?
-      first_donation_in_series = false
-      last_donation_in_series = false
-      stopped_donating_date = nil
+      reasonable_date_range_future = self.donated_at + (donor.donation_interval*2).days
+      if donor.donations.where("id != ?", self.id).where(amount: self.amount).where("donated_at > ?", self.donated_at).where("donated_at < ?", reasonable_date_range_future).count == 0
+        last_donation_in_series = true
+        stopped_donating_date = self.donated_at.to_date + donor.donation_interval + 5.days
+      end
     end
     
     # Save attributes without invoking callbacks
