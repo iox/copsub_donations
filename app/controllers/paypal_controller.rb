@@ -203,6 +203,11 @@ class PaypalController < ApplicationController
       donated_at = Time.now
     end
     
+    if Donation.where(paypal_transaction_id: notify.transaction_id).count > 0
+      logger.info "The Paypal transaction #{notify.transaction_id} was already in the DB. Skipping."
+      return true
+    end
+    
     
     donation = Donation.new(
       :paypal_transaction_id => notify.transaction_id,
