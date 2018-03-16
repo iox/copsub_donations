@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.13'
 
 # Use mysql as the database for Active Record
-gem 'mysql2'
+gem 'mysql2', '~> 0.3.18'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.2'
@@ -55,7 +55,7 @@ gem "hobo_jquery_ui", "2.1.1"
 gem "hobo_bootstrap_ui", "2.1.1"
 gem "jquery-ui-themes", "~> 0.0.4"
 gem "hobo_clean_admin", "2.1.1"
-gem 'hobo-metasearch', :git => "git://github.com/suyccom/hobo-metasearch"
+gem 'hobo-metasearch', :git => "https://github.com/suyccom/hobo-metasearch"
 gem 'charlock_holmes' # Autodetect imported CSV encoding
 gem 'php_serialize' # Parse serialized arrays from the Wordpress database
 gem 'render_csv'
