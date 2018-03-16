@@ -29,6 +29,8 @@ class DonorsController < ApplicationController
   # It is called for all donation methods except Paypal. Paypal uses paypal#generate_payment_token
   def new_donor
     override_cors_limitations
+    
+    params["name"] ||= ''
 
     # TODO: Create a smarter way of finding users.
     # 1. Search not only in the user_email column, but in the paymentid, paypalid, and alternativeid

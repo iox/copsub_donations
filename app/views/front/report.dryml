@@ -70,6 +70,8 @@
                       <% last_paypal_events = donation.donor.paypal_events.last(5).map{|event| "#{I18n.l(event.created_at.to_date)} - #{event.txn_type}"}.join("\n") %>
                       <i class=" icon-info-sign" title="#{last_paypal_events}"></i>
                     <% end %>
+                    <a target="_blank" href="#{donation.donor.stopped_donating_english_mailto_template}"><i class=" icon-envelope" title="Send email in English"></i></a>
+                    <a target="_blank" href="#{donation.donor.stopped_donating_danish_mailto_template}"><i class=" icon-envelope" title="Send email in Danish"></i></a>
                   </td>
                 </tr>
               <% end %>
@@ -119,8 +121,7 @@
                     <%= donor.donation_method %>
                   </td>
                   <td>
-                    <a href="#{donor.almost_donated_mailto_template}"><i class=" icon-envelope" title="Send email"></i></a>
-
+                    <a target="_blank" href="#{donor.almost_donated_mailto_template}"><i class=" icon-envelope" title="Send email"></i></a>
                   </td>
                 </tr>
               <% end %>
@@ -139,21 +140,23 @@
       
       <div class="row">
         <div class="span6">
-          <div style="padding-right: 20px">
-            <h4>Last month's income from recurring supporters</h4>
-            <h1 style=""><%= number_with_delimiter(@last_month_recurring_donations.sum(&:amount_in_dkk).to_i) %> kr<small> in <%= @last_month_recurring_donations.first.donated_at.strftime("%B %Y") %></small></h1>
-            <% all_amounts = @last_month_recurring_donations.map(&:amount_in_dkk) %>
-            
-            <% average = all_amounts.reduce(:+) / all_amounts.size.to_f %>
-            
-            <h2>
-              <small>
-                from <%= @last_month_recurring_donations.map(&:donor_id).uniq.count %> supporters<br/>
-                in <%= @last_month_recurring_donations.count %> donations<br/>
-                with an average donation of <%= average.round %> kr<br/>
-              </small>
-            </h2>
-          </div>
+          <% if @last_month_recurring_donations.first %>
+            <div style="padding-right: 20px">
+              <h4>Last month's income from recurring supporters</h4>
+              <h1 style=""><%= number_with_delimiter(@last_month_recurring_donations.sum(&:amount_in_dkk).to_i) %> kr<small> in <%= @last_month_recurring_donations.first.donated_at.strftime("%B %Y") %></small></h1>
+              <% all_amounts = @last_month_recurring_donations.map(&:amount_in_dkk) %>
+              
+              <% average = all_amounts.reduce(:+) / all_amounts.size.to_f %>
+              
+              <h2>
+                <small>
+                  from <%= @last_month_recurring_donations.map(&:donor_id).uniq.count %> supporters<br/>
+                  in <%= @last_month_recurring_donations.count %> donations<br/>
+                  with an average donation of <%= average.round %> kr<br/>
+                </small>
+              </h2>
+            </div>
+          <% end %>
         </div>
       </div>
       
@@ -176,6 +179,7 @@
             </thead>
             <tbody>
               <% for month, value in @started_donating_monthly %>
+                <% if value && @started_donating_monthly[month] && @stopped_donating_monthly[month]%>
                 <tr>
                   <td><%= month %></td>
                   <td style="text-align:right; color: #14892C">+<%= value.round %> kr</td>
@@ -184,6 +188,7 @@
                   <% color = net_change > 0 ? '#14892C' : '#D04437' %>
                   <td style="text-align:right; color: #{color}"><%= net_change %>kr</td>
                 </tr>
+                <% end %>
               <% end %>
             </tbody>
           </table>
@@ -203,12 +208,14 @@
               </thead>
               <tbody>
                 <% for month, value in @regular_donations_monthly %>
+                  <% if value && @onetime_donations_monthly[month] %>
                   <tr>
                     <td><%= month %></td>
                     <td style="text-align:right"><%= value.round %> kr</td>
                     <td style="text-align:right"><%= @onetime_donations_monthly[month].round %> kr</td>
                     <td style="text-align:right"><%= (value + @onetime_donations_monthly[month]).round %> kr</td>
                   </tr>
+                  <% end %>
                 <% end %>
               </tbody>
             </table>

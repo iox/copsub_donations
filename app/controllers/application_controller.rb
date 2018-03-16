@@ -4,7 +4,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   include Hobo::Controller::AuthenticationSupport
-  before_filter :authenticate, :except => [:login, :forgot_password, :reset_password, :do_reset_password]
+  unless Rails.env.test?
+    before_filter :authenticate, :except => [:login, :forgot_password, :reset_password, :do_reset_password]
+  end
 
   def authenticate
     if logged_in?
