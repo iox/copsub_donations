@@ -40,33 +40,34 @@ class PaypalController < ApplicationController
   
   def generate_payment_token
     
-    donor = Donor.find_by_user_email(params["email"]) || Donor.create(
-      first_name: params["name"].split(' ',2)[0],
-      last_name: params["name"].split(' ',2)[1],
-      user_email: params["email"],
-      # They are just subscribers, until a payment has been registered
-      role: "subscriber",
-      country: params["country"]
-    )
+    # donor = Donor.find_by_user_email(params["email"]) || Donor.create(
+    #   first_name: params["name"].split(' ',2)[0],
+    #   last_name: params["name"].split(' ',2)[1],
+    #   user_email: params["email"],
+    #   # They are just subscribers, until a payment has been registered
+    #   role: "subscriber",
+    #   country: params["country"]
+    # )
+    # donor = Donor.create(role: "subscriber")
     
 
-    donor.paymentid = "donor#{donor.id}"
-    # "supporter" or "one_time", depending on what the donor selected in the donations flow
-    donor.selected_donor_type = params[:selected_donor_type]
-    # we store how much the donor wished to donate, in case something fails and we need to send a reminder
-    donor.selected_amount = params[:selected_amount].to_i
-    # Store the donation method and the date when the user filled in the donation form    
-    donor.donation_method = "paypal"
-    donor.filled_donation_form_date = Date.today
+    # donor.paymentid = "donor#{donor.id}"
+    # # "supporter" or "one_time", depending on what the donor selected in the donations flow
+    # donor.selected_donor_type = params[:selected_donor_type]
+    # # we store how much the donor wished to donate, in case something fails and we need to send a reminder
+    # donor.selected_amount = params[:selected_amount].to_i
+    # # Store the donation method and the date when the user filled in the donation form    
+    # donor.donation_method = "paypal"
+    # donor.filled_donation_form_date = Date.today
 
-    if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
-      donor.subscribe_to_mailchimp_list
-      donor.mailchimp_status = "subscribed"
-    else
-      donor.mailchimp_status = "unsubscribed"
-    end
+    # if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
+    #   donor.subscribe_to_mailchimp_list
+    #   donor.mailchimp_status = "subscribed"
+    # else
+    #   donor.mailchimp_status = "unsubscribed"
+    # end
 
-    donor.save
+    # donor.save
     
     
     

@@ -5,7 +5,7 @@ class StripeController < ApplicationController
   before_filter :override_cors_limitations
 
   def subscribe
-    donor = Donor.where(user_email: params["email"]).first
+    donor = Donor.where(user_email: params["email"]).first || Donor.new(user_email: params["email"])
     donor.create_stripe_customer
     donor.update_attribute(:stripe_card_expiration_date, Date.parse("#{params['card']['exp_year']}-#{params['card']['exp_month']}-01"))
 
@@ -16,7 +16,7 @@ class StripeController < ApplicationController
     )
     
     # DonorMailer.thank_you(donor, true).deliver
-    donor.send_thank_you_mailchimp_email
+    # donor.send_thank_you_mailchimp_email
 
     render status: 200, json: "OK".to_json
   end
