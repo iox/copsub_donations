@@ -66,12 +66,14 @@
                   </td>
                   <td>
                     <%= donation.donation_method %>
+                  </td>
+                  <td>
+                    <a target="_blank" href="#{donation.donor.stopped_donating_english_mailto_template}"><img src="/uk_flag.png" title="Send email in English"/></a>
+                    <a target="_blank" href="#{donation.donor.stopped_donating_danish_mailto_template}"><img src="/danish_flag.png" title="Send email in Danish"/></a>
                     <% if donation.donation_method == 'paypal' %>
                       <% last_paypal_events = donation.donor.paypal_events.last(5).map{|event| "#{I18n.l(event.created_at.to_date)} - #{event.txn_type}"}.join("\n") %>
                       <i class=" icon-info-sign" title="#{last_paypal_events}"></i>
                     <% end %>
-                    <a target="_blank" href="#{donation.donor.stopped_donating_english_mailto_template}"><i class=" icon-envelope" title="Send email in English"></i></a>
-                    <a target="_blank" href="#{donation.donor.stopped_donating_danish_mailto_template}"><i class=" icon-envelope" title="Send email in Danish"></i></a>
                   </td>
                 </tr>
               <% end %>
