@@ -85,7 +85,7 @@ class DonorsController < ApplicationController
     @fields += 'mailchimp_status, ' if params[:mailchimp_status].present?
     @fields += 'donation_method, ' if params[:donation_method].present?
     @fields += 'donated_total, ' if params[:donated_total]
-    @fields += 'donated_last_year_in_dkk' if params[:donated_last_year]
+    @fields += 'donated_last_year_in_dkk, ' if params[:donated_last_year]
     @fields += 'number_of_donations' if params[:number_of_donations]
 
     respond_to do |format|
