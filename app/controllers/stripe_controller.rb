@@ -22,11 +22,11 @@ class StripeController < ApplicationController
   end
 
   def donate
-    donor = Donor.where(user_email: params["email"]).first
+    donor = Donor.where(user_email: params["email"]).first || Donor.create(user_email: params["email"])
 
     temp = {
-      :amount => donor.selected_amount*100, # Stripe expects the amount in cents. 20€ => 2000
-      :currency => "eur",
+      :amount => (params["selected_amount"].to_i)*100, # Stripe expects the amount in cents. 20€ => 2000
+      :currency => "usd",
       :description => "Copenhagen Suborbitals donation",
       :source => params["id"]
     }
