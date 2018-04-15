@@ -3,9 +3,23 @@ class DonorsController < ApplicationController
   hobo_model_controller
 
   auto_actions :all
+  
+  before_filter :clean_utf8_characters, :only => [:update]
 
   skip_before_filter :authenticate, :only => [:new_bank_donor, :new_donor]
   protect_from_forgery :except => [:new_bank_donor, :new_donor]
+
+
+  def clean_utf8_characters
+    # Our Mysql database is in utf9, not in utf8mb4
+    # To avoid things breaking when adding a note with an special smiley character, we remove this character
+    # We could also modify our database, but it does not seem to be worth the effort at the moment
+    # https://mathiasbynens.be/notes/mysql-utf8mb4#character-sets
+    if params[:donor] && params[:donor][:notes]
+      params[:donor][:notes] = params[:donor][:notes].each_char.select{|c| c.bytes.count < 4 }.join('')
+    end
+  end
+
 
   # POST /api/new_bank_donor
   # TODO: Remove this method, after the new website is online
