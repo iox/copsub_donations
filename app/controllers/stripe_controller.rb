@@ -9,11 +9,22 @@ class StripeController < ApplicationController
     donor.create_stripe_customer
     donor.update_attribute(:stripe_card_expiration_date, Date.parse("#{params['card']['exp_year']}-#{params['card']['exp_month']}-01"))
 
-    Stripe::Subscription.create(
-      :customer => donor.stripe_customer_id,
-      :plan => params["plan"],
-      :source => params["id"]
-    )
+    begin
+      Stripe::Subscription.create(
+        :customer => donor.stripe_customer_id,
+        :plan => params["plan"],
+        :source => params["id"]
+      )
+    rescue Stripe::CardError => e
+      # Since it's a decline, Stripe::CardError will be caught
+      body = e.json_body
+      err  = body[:error]
+      
+      Rails.logger.info "Stripe::CardError"
+      Rails.logger.info err.inspect
+      
+      render status: 500, json: e.json_body and return
+    end
     
     # DonorMailer.thank_you(donor, true).deliver
     # donor.send_thank_you_mailchimp_email
@@ -24,18 +35,27 @@ class StripeController < ApplicationController
   def donate
     donor = Donor.where(user_email: params["email"]).first || Donor.create(user_email: params["email"])
 
-    temp = {
+    charge = {
       :amount => (params["selected_amount"].to_i)*100, # Stripe expects the amount in cents. 20€ => 2000
       :currency => "usd",
       :description => "Copenhagen Suborbitals donation",
       :source => params["id"]
     }
     
-    Rails.logger.info temp.inspect
+    Rails.logger.info charge.inspect
 
-    Stripe::Charge.create(
-      temp
-    )
+    begin
+      Stripe::Charge.create(charge)
+    rescue Stripe::CardError => e
+      # Since it's a decline, Stripe::CardError will be caught
+      body = e.json_body
+      err  = body[:error]
+      
+      Rails.logger.info "Stripe::CardError"
+      Rails.logger.info err.inspect
+      
+      render status: 500, json: e.json_body and return
+    end
     
     DonorMailer.thank_you(donor, false).deliver
 
