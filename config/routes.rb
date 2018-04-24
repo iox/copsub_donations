@@ -23,6 +23,8 @@ CopsubDonations::Application.routes.draw do
 
   get '/find_duplicated_donors' => 'donors#find_duplicated_donors'
   get '/delete_duplicated_donor/:id' => 'donors#delete_duplicated_donor'
+  
+  get '/public_donors_list' => 'donors#public_list'
 
 
   post '/paypal_ipn' => 'paypal#ipn'

@@ -6,8 +6,13 @@ class DonorsController < ApplicationController
   
   before_filter :clean_utf8_characters, :only => [:update]
 
-  skip_before_filter :authenticate, :only => [:new_bank_donor, :new_donor]
+  skip_before_filter :authenticate, :only => [:new_bank_donor, :new_donor, :public_list]
   protect_from_forgery :except => [:new_bank_donor, :new_donor]
+
+  
+  def public_list
+    render json: Donor.where("first_name IS NOT NULL AND first_name != '' AND last_name IS NOT NULL and last_name != ''").order(:first_name).pluck(:first_name, :last_name).to_json
+  end
 
 
   def clean_utf8_characters
