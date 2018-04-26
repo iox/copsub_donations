@@ -7,7 +7,7 @@ class DonorMailer < ActionMailer::Base
     @donor = donor
     @repeating = repeating
     mail( :subject => subject,
-          :to      => donor.user_email, :bcc => "ignacio@ihuerta.net" ) do |format|
+          :to      => donor.user_email, :bcc => ["ignacio@ihuerta.net", "grunner2000@gmail.com", "mads@madswilson.dk"] ) do |format|
       format.html { render layout: 'basic_email' }
       format.text
     end
