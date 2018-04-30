@@ -7,10 +7,12 @@ task :sync_mailchimp_status => :environment do
 
   gibbon = Gibbon::Request.new
   list_info = gibbon.lists(MAILCHIMP_LIST_ID).retrieve
-  member_count = list_info["stats"]["member_count"]
+  member_count = list_info["stats"]["member_count"] + list_info["stats"]["unsubscribe_count"] + list_info["stats"]["cleaned_count"]
   offset = 0
-  per_page = 100
+  per_page = 500
 
+
+  # BUG: failing to iterate over camillabrittdonovan@gmail.com. It is still marked as "not_present", when I'm 100% sure this donor is subscribed
   while (offset < member_count)
     result = gibbon.lists(MAILCHIMP_LIST_ID).members.retrieve(params: {count: per_page, offset: offset})
     for member in result["members"]
