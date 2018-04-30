@@ -80,5 +80,15 @@ task :sync_mailchimp_status => :environment do
 
     offset += per_page
   end
+  
+  # Donor.where(mailchimp_status: 'not_present').each do |donor|
+  #   merge_fields = {}
+  #   merge_fields["FNAME"] = donor.first_name if donor.first_name.present?
+  #   merge_fields["LNAME"] = donor.last_name if donor.last_name.present?
+    
+  #   if donor.user_email.present?
+  #     gibbon.lists(MAILCHIMP_LIST_ID).members.create(body: {email_address: donor.user_email, status: "subscribed", merge_fields: merge_fields})
+  #   end
+  # end
 
 end
