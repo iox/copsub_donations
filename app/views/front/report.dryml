@@ -33,8 +33,8 @@
                   <td><%= l(donation.donated_at.to_date) %></td>
                   <td>
                     <a href="/donors/#{donation.donor_id}"><%=donation.donor.full_name %></a>
-                    <% if donation.donor.donations.where("donated_at < ?", donation.donated_at).count > 0 %>
-                      <i class=" icon-star" title="Donor had donated in the past, we have recovered a donor!"></i>
+                    <% if donation.donor.donations.where("donated_at < ?", donation.donated_at).count > 0 && donation.donor.donations.where("donated_at > ?", (Time.now-(donation.donor.donation_interval+60).days)).count == 0 %>
+                      <i class=" icon-star" title="Donor had donated in the past, and had not donated in the previous #{(donation.donor.donation_interval+60)/30} months, we have recovered a donor!"></i>
                     <% end %>
                     <% if @stopped_donating.map(&:donor_id).include?(donation.donor_id) %><i class=" icon-random" title="This donor is in both lists, maybe he changed the amount?"></i><% end %>
                   </td>
