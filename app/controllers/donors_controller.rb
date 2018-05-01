@@ -29,7 +29,7 @@ class DonorsController < ApplicationController
   # POST /api/new_bank_donor
   # TODO: Remove this method, after the new website is online
   def new_bank_donor
-    donor = Donor.find_by_user_email(params["email"]) || Donor.new(
+    donor = Donor.find_by_any_email(params["email"]) || Donor.new(
       user_email: params["email"],
       role: "subscriber")
     donor.save
@@ -54,7 +54,7 @@ class DonorsController < ApplicationController
     # TODO: Create a smarter way of finding users.
     # 1. Search not only in the user_email column, but in the paymentid, paypalid, and alternativeid
     # 2. If there are several matches, select the one who has donated more
-    donor = Donor.find_by_user_email(params["email"]) || Donor.create(
+    donor = Donor.find_by_any_email(params["email"]) || Donor.create(
       first_name: params["name"].split(' ',2)[0],
       last_name: params["name"].split(' ',2)[1],
       user_email: params["email"],
@@ -195,18 +195,18 @@ class DonorsController < ApplicationController
     end
 
     for suspect in suspects.uniq
-      donors = Donor.where("user_email LIKE ? OR paypalid LIKE ?", "%#{suspect}%", "%#{suspect}%")
+      donors = Donor.find_by_any_email("%#{suspect}%")
       @duplicated_emails << suspect if donors.count > 1
     end
 
     if @duplicated_emails.size > 0
-      @first_duplicated_donors = Donor.where("user_email LIKE ? OR paypalid LIKE ?", "%#{@duplicated_emails.first}%", "%#{@duplicated_emails.first}%")
+      @first_duplicated_donors = Donor.find_by_any_email("%#{@duplicated_emails.first}%")
     end
   end
 
   def delete_duplicated_donor
     duplicated = Donor.find(params[:id])
-    other_donor = Donor.where("user_email LIKE ? OR paypalid LIKE ?", "%#{params[:email]}%", "%#{params[:email]}%").where("id != ?", params[:id]).first
+    other_donor = Donor.find_by_any_email("%#{params[:email]}%").where("id != ?", params[:id]).first
     duplicated.donations.update_all("donor_id = #{other_donor.id}")
     other_donor.update_amount_donated_last_year!
     if duplicated.destroy

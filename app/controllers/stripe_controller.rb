@@ -5,7 +5,7 @@ class StripeController < ApplicationController
   before_filter :override_cors_limitations
 
   def subscribe
-    donor = Donor.where(user_email: params["email"]).first || Donor.new(user_email: params["email"])
+    donor = Donor.find_by_any_email(params["email"]).first || Donor.new(user_email: params["email"])
     donor.create_stripe_customer
     donor.update_attribute(:stripe_card_expiration_date, Date.parse("#{params['card']['exp_year']}-#{params['card']['exp_month']}-01"))
 
@@ -33,7 +33,7 @@ class StripeController < ApplicationController
   end
 
   def donate
-    donor = Donor.where(user_email: params["email"]).first || Donor.create(user_email: params["email"])
+    donor = Donor.find_by_any_email(params["email"]).first || Donor.create(user_email: params["email"])
 
     charge = {
       :amount => (params["selected_amount"].to_i)*100, # Stripe expects the amount in cents. 20€ => 2000

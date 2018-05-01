@@ -32,7 +32,7 @@ class AssignUserAutomatically
 
     # Step 3: If that didn't work and we have en email, try to find an existing user via email
     if @donation.donor_id.blank? && !@donation.email.blank?
-      user = Donor.where(user_email: @donation.email).first || Donor.where(paypalid: @donation.email).first || Donor.where(alternativeid: @donation.email).first
+      user = Donor.find_by_any_email(@donation.email).first
       if user
         @donation.donor_id = user.id
       end

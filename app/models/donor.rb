@@ -90,6 +90,12 @@ class Donor < ActiveRecord::Base
       0
     end
   end
+  
+  
+  def self.find_by_any_email(email)
+    email = email.strip
+    where("user_email LIKE ? OR paypalid LIKE ? OR paymentid LIKE ? OR alternativeid LIKE ?", email, email, email, email)
+  end
 
 
   # This scope method allows to search for users using several fields, for example "Donor.fuzzy_search('ignacio')"
