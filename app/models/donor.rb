@@ -224,17 +224,6 @@ class Donor < ActiveRecord::Base
     end
   end
   
-  
-  def send_thank_you_mailchimp_email
-    begin
-      #TODO: This automation does not seem to be working at the moment
-      gibbon = Gibbon::Request.new
-      gibbon.automations("998bb9f4fc").emails("1cc5f6e19a").queue.create(body: {email_address: self.user_email})
-    rescue
-      Rails.logger.info "The thank you email could not be sent via Mailchimp."
-    end
-  end
-  
   def full_name
     if first_name.present? || last_name.present?
       "#{first_name} #{last_name}"

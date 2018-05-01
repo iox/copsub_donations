@@ -170,10 +170,13 @@ class PaypalController < ApplicationController
     agreement = PayPal::SDK::REST::Agreement.new(token: params[:token])
     agreement.execute
     
-    # TODO: If the execution of the agreement worked fine, it means that the user has started a regular donation
-    # In this case, we need to send him or her an a welcome email
-    # donor = Donor.where(email: agreement.email)
-    # donor.send_thank_you_mailchimp_email if donor
+    # If the execution of the agreement worked fine, it means that the user has started a regular donation. Send him/her a welcome email
+    if agreement.error.nil? && agreement.payer.status == 'verified'
+      Rails.logger.info agreement.payer.payer_info.inspect
+      email = 
+      donor = Donor.find_by_any_email(agreement.payer.payer_info.email).first || Donor.create(user_email: agreement.payer.payer_info.email, first_name: agreement.payer.payer_info.first_name, last_name: agreement.payer.payer_info.last_name)
+      DonorMailer.thank_you(donor, true).deliver
+    end
     
     render json: agreement
   end

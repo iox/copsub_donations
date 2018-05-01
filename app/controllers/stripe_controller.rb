@@ -26,8 +26,7 @@ class StripeController < ApplicationController
       render status: 500, json: e.json_body and return
     end
     
-    # DonorMailer.thank_you(donor, true).deliver
-    # donor.send_thank_you_mailchimp_email
+    DonorMailer.thank_you(donor, true).deliver
 
     render status: 200, json: "OK".to_json
   end
