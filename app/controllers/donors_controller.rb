@@ -29,7 +29,7 @@ class DonorsController < ApplicationController
   # POST /api/new_bank_donor
   # TODO: Remove this method, after the new website is online
   def new_bank_donor
-    donor = Donor.find_by_any_email(params["email"]) || Donor.new(
+    donor = Donor.find_by_any_email(params["email"]).first || Donor.new(
       user_email: params["email"],
       role: "subscriber")
     donor.save
@@ -54,7 +54,7 @@ class DonorsController < ApplicationController
     # TODO: Create a smarter way of finding users.
     # 1. Search not only in the user_email column, but in the paymentid, paypalid, and alternativeid
     # 2. If there are several matches, select the one who has donated more
-    donor = Donor.find_by_any_email(params["email"]) || Donor.create(
+    donor = Donor.find_by_any_email(params["email"]).first || Donor.create(
       first_name: params["name"].split(' ',2)[0],
       last_name: params["name"].split(' ',2)[1],
       user_email: params["email"],
