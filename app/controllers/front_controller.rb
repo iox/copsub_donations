@@ -33,10 +33,10 @@ class FrontController < ApplicationController
     
     @last_month_recurring_donations = Donation.donor_assigned.where("category_id != 5").where("donated_at >= ? AND donated_at <= ?", (Time.now - 1.month).beginning_of_month, (Time.now - 1.month).end_of_month)
     
-    @regular_donations_monthly = Donation.donor_assigned.where("category_id != 5").where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
-    @onetime_donations_monthly = Donation.donor_assigned.where("category_id  = 5").where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
-    @started_donating_monthly = Donation.donor_assigned.where(first_donation_in_series: true).where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')").sum(:amount_in_dkk)
-    @stopped_donating_monthly = Donation.donor_assigned.where(last_donation_in_series: true).where("stopped_donating_date >= ?", (@start_date - 1.year).beginning_of_month).where("stopped_donating_date < ?", Time.now.beginning_of_month).order("stopped_donating_date").group("date_format(stopped_donating_date, '%M %Y')").sum(:amount_in_dkk)
+    @regular_donations_monthly = Donation.donor_assigned.where("category_id != 5").where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')")
+    @onetime_donations_monthly = Donation.donor_assigned.where("category_id  = 5").where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')")
+    @started_donating_monthly = Donation.donor_assigned.where(first_donation_in_series: true).where("donated_at >= ?", (@start_date - 1.year).beginning_of_month).where("donated_at < ?", Time.now.beginning_of_month).order("donated_at").group("date_format(donated_at, '%M %Y')")
+    @stopped_donating_monthly = Donation.donor_assigned.where(last_donation_in_series: true).where("stopped_donating_date >= ?", (@start_date - 1.year).beginning_of_month).where("stopped_donating_date < ?", Time.now.beginning_of_month).order("stopped_donating_date").group("date_format(stopped_donating_date, '%M %Y')")
     
     @onetime_donations = Donation.donor_assigned.where(category_id: 5).where("donated_at >= ? AND donated_at <= ?", @start_date, @end_date).order("donated_at desc")
     

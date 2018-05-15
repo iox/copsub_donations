@@ -183,13 +183,13 @@
               </tr>
             </thead>
             <tbody>
-              <% for month, value in @started_donating_monthly %>
-                <% if value && @started_donating_monthly[month] && @stopped_donating_monthly[month]%>
+              <% for month, value in @started_donating_monthly.sum(:amount_in_dkk) %>
+                <% if value && @started_donating_monthly.sum(:amount_in_dkk)[month] && @stopped_donating_monthly.sum(:amount_in_dkk)[month]%>
                 <tr>
                   <td><%= month %></td>
-                  <td style="text-align:right; color: #14892C">+<%= value.round %> kr</td>
-                  <td style="text-align:right; color: #D04437">-<%= @stopped_donating_monthly[month].round %>kr</td>
-                  <% net_change = value.round - @stopped_donating_monthly[month].round %>
+                  <td style="text-align:right; color: #14892C">+<%= value.round %> kr (<%= @started_donating_monthly.count[month]%> gained)</td>
+                  <td style="text-align:right; color: #D04437">-<%= @stopped_donating_monthly.sum(:amount_in_dkk)[month].round %>kr (<%= @stopped_donating_monthly.count[month]%> lost)</td>
+                  <% net_change = value.round - @stopped_donating_monthly.sum(:amount_in_dkk)[month].round %>
                   <% color = net_change > 0 ? '#14892C' : '#D04437' %>
                   <td style="text-align:right; color: #{color}"><%= net_change %>kr</td>
                 </tr>
@@ -212,13 +212,13 @@
                 </tr>
               </thead>
               <tbody>
-                <% for month, value in @regular_donations_monthly %>
-                  <% if value && @onetime_donations_monthly[month] %>
+                <% for month, value in @regular_donations_monthly.sum(:amount_in_dkk) %>
+                  <% if value && @onetime_donations_monthly.sum(:amount_in_dkk)[month] %>
                   <tr>
                     <td><%= month %></td>
-                    <td style="text-align:right"><%= value.round %> kr</td>
-                    <td style="text-align:right"><%= @onetime_donations_monthly[month].round %> kr</td>
-                    <td style="text-align:right"><%= (value + @onetime_donations_monthly[month]).round %> kr</td>
+                    <td style="text-align:right"><%= value.round %> kr (<%= @regular_donations_monthly.count[month]%> donations)</td>
+                    <td style="text-align:right"><%= @onetime_donations_monthly.sum(:amount_in_dkk)[month].round %> kr (<%= @onetime_donations_monthly.count[month]%> donations)</td>
+                    <td style="text-align:right"><%= (value + @onetime_donations_monthly.sum(:amount_in_dkk)[month]).round %> kr</td>
                   </tr>
                   <% end %>
                 <% end %>
