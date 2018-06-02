@@ -173,7 +173,7 @@
         <div class="span12">
           <h4>Evolution of recurring supporters</h4>
           <div id="highchart-recurring-supporters"></div>
-          <table class="table highchart" data-graph-container="#highchart-recurring-supporters" data-graph-type="line" data-graph-color-1="#14892C" data-graph-color-2="#D04437" data-graph-color-3="#E2B9E6">
+          <table class="table highchart" data-graph-container="#highchart-recurring-supporters" data-graph-type="line" data-graph-color-1="#14892C" data-graph-color-2="#D04437" data-graph-color-3="#E2B9E6" data-graph-xaxis-reversed="1">
             <thead>
               <tr>
                 <th>Month</th>
@@ -183,7 +183,7 @@
               </tr>
             </thead>
             <tbody>
-              <% for month, value in @started_donating_monthly.sum(:amount_in_dkk) %>
+              <% for month, value in @started_donating_monthly.sum(:amount_in_dkk).to_a.reverse.to_h %>
                 <% if value && @started_donating_monthly.sum(:amount_in_dkk)[month] && @stopped_donating_monthly.sum(:amount_in_dkk)[month]%>
                 <tr>
                   <td><%= month %></td>
@@ -202,7 +202,7 @@
         
           <h4>Evolution of income</h4>
             <div id="highchart-container"></div>
-            <table class="table highchart" data-graph-container="#highchart-container" data-graph-type="line" data-graph-color-1="#14892C" data-graph-color-2="#0D397F" data-graph-color-3="#E2B9E6">
+            <table class="table highchart" data-graph-container="#highchart-container" data-graph-type="line" data-graph-color-1="#14892C" data-graph-color-2="#0D397F" data-graph-color-3="#E2B9E6" data-graph-xaxis-reversed="1">
               <thead>
                 <tr>
                   <th>Month</th>
@@ -212,7 +212,7 @@
                 </tr>
               </thead>
               <tbody>
-                <% for month, value in @regular_donations_monthly.sum(:amount_in_dkk) %>
+                <% for month, value in @regular_donations_monthly.sum(:amount_in_dkk).to_a.reverse.to_h %>
                   <% if value && @onetime_donations_monthly.sum(:amount_in_dkk)[month] %>
                   <tr>
                     <td><%= month %></td>
@@ -243,7 +243,7 @@
       <script src="/jquery.highchartTable-min.js"></script>
       <script type="text/javascript">
         $(document).ready(function() {
-          $('table.highchart').highchartTable();
+          $('table.highchart').highchartTable({'xAxis': {reversed:true}});
         });
       </script>
 
