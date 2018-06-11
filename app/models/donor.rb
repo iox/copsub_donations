@@ -32,9 +32,10 @@ class Donor < ActiveRecord::Base
     stopped_regular_donations_date :date
     filled_donation_form_date :date
     custom_donation_interval :integer
+    force_display_as_sponsor :boolean, default: false
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date, :filled_donation_form_date, :custom_donation_interval
+  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date, :filled_donation_form_date, :custom_donation_interval, :force_display_as_sponsor
 
   has_many :donations
   has_many :role_changes

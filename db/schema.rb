@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180219195544) do
+ActiveRecord::Schema.define(version: 20180611102645) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(version: 20180219195544) do
     t.date     "stopped_regular_donations_date"
     t.date     "filled_donation_form_date"
     t.integer  "custom_donation_interval"
+    t.boolean  "force_display_as_sponsor",       default: false
   end
 
   create_table "email_logs", force: true do |t|

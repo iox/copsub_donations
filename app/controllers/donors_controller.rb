@@ -11,7 +11,7 @@ class DonorsController < ApplicationController
 
   
   def public_list
-    render json: Donor.where("first_name IS NOT NULL AND first_name != '' AND last_name IS NOT NULL and last_name != ''").where("donated_total > 0").order(:first_name).pluck(:first_name, :last_name).to_json
+    render json: Donor.where("first_name IS NOT NULL AND first_name != '' AND last_name IS NOT NULL and last_name != ''").where("donated_total > 0 || force_display_as_sponsor = TRUE").order(:first_name).pluck(:first_name, :last_name).to_json
   end
 
 
@@ -24,7 +24,6 @@ class DonorsController < ApplicationController
       params[:donor][:notes] = params[:donor][:notes].each_char.select{|c| c.bytes.count < 4 }.join('')
     end
   end
-
 
   # POST /api/new_bank_donor
   # TODO: Remove this method, after the new website is online
