@@ -66,3 +66,18 @@
     </account-nav:>
   </old-page>
 </extend>
+
+
+<def tag="card" for="Note">
+  <card class="note" param="default" merge>
+    <header: param>
+      <div param="actions" class="pull-right">
+        <delete-button label="X" param/>
+      </div>
+    </header:>
+    <body: param>
+      <small><i><view:created-at/></i></small>
+      <view:body param="description"/>
+    </body:>
+  </card>
+</def>

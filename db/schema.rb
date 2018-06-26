@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180611102645) do
+ActiveRecord::Schema.define(version: 20180626172029) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -63,7 +63,7 @@ ActiveRecord::Schema.define(version: 20180611102645) do
     t.string   "alternativeid"
     t.date     "first_donated_at"
     t.string   "mailchimp_status",               default: "not_present"
-    t.text     "notes"
+    t.text     "old_notes_backup"
     t.integer  "donated_total"
     t.date     "last_donated_at"
     t.string   "donation_method"
@@ -88,6 +88,15 @@ ActiveRecord::Schema.define(version: 20180611102645) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "notes", force: true do |t|
+    t.text     "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "donor_id"
+  end
+
+  add_index "notes", ["donor_id"], name: "index_notes_on_donor_id", using: :btree
 
   create_table "paypal_events", force: true do |t|
     t.string   "txn_type"

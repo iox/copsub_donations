@@ -35,10 +35,13 @@ class Donor < ActiveRecord::Base
     force_display_as_sponsor :boolean, default: false
     timestamps
   end
-  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :notes, :stopped_regular_donations_date, :filled_donation_form_date, :custom_donation_interval, :force_display_as_sponsor
+  attr_accessible :wordpress_id, :user_email, :first_name, :last_name, :user_adress, :city, :country, :paymentid, :paypalid, :alternativeid, :user_phone, :role, :old_notes_backup, :stopped_regular_donations_date, :filled_donation_form_date, :custom_donation_interval, :force_display_as_sponsor
 
   has_many :donations
   has_many :role_changes
+  has_many :notes
+  
+  children :notes
 
   ROLES = [:single_supporter, :subscriber, :inactive_supporter, :recurring_supporter, :inactive_subscriber]
 
