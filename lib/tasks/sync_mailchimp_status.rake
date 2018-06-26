@@ -83,14 +83,32 @@ task :sync_mailchimp_status => :environment do
     offset += per_page
   end
   
-  # Donor.where(mailchimp_status: 'not_present').each do |donor|
-  #   merge_fields = {}
-  #   merge_fields["FNAME"] = donor.first_name if donor.first_name.present?
-  #   merge_fields["LNAME"] = donor.last_name if donor.last_name.present?
+  Donor.where(mailchimp_status: 'not_present').where("user_email != '' AND user_email IS NOT NULL").each do |donor|
+    merge_fields = {}
+    merge_fields["FNAME"] = donor.first_name if donor.first_name.present?
+    merge_fields["LNAME"] = donor.last_name if donor.last_name.present?
     
-  #   if donor.user_email.present?
-  #     gibbon.lists(MAILCHIMP_LIST_ID).members.create(body: {email_address: donor.user_email, status: "subscribed", merge_fields: merge_fields})
-  #   end
-  # end
+    if donor.user_email.present?
+      begin
+        member_id = Digest::MD5.hexdigest(donor.user_email)
+        member_info = gibbon.lists(MAILCHIMP_LIST_ID).members(member_id).retrieve["status"]
+        if member_info == 'subscribed'
+          donor.update_attribute(:mailchimp_status, "subscribed")
+        else
+          donor.update_attribute(:mailchimp_status, "unsubscribed")
+        end
+      rescue
+        puts "Adding #{donor.user_email}"
+        begin
+          gibbon.lists(MAILCHIMP_LIST_ID).members.create(body: {email_address: donor.user_email, status: "subscribed", merge_fields: merge_fields})
+        rescue => e
+          puts "#{donor.user_email} was impossible to add to Mailchimp"
+          puts e.message
+        end
+      end
+    end
+    
+    donor.update_attribute(:mailchimp_status, "subscribed")
+  end
 
 end
