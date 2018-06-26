@@ -40,7 +40,7 @@ class FrontController < ApplicationController
     
     @onetime_donations = Donation.donor_assigned.where(category_id: 5).where("donated_at >= ? AND donated_at <= ?", @start_date, @end_date).order("donated_at desc")
     
-    @almost_donated = Donor.where("filled_donation_form_date >= ? AND filled_donation_form_date <= ?", @start_date, @end_date).where("last_donated_at IS NULL OR DATE(last_donated_at) < filled_donation_form_date").where("selected_amount > 0").order("filled_donation_form_date desc")
+    @almost_donated = Donor.where("last_donated_at IS NULL OR DATE(last_donated_at) < filled_donation_form_date").where("selected_amount > 0").order("filled_donation_form_date desc")
   end
 
 end
