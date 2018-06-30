@@ -212,10 +212,11 @@ class PaypalController < ApplicationController
       return true
     end
     
+    amount = notify.gross.to_f - notify.fee.to_f 
     
     donation = Donation.new(
       :paypal_transaction_id => notify.transaction_id,
-      :amount => notify.amount,
+      :amount => amount,
       :donated_at => donated_at,
       :currency => notify.currency,
       :email => params['payer_email'],
