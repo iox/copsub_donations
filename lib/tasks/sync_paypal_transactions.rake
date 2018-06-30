@@ -55,17 +55,16 @@ task :sync_paypal_transactions => :environment do
     puts "Payer First Name: #{payer_info["payer_name"]["given_name"]}"
     puts "Payer Last Name: #{payer_info["payer_name"]["surname"]}"
     puts "Amount: #{transaction_info["transaction_amount"]["value"]} #{transaction_info["transaction_amount"]["currency_code"]}"
-    # puts "Billing agreement: #{sale.billing_agreement_id}"
     puts "Create time: #{I18n.l(transaction_info["transaction_initiation_date"].to_date)}"
     puts "\n\n\n\n\n"
     
     
     donation = Donation.new(
-      :paypal_transaction_id => sale.id,
-      :amount => transaction.amount.total,
-      :donated_at => payment.create_time,
-      :currency => transaction.amount.currency,
-      :email => payer_info.email,
+      :paypal_transaction_id => transaction_info["transaction_id"],
+      :amount => transaction_info["transaction_amount"]["value"],
+      :donated_at => transaction_info["transaction_initiation_date"].to_time,
+      :currency => transaction_info["transaction_amount"]["currency_code"],
+      :email => payer_info["email_address"],
       :donation_method => 'paypal'
     )
     
