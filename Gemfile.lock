@@ -326,6 +326,7 @@ DEPENDENCIES
   hobo_clean_admin (= 2.1.1)
   hobo_jquery_ui (= 2.1.1)
   hobo_will_paginate
+  httparty
   jbuilder (~> 1.2)
   jquery-rails
   jquery-ui-themes (~> 0.0.4)

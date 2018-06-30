@@ -85,6 +85,9 @@ gem 'offsite_payments'
 # Connect to Paypal's API to generate Payment Tokens
 gem 'paypal-sdk-rest'
 
+# Connecting to Paypal Sync API - using oauth directly
+gem 'httparty'
+
 # Send an email when an error occurs
 gem 'exception_notification'
 
