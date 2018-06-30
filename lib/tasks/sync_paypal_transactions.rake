@@ -76,7 +76,7 @@ task :sync_paypal_transactions => :environment do
     
     # Try to assign the donation to a user automatically
     if donation.save
-      AssignUserAutomatically.new(donation, recurring, payer_info.first_name, payer_info.last_name).try_to_assign_user
+      AssignUserAutomatically.new(donation, recurring, payer_info["payer_name"]["given_name"], payer_info["payer_name"]["surname"]).try_to_assign_user
     else
       raise "Error - donation could not be saved: #{donation.inspect}"
     end
