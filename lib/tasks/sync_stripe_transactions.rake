@@ -93,11 +93,9 @@ end
 task :fix_stripe_amounts => :environment do
 
   list = Stripe::Charge.list
-  # for charge in list.data
   list.auto_paging_each do | charge |
     donation = Donation.where(stripe_charge_id: charge.id).first
     next unless donation
-    next unless donation.donor_id == 5288
 
     balance_transaction = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
     
@@ -109,7 +107,7 @@ task :fix_stripe_amounts => :environment do
     )
     
     donation.set_series_flags
-    
+
   end
 
 end
