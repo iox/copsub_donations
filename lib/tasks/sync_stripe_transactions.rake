@@ -1,6 +1,7 @@
 task :sync_stripe_transactions => :environment do
   list = Stripe::Charge.list
-  for charge in list.data
+  # for charge in list.data
+  list.auto_paging_each do | charge |
     if charge.status != 'succeeded'
       puts "Skipping. charge.status #{charge.status}"
       next
@@ -28,11 +29,13 @@ task :sync_stripe_transactions => :environment do
     end
     
     
+    balance_transaction = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+    
     
     donation = Donation.new(
       stripe_charge_id: charge.id,
-      amount: charge.amount / 100,
-      currency: charge.currency.upcase,
+      amount: balance_transaction.net / 100.0,
+      currency: balance_transaction.currency.upcase,
       email: email,
       donated_at: DateTime.strptime(charge.created.to_s,'%s'),
       donation_method: 'stripe',
@@ -70,5 +73,43 @@ task :sync_stripe_transactions => :environment do
     
   end
 
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+task :fix_stripe_amounts => :environment do
+
+  list = Stripe::Charge.list
+  # for charge in list.data
+  list.auto_paging_each do | charge |
+    donation = Donation.where(stripe_charge_id: charge.id).first
+    next unless donation
+    next unless donation.donor_id == 5288
+
+    balance_transaction = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
+    
+    puts "Donation #{donation.id} has amount #{donation.amount} #{donation.currency}. The amount should change to #{balance_transaction.net / 100.0} #{balance_transaction.currency.upcase}"
+    donation.update_attributes(
+      currency: balance_transaction.currency.upcase,
+      amount: balance_transaction.net / 100.0,
+      amount_in_dkk: nil
+    )
+    
+    donation.set_series_flags
+    
+  end
 
 end
