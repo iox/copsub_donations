@@ -7,7 +7,7 @@ class DonorMailer < ActionMailer::Base
     @donor = donor
     @repeating = repeating
     mail( :subject => subject,
-          :to      => donor.user_email, :bcc => ["ignacio@ihuerta.net", "grunner2000@gmail.com", "mads@madswilson.dk"] ) do |format|
+          :to      => donor.user_email, :bcc => ["ignacio@ihuerta.net", "rasmusagdestein@gmail.com", "mads@madswilson.dk"] ) do |format|
       format.html { render layout: 'basic_email' }
       format.text
     end
@@ -23,7 +23,7 @@ class DonorMailer < ActionMailer::Base
     @donor = donor
     @repeating = repeating
     mail( :subject => subject,
-          :to      => donor.user_email, :bcc => ["ignacio@ihuerta.net", "grunner2000@gmail.com", "mads@madswilson.dk"] ) do |format|
+          :to      => donor.user_email, :bcc => ["ignacio@ihuerta.net", "rasmusagdestein@gmail.com", "mads@madswilson.dk"] ) do |format|
       format.html { render layout: 'basic_email' }
       format.text
     end
@@ -34,7 +34,7 @@ class DonorMailer < ActionMailer::Base
     @logs_from_role_switching = logs_from_role_switching
 
     mail( :subject => "Copenhagen Suborbitals - daily Donations App report",
-          :to      => ["ignacio@ihuerta.net", "grunner2000@gmail.com"] )
+          :to      => ["ignacio@ihuerta.net", "rasmusagdestein@gmail.com"] )
   end
 
 end
