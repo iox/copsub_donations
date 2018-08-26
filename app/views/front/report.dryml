@@ -58,7 +58,7 @@
                   <td><%= l(donation.stopped_donating_date) %></td>
                   <td>
                     <a href="/donors/#{donation.donor_id}"><%=donation.donor.full_name %></a>
-                    <% if donation.donor.notes.present? %><i class=" icon-info-sign" title="#{donation.donor.notes}"></i><% end %>
+                    <% if donation.donor.notes.present? %><i class=" icon-info-sign" title="#{donation.donor.notes_as_text}"></i><% end %>
                     <% if @started_donating.map(&:donor_id).include?(donation.donor_id) %><i class=" icon-random" title="This donor is in both lists, maybe he changed the amount?"></i><% end %>
                     <% if donation.donor.number_of_donations > 24 %><i class=" icon-heart" title="This donor has been donating for more than 2 years"></i><% end %>
                     <% if donation.donor.donated_last_year_in_dkk > 2000 %><strong title="This donor has donated more than 2000kr in the last year">$</strong>

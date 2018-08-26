@@ -238,6 +238,10 @@ class Donor < ActiveRecord::Base
     end
   end
   
+  def notes_as_text
+    notes.map{|n| I18n.l(n.created_at.to_date) + ': ' + n.body}.join('&#10;')
+  end
+  
   def almost_donated_mailto_template
     subject = URI.encode "Donation to Copenhagen Suborbitals"
     body = URI.encode "Hi #{first_name}, \n\nI can see that you signed up as a Copenhagen Suborbitals Supporter on #{I18n.l(filled_donation_form_date, format: :long) if filled_donation_form_date}, however we haven’t registered your payment yet?\n\nWe have recently implemented a new system for managing our donors so it might be a system error during the payment.\n\nDid you have any trouble while donating? Is there anything I can help you with?\n\nMads Wilson, Copenhagen Suborbitals"
