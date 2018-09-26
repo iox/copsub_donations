@@ -2,7 +2,7 @@ class ExchangeRate
   require 'nokogiri'
 
   # This class connects to the National Bank and retrieves the exchange rate once a day
-  EXCHANGE_URL = "http://www.nationalbanken.dk/_vti_bin/DN/DataService.svc/CurrencyRatesXML?lang=en"
+  EXCHANGE_URL = "https://www.nationalbanken.dk/_vti_bin/DN/DataService.svc/CurrencyRatesXML?lang=en"
 
   def self.get(currency)
     @last_update ||= Time.now
