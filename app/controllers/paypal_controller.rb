@@ -83,7 +83,7 @@ class PaypalController < ApplicationController
               "frequency_interval" => "1",
               "amount" => {
                   "value" => "#{params['selected_amount']}",
-                  "currency" => "EUR"
+                  "currency" => "USD"
               },
               "cycles" => "0",
           }
