@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "RSpec - debug current file:line without spring",
+        "type": "Ruby",
+        "request": "launch",
+        "program": "/usr/local/bundle/bin/rspec",
+        "args": [
+            "-I",
+            "${workspaceRoot}",
+            "${file}:${lineNumber}"
+        ]
+    },
+        {
+            "name": "Start Rails server",
+            "type": "Ruby",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/bin/rails",
+            "args": [
+                "server",
+                "-p",
+                "3016",
+                "-b",
+                "0.0.0.0"
+            ]
+        }
+    ]
+}
