@@ -1,0 +1,32 @@
+{
+  "name": "Copsub Donations Rails",
+  "dockerFile": "Dockerfile",
+
+  // Specifies a list of ports that should be published from the container.
+  "appPort": [],
+
+  // Comment out the next line to run as root instead. Linux users,
+  // update Dockerfile with your user's UID/GID if not 1000.
+  // "runArgs": ["-u", "vscode"],
+
+  // Use 'settings' to set *default* container specific settings.json values on container create.
+  // You can edit these settings after create using File > Preferences > Settings > Remote.
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+
+  // Specifies a command to run after the container is created
+  "postCreateCommand": "bundle install && yarn install && rake db:create && rake db:schema:load",
+
+  "extensions": [
+    "rebornix.Ruby",
+    "ms-azuretools.vscode-docker",
+    "connorshea.vscode-ruby-test-adapter",
+    "esbenp.prettier-vscode",
+    "nautigsam.go-to-test"
+  ],
+
+  "overrideCommand": false,
+
+  "runArgs": ["-p", "0.0.0.0:3016:3016", "-u", "vscode"]
+}
