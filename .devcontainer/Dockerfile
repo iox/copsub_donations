@@ -3,7 +3,7 @@ FROM drecom/ubuntu-ruby:2.3.8
 LABEL maintainer="ignacio@ihuerta.net"
 
 # install required system packages
-RUN apt-get update -qq && apt-get install -y sudo wget build-essential libfontconfig1 libxrender1 libxext6 curl net-tools git nano --fix-missing --no-install-recommends
+RUN apt-get update -qq && apt-get install -y sudo wget build-essential libfontconfig1 libxrender1 libxext6 curl net-tools git nano memcached --fix-missing --no-install-recommends
 
 # Install mysql in noninteractive mode: sets the root password to an empty string
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server
@@ -66,4 +66,4 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     /var/tmp/*
 
 
-CMD sudo service mysql start && /bin/sh -c "while sleep 1000; do :; done"
+CMD sudo service mysql start && sudo service memcached start && /bin/sh -c "while sleep 1000; do :; done"

@@ -16,7 +16,7 @@
   },
 
   // Specifies a command to run after the container is created
-  "postCreateCommand": "bundle install && yarn install && rake db:create && rake db:schema:load",
+  "postCreateCommand": "bundle install && cp config/database.yml.example config/database.yml && rake db:create && rake db:schema:load",
 
   "extensions": [
     "rebornix.Ruby",
