@@ -8,7 +8,12 @@
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donors" fields="&@fields" field-tag="highlighted-field">
       <field-heading-row:><sorting-row fields="&@fields"/></field-heading-row:>
-      <id-view:><a href="/donors/#{this}"><highlighted-field/></a></id-view:>
+      <id-view:>
+        <span style="white-space: nowrap">
+          <a href="/donors/#{this}"><highlighted-field/></a>
+          <% if this_parent.notes.present? %><i class=" icon-info-sign" title="#{this_parent.notes_as_text}"></i><% end %>
+        </span>
+      </id-view:>
       <first-donation-view:><%= l(this) if this %></first-donation-view:>
     </table>
 
