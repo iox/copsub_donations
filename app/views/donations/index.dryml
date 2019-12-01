@@ -18,7 +18,18 @@
 
     <table style="font-size: 12px" class="table table-bordered table-rounded table-striped" with="&@donations" fields="&fields">
       <field-heading-row:><sorting-row fields="&fields"/></field-heading-row:>
-      <id-view:><a href="/donations/#{this}"><view/></a></id-view:>
+      <id-view:><a href="/donations/#{this}"><view/></a>
+      
+      
+      <% if this_parent.donor.notes.present? %><i class=" icon-info-sign" title="#{this_parent.donor.notes_as_text}"></i><% end %>
+      
+      
+      </id-view:>
+
+
+
+
+
 
       <email-heading:>Email / Bank Reference</email-heading:>
       <email-view:><this/><%= this_parent.bank_reference%></email-view:>
