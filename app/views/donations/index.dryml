@@ -21,7 +21,7 @@
       <id-view:><a href="/donations/#{this}"><view/></a>
       
       
-      <% if this_parent.donor.notes.present? %><i class=" icon-info-sign" title="#{this_parent.donor.notes_as_text}"></i><% end %>
+      <% if this_parent.donor.try(:notes).present? %><i class=" icon-info-sign" title="#{this_parent.donor.notes_as_text}"></i><% end %>
       
       
       </id-view:>
