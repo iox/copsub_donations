@@ -244,19 +244,19 @@ class Donor < ActiveRecord::Base
   
   def almost_donated_mailto_template
     subject = URI.encode "Donation to Copenhagen Suborbitals"
-    body = URI.encode "Hi #{first_name}, \n\nI can see that you signed up as a Copenhagen Suborbitals Supporter on #{I18n.l(filled_donation_form_date, format: :long) if filled_donation_form_date}, however we haven’t registered your payment yet?\n\nWe have recently implemented a new system for managing our donors so it might be a system error during the payment.\n\nDid you have any trouble while donating? Is there anything I can help you with?\n\nMads Wilson, Copenhagen Suborbitals"
+    body = URI.encode "Hi #{first_name}, \n\nI can see that you signed up as a Copenhagen Suborbitals Supporter on #{I18n.l(filled_donation_form_date, format: :long) if filled_donation_form_date}, however we haven’t registered your payment yet?\n\nWe have recently implemented a new system for managing our donors so it might be a system error during the payment.\n\nDid you have any trouble while donating? Is there anything I can help you with?\n\nRasmus Agdestein, Copenhagen Suborbitals"
     "mailto:#{user_email}?subject=#{subject}&body=#{body}"
   end
   
   def stopped_donating_english_mailto_template
     subject = URI.encode "Copenhagen Suborbitals Support donation"
-    body = URI.encode "Hi #{first_name}, \n\nI can see in our bank that it looks like your regular CSS donation has not arrived this month. We have not heard from you so there was maybe an error with the transfer?\n\nBest regards\n\nMads Wilson, Copenhagen Suborbitals Support"
+    body = URI.encode "Hi #{first_name}, \n\nI can see in our bank that it looks like your regular CSS donation has not arrived this month. We have not heard from you so there was maybe an error with the transfer?\n\nBest regards\n\nRasmus Agdestein, Copenhagen Suborbitals Support"
     "mailto:#{user_email}?subject=#{subject}&body=#{body}"
   end
   
   def stopped_donating_danish_mailto_template
     subject = URI.encode "Copenhagen Suborbitals Support kontingent"
-    body = URI.encode "Hi #{first_name}, \n\nJeg kan se på vores bankudskrift at det ser ud som om dit CSS kontingent ikke er dukket op på kontoen i denne måned. Vi har ikke hørt noget andet så jeg tænker at der måske er en fejl i overførslen?\n\nMvh\n\nMads Wilson, Copenhagen Suborbitals Support"
+    body = URI.encode "Hi #{first_name}, \n\nJeg kan se på vores bankudskrift at det ser ud som om dit CSS kontingent ikke er dukket op på kontoen i denne måned. Vi har ikke hørt noget andet så jeg tænker at der måske er en fejl i overførslen?\n\nMvh\n\nRasmus Agdestein, Copenhagen Suborbitals Support"
     "mailto:#{user_email}?subject=#{subject}&body=#{body}"
   end
 
