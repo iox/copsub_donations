@@ -191,7 +191,7 @@
                   <td style="text-align:right; color: #D04437"><%= @stopped_donating_monthly.count[month]%> lost</td>
                   <% net_change = @started_donating_monthly.count[month] - @stopped_donating_monthly.count[month] %>
                   <% color = net_change > 0 ? '#14892C' : '#D04437' %>
-                  <td style="text-align:right; color: #{color}"><%= net_change %>kr</td>
+                  <td style="text-align:right; color: #{color}"><%= net_change %></td>
                 </tr>
                 <% end %>
               <% end %>
