@@ -187,9 +187,9 @@
                 <% if value && @started_donating_monthly.sum(:amount_in_dkk)[month] && @stopped_donating_monthly.sum(:amount_in_dkk)[month]%>
                 <tr>
                   <td><%= month %></td>
-                  <td style="text-align:right; color: #14892C">+<%= value.round %> kr (<%= @started_donating_monthly.count[month]%> gained)</td>
-                  <td style="text-align:right; color: #D04437">-<%= @stopped_donating_monthly.sum(:amount_in_dkk)[month].round %>kr (<%= @stopped_donating_monthly.count[month]%> lost)</td>
-                  <% net_change = value.round - @stopped_donating_monthly.sum(:amount_in_dkk)[month].round %>
+                  <td style="text-align:right; color: #14892C"><%= @started_donating_monthly.count[month]%> gained</td>
+                  <td style="text-align:right; color: #D04437"><%= @stopped_donating_monthly.count[month]%> lost</td>
+                  <% net_change = @started_donating_monthly.count[month] - @stopped_donating_monthly.count[month] %>
                   <% color = net_change > 0 ? '#14892C' : '#D04437' %>
                   <td style="text-align:right; color: #{color}"><%= net_change %>kr</td>
                 </tr>
