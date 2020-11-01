@@ -215,9 +215,9 @@
                 <% for month, value in @regular_donations_monthly.sum(:amount_in_dkk).to_a.reverse.to_h %>
                   <tr>
                     <td><%= month %></td>
-                    <td style="text-align:right"><%= value.round %> kr (<%= @regular_donations_monthly.count[month]%> donations)</td>
-                    <td style="text-align:right"><%= @onetime_donations_monthly.sum(:amount_in_dkk)[month].round %> kr (<%= @onetime_donations_monthly.count[month]%> donations)</td>
-                    <td style="text-align:right"><%= (value + @onetime_donations_monthly.sum(:amount_in_dkk)[month]).round %> kr</td>
+                    <td style="text-align:right"><%= value.try(:round) %> kr (<%= @regular_donations_monthly.count[month]%> donations)</td>
+                    <td style="text-align:right"><%= @onetime_donations_monthly.sum(:amount_in_dkk)[month].try(:round) %> kr (<%= @onetime_donations_monthly.count[month]%> donations)</td>
+                    <td style="text-align:right"><%= (value + @onetime_donations_monthly.sum(:amount_in_dkk)[month]).try(:round) %> kr</td>
                   </tr>
                 <% end %>
               </tbody>
