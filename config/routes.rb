@@ -39,6 +39,12 @@ CopsubDonations::Application.routes.draw do
   post '/api/stripe/donate' => 'stripe#donate'
   post '/api/stripe/webhook' => 'stripe#webhook'
 
+  # Stripe SCA-ready endpoints
+  post '/api/stripe/new_onetime_payment_session' => 'stripe#new_onetime_payment_session'
+  get '/api/stripe/onetime_payment_success' => 'stripe#onetime_payment_success'
+
+
+  
   get '/documentation' => 'front#documentation'
 
   get '/role_changes' => 'role_changes#index'
