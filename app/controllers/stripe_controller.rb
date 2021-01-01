@@ -31,6 +31,88 @@ class StripeController < ApplicationController
     render status: 200, json: "OK".to_json
   end
 
+  def new_recurring_payment_session
+    session = Stripe::Checkout::Session.create(
+      success_url: "#{request.base_url}/api/stripe/recurring_payment_success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: 'https://www.copenhagensuborbitals.com/support-us',
+      payment_method_types: ['card'],
+      mode: 'subscription',
+      line_items: [{
+        quantity: 1,
+        price: params['plan_id'], # this will be either 'mach2' or 'mach3'
+      }],
+    )
+    render status: 200, json: {session_id: session.id}
+  end
+
+  def recurring_payment_success
+    customer_id = Stripe::Checkout::Session.retrieve(params[:session_id]).customer
+    email = Stripe::Customer.retrieve(customer_id).email
+
+    donor = Donor.find_by_any_email(email).first || Donor.create(user_email: email)
+
+    DonorMailer.thank_you(donor, true).deliver
+    
+    redirect_to 'https://www.copenhagensuborbitals.com/thank_you'
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  def new_onetime_payment_session
+    session = Stripe::Checkout::Session.create(
+      payment_method_types: ['card'],
+      line_items: [{
+        name: "Copenhagen Suborbitals donation",
+        description: 'One time donation',
+        images: ['https://copenhagensuborbitals.com/wp-content/uploads/2017/02/header_supportus_1600x800_jl_v2.jpg'],
+        amount: (params["selected_amount"].to_i)*100,
+        currency: 'usd',
+        quantity: 1,
+      }],
+      success_url: "#{request.base_url}/api/stripe/onetime_payment_success?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: 'https://www.copenhagensuborbitals.com/support-us',
+    )
+
+    render status: 200, json: {session_id: session.id}
+  end
+
+
+  def onetime_payment_success
+    customer_id = Stripe::Checkout::Session.retrieve("params[:session_id]").customer
+    email = Stripe::Customer.retrieve(customer_id).email
+
+    donor = Donor.find_by_any_email(email).first || Donor.create(user_email: email)
+
+    DonorMailer.thank_you(donor, false).deliver
+    
+    redirect_to 'https://www.copenhagensuborbitals.com/thank_you'
+  end
+
+
+
+
+
+
+
+  
+  # TODO: This API endpoint is deprecated due to the SCA rules
   def donate
     donor = Donor.find_by_any_email(params["email"]).first || Donor.create(user_email: params["email"])
 
