@@ -16,6 +16,11 @@ task :sync_stripe_transactions => :environment do
       email = charge.billing_details.email
       first_name = charge.billing_details.name.split(" ")[0]
       last_name = charge.billing_details.name.split(" ")[1]
+    elsif charge.customer.present?
+      customer = Stripe::Customer.retrieve(charge.source.customer)
+      email = customer.email
+      first_name = charge.source.name.split(" ")[0]
+      last_name = charge.source.name.split(" ")[1]
     elsif charge.source.present?
       if charge.source.customer
         customer = Stripe::Customer.retrieve(charge.source.customer)
