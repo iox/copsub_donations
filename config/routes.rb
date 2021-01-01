@@ -40,6 +40,10 @@ CopsubDonations::Application.routes.draw do
   post '/api/stripe/webhook' => 'stripe#webhook'
 
   # Stripe SCA-ready endpoints
+  post '/api/stripe/new_recurring_payment_session' => 'stripe#new_recurring_payment_session'
+  get '/api/stripe/recurring_payment_success' => 'stripe#recurring_payment_success'
+
+
   post '/api/stripe/new_onetime_payment_session' => 'stripe#new_onetime_payment_session'
   get '/api/stripe/onetime_payment_success' => 'stripe#onetime_payment_success'
 
