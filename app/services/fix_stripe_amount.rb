@@ -1,7 +1,7 @@
 class FixStripeAmount
   def call(charge)
     donation = Donation.where(stripe_charge_id: charge.id).first
-    next unless donation
+    return unless donation
 
     balance_transaction = Stripe::BalanceTransaction.retrieve(charge.balance_transaction)
     
