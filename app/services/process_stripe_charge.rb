@@ -2,12 +2,12 @@ class ProcessStripeCharge
   def call(charge)
     if charge.status != 'succeeded'
       puts "Skipping. charge.status #{charge.status}"
-      next
+      return
     end
     
     if Donation.where(stripe_charge_id: charge.id).count > 0
       puts "This Stripe charge is already in the DB. Skipping"
-      next
+      return
     end
     
     if charge.source.present?
