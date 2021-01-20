@@ -1,7 +1,5 @@
 class PaypalController < ApplicationController
 
-
-
   skip_before_filter :authenticate
   protect_from_forgery :except => [:ipn, :execute_billing_agreement]
   before_filter :override_cors_limitations
@@ -35,41 +33,7 @@ class PaypalController < ApplicationController
   
   
   
-  
-  
-  
   def generate_payment_token
-    
-    # donor = Donor.find_by_user_email(params["email"]) || Donor.create(
-    #   first_name: params["name"].split(' ',2)[0],
-    #   last_name: params["name"].split(' ',2)[1],
-    #   user_email: params["email"],
-    #   # They are just subscribers, until a payment has been registered
-    #   role: "subscriber",
-    #   country: params["country"]
-    # )
-    # donor = Donor.create(role: "subscriber")
-    
-
-    # donor.paymentid = "donor#{donor.id}"
-    # # "supporter" or "one_time", depending on what the donor selected in the donations flow
-    # donor.selected_donor_type = params[:selected_donor_type]
-    # # we store how much the donor wished to donate, in case something fails and we need to send a reminder
-    # donor.selected_amount = params[:selected_amount].to_i
-    # # Store the donation method and the date when the user filled in the donation form    
-    # donor.donation_method = "paypal"
-    # donor.filled_donation_form_date = Date.today
-
-    # if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
-    #   donor.subscribe_to_mailchimp_list
-    #   donor.mailchimp_status = "subscribed"
-    # else
-    #   donor.mailchimp_status = "unsubscribed"
-    # end
-
-    # donor.save
-    
-    
     
     plan = Plan.new({
       "name" => "Copenhagen Suborbitals Support Group - #{params['plan'].upcase}",
@@ -105,8 +69,6 @@ class PaypalController < ApplicationController
     patch.path = "/"
     patch.value = { :state => "ACTIVE" }
     plan.update(patch)
-        
-    
     
     agreement = Agreement.new({
       "name" => "Copenhagen Suborbitals Support Group - #{params['plan'].upcase}",
@@ -125,42 +87,6 @@ class PaypalController < ApplicationController
     else
       render json: agreement.error, status: 500  # Error Hash
     end
-    
-    
-    # # Build Payment object for single donation
-    # @payment = Payment.new({
-    #   :intent => "sale",
-    #   :redirect_urls => {
-    #     :return_url => "http://example.com/your_redirect_url.html",
-    #     :cancel_url => "http://example.com/your_cancel_url.html"
-    #   },
-    #   :payer => {
-    #     :payment_method => "paypal"
-    #   },
-    #   :transactions => [{
-    #     :item_list => {
-    #       :items => [{
-    #         :name => "item",
-    #         :sku => "item",
-    #         :price => "1",
-    #         :currency => "USD",
-    #         :quantity => 1 }]},
-    #     :amount => {
-    #       :total => "1.00",
-    #       :currency => "USD" },
-    #     :description => "This is the payment transaction description." }]})
-    
-    
-    
-    # # Create Payment and return the status(true or false)
-    # if @payment.create
-    #   render json: @payment.id     # Payment Id
-    # else
-    #   render json: @payment.error, status: 500  # Error Hash
-    # end
-    
-    
-    
     
   end
   

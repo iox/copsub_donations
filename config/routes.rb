@@ -35,19 +35,14 @@ CopsubDonations::Application.routes.draw do
   post '/api/new_donor' => 'donors#new_donor'
   post '/api/new_bank_donor' => 'donors#new_bank_donor' # OLD API, TO BE DELETED
 
-  post '/api/stripe/subscribe' => 'stripe#subscribe'
-  post '/api/stripe/donate' => 'stripe#donate'
-  post '/api/stripe/webhook' => 'stripe#webhook'
-
   # Stripe SCA-ready endpoints
   post '/api/stripe/new_recurring_payment_session' => 'stripe#new_recurring_payment_session'
   get '/api/stripe/recurring_payment_success' => 'stripe#recurring_payment_success'
 
-
   post '/api/stripe/new_onetime_payment_session' => 'stripe#new_onetime_payment_session'
   get '/api/stripe/onetime_payment_success' => 'stripe#onetime_payment_success'
 
-
+  post '/api/stripe/webhook' => 'stripe#webhook'
   
   get '/documentation' => 'front#documentation'
 

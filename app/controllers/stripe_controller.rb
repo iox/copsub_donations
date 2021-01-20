@@ -1,37 +1,13 @@
 class StripeController < ApplicationController
 
   skip_before_filter :authenticate
-  protect_from_forgery :except => [:donation, :webhook]
+  protect_from_forgery :except => [:webhook]
   before_filter :override_cors_limitations
 
-  def subscribe
-    donor = Donor.find_by_any_email(params["email"]).first || Donor.new(user_email: params["email"])
-    donor.create_stripe_customer
-    donor.update_attribute(:stripe_card_expiration_date, Date.parse("#{params['card']['exp_year']}-#{params['card']['exp_month']}-01"))
 
-    begin
-      Stripe::Subscription.create(
-        :customer => donor.stripe_customer_id,
-        :plan => params["plan"],
-        :source => params["id"]
-      )
-    rescue Stripe::CardError => e
-      # Since it's a decline, Stripe::CardError will be caught
-      body = e.json_body
-      err  = body[:error]
-      
-      Rails.logger.info "Stripe::CardError"
-      Rails.logger.info err.inspect
-      
-      render status: 500, json: e.json_body and return
-    end
-    
-    DonorMailer.thank_you(donor, true).deliver
-
-    render status: 200, json: "OK".to_json
-  end
-
+  # RECURRING PAYMENT ACTIONS
   def new_recurring_payment_session
+    Stripe.api_key = ENV['STRIPE_CSS_API_KEY']
     session = Stripe::Checkout::Session.create(
       success_url: "#{request.base_url}/api/stripe/recurring_payment_success?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: 'https://www.copenhagensuborbitals.com/support-us',
@@ -46,6 +22,7 @@ class StripeController < ApplicationController
   end
 
   def recurring_payment_success
+    Stripe.api_key = ENV['STRIPE_CSS_API_KEY']
     customer_id = Stripe::Checkout::Session.retrieve(params[:session_id]).customer
     email = Stripe::Customer.retrieve(customer_id).email
 
@@ -58,24 +35,9 @@ class StripeController < ApplicationController
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  # ONETIME PAYMENT ACTIONS
   def new_onetime_payment_session
+    Stripe.api_key = ENV['STRIPE_CS_API_KEY']
     session = Stripe::Checkout::Session.create(
       payment_method_types: ['card'],
       line_items: [{
@@ -95,7 +57,8 @@ class StripeController < ApplicationController
 
 
   def onetime_payment_success
-    customer_id = Stripe::Checkout::Session.retrieve("params[:session_id]").customer
+    Stripe.api_key = ENV['STRIPE_CS_API_KEY']
+    customer_id = Stripe::Checkout::Session.retrieve(params[:session_id]).customer
     email = Stripe::Customer.retrieve(customer_id).email
 
     donor = Donor.find_by_any_email(email).first || Donor.create(user_email: email)
@@ -109,40 +72,6 @@ class StripeController < ApplicationController
 
 
 
-
-
-  
-  # TODO: This API endpoint is deprecated due to the SCA rules
-  def donate
-    donor = Donor.find_by_any_email(params["email"]).first || Donor.create(user_email: params["email"])
-
-    charge = {
-      :amount => (params["selected_amount"].to_i)*100, # Stripe expects the amount in cents. 20€ => 2000
-      :currency => "usd",
-      :description => "Copenhagen Suborbitals donation",
-      :source => params["id"]
-    }
-    
-    Rails.logger.info charge.inspect
-
-    begin
-      Stripe::Charge.create(charge)
-    rescue Stripe::CardError => e
-      # Since it's a decline, Stripe::CardError will be caught
-      body = e.json_body
-      err  = body[:error]
-      
-      Rails.logger.info "Stripe::CardError"
-      Rails.logger.info err.inspect
-      
-      render status: 500, json: e.json_body and return
-    end
-    
-    DonorMailer.thank_you(donor, false).deliver
-
-    render status: 200, json: "OK".to_json
-  end
-  
   
   def webhook
     # TODO: webhook is disabled temporarily. For now, we use a rake task to import Stripe payments
