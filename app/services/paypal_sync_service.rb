@@ -31,6 +31,10 @@ class PaypalSyncService
       }
     )
 
+    if queryAnswer.parsed_response["transaction_details"].blank?
+      puts "\n\n\n!!! queryAnswer.parsed_response['transaction_details'] is empty !!!\n\n\n"
+      return
+    end
 
     queryAnswer.parsed_response["transaction_details"].each do |transaction|
       payer_info = transaction["payer_info"]
