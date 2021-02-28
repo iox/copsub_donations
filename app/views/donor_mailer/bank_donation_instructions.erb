@@ -8,16 +8,23 @@ Our effort to put a man in space depends entirely on donations from our supporte
 You have selected to pay via bank.
 <% if @repeating %>
 Please set up an automatic monthly transfer to our bank account:<br/>
-<% else %>
-Please send your transfer to our bank account:<br/>
-<% end %>
-<br/>
 Bank: Nordea<br/>
 Registration number: 2102<br/>
 Account Number: 0713648507<br/>
 <br/>
 IBAN: DK0520000713648507<br/>
 SWIFT: NDEADKKK<br/>
+<% else %>
+Please send your transfer to our bank account:<br/>
+Danske Bank<br/>
+Registration number: 9570<br/>
+Account Number: 13128871<br/>
+<br/>
+IBAN:		DK63 3000 0013 1288 71<br/>
+BIC/SWIFT:		DABADKKK<br/>
+<% end %>
+<br/>
+
 <br/>
 Please make sure to include your personal payment id: <strong><%= @donor.paymentid %></strong> in all transfers so we can keep track of your payments automatically.<br/>
 <br/>
