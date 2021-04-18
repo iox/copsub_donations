@@ -256,7 +256,7 @@ class Donor < ActiveRecord::Base
   
   def stopped_donating_danish_mailto_template
     subject = URI.encode "Copenhagen Suborbitals Support kontingent"
-    body = URI.encode "Hi #{first_name}, \n\nJeg kan se på vores bankudskrift at det ser ud som om dit CSS kontingent ikke er dukket op på kontoen i denne måned. Vi har ikke hørt noget andet så jeg tænker at der måske er en fejl i overførslen?\n\nMvh\n\nRasmus Agdestein, Copenhagen Suborbitals Support"
+    body = URI.encode "Hej #{first_name}, \n\nJeg kan se på vores bankudskrift at det ser ud som om dit CSS kontingent ikke er dukket op på kontoen i denne måned. Vi har ikke hørt noget andet så jeg tænker at der måske er en fejl i overførslen?\n\nMvh\n\nRasmus Agdestein, Copenhagen Suborbitals Support"
     "mailto:#{user_email}?subject=#{subject}&body=#{body}"
   end
 
