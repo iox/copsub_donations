@@ -7,6 +7,15 @@ class StripeController < ApplicationController
 
   # RECURRING PAYMENT ACTIONS
   def new_recurring_payment_session
+    # Stripe no longer supports manually setting the price id for a certain plan
+    # This is a workaround
+    mach1_price_id_development = "price_1IuxHYHZGxJbl38FlPKw6dvU"
+    mach1_price_id_production = "price_1IuxGrHZGxJbl38Fhnkr0Scm"
+    if params['plan_id'] == 'mach1'
+      params['plan_id'] = Rails.env.production? ? mach1_price_id_production : mach1_price_id_development
+    end
+
+
     Stripe.api_key = ENV['STRIPE_CSS_API_KEY']
     session = Stripe::Checkout::Session.create(
       success_url: "#{request.base_url}/api/stripe/recurring_payment_success?session_id={CHECKOUT_SESSION_ID}",
@@ -15,7 +24,7 @@ class StripeController < ApplicationController
       mode: 'subscription',
       line_items: [{
         quantity: 1,
-        price: params['plan_id'], # this will be either 'mach2' or 'mach3'
+        price: params['plan_id'], # this will be either 'mach1', 'mach2' or 'mach3'
       }],
     )
     render status: 200, json: {session_id: session.id}
