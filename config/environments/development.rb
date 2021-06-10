@@ -32,7 +32,7 @@ CopsubDonations::Application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  BetterErrors::Middleware.allow_ip! '80.167.164.26'
+  BetterErrors::Middleware.allow_ip! '172.17.0.0/16'
 
   Rails.application.routes.default_url_options[:host] = 'copsub_donations.dev.ihuerta.net:3016'
   PREFIX = "cy3su_"
