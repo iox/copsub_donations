@@ -65,7 +65,10 @@ class AssignUserAutomatically
   def search_for_similar_assigned_donation
     scope = Donation.where("donor_id IS NOT NULL")
     if !@donation.bank_reference.blank?
-      if @donation.bank_reference.to_s.mb_chars.downcase.to_s.strip.in?(BANK_REFERENCE_BLACKLIST)
+      # International transfers can not be matched automatically, because the real reference entered by the user is not in the CSV list
+      if @donation.bank_reference.to_s.include?("Udenl. overf")
+        return nil
+      elsif @donation.bank_reference.to_s.mb_chars.downcase.to_s.strip.in?(BANK_REFERENCE_BLACKLIST)
         return nil
       else
         scope.where(:bank_reference => @donation.bank_reference).first
