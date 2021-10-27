@@ -14,5 +14,5 @@ task :daily_donor_update => :environment do
     donor.donations.last(4).to_a.each(&:set_series_flags)
   end
 
-  DonorMailer.daily_report(@logs_from_role_switching).deliver
+  # DonorMailer.daily_report(@logs_from_role_switching).deliver
 end
