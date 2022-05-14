@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/suyccom/hobo-metasearch
+  remote: https://github.com/iox/hobo-metasearch
   revision: 2ee3c30eaabf8140801efae8cadb3f431405b42e
   specs:
     hobo-metasearch (0.1)
