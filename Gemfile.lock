@@ -143,8 +143,8 @@ GEM
     hobo_will_paginate (2.1.1)
     hobo_will_paginate-bootstrap (1.0.0)
       hobo_will_paginate
-    httparty (0.13.3)
-      json (~> 1.8)
+    httparty (0.21.0)
+      mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
     jbuilder (1.5.3)
@@ -155,7 +155,7 @@ GEM
       thor (>= 0.14, < 2.0)
     jquery-ui-themes (0.0.11)
       httparty
-    json (1.8.2)
+    json (1.8.6)
     launchy (2.4.3)
       addressable (~> 2.3)
     listen (3.1.5)
@@ -173,7 +173,7 @@ GEM
     money (6.5.1)
       i18n (>= 0.6.4, <= 0.7.0)
     multi_json (1.15.0)
-    multi_xml (0.5.5)
+    multi_xml (0.6.0)
     multipart-post (2.1.1)
     mysql2 (0.3.18)
     nenv (0.3.0)
