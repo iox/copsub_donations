@@ -1,13 +1,13 @@
 task :sync_stripe_transactions => :environment do
 
   Stripe.api_key = ENV['STRIPE_CS_API_KEY']
-  list = Stripe::Charge.list
+  list = Stripe::Charge.list({created: {gt: (Time.now-7.days).to_i}})
   list.auto_paging_each do | charge |
     ProcessStripeCharge.new.call(charge)
   end
-  
+
   Stripe.api_key = ENV['STRIPE_CSS_API_KEY']
-  list = Stripe::Charge.list
+  list = Stripe::Charge.list({created: {gt: (Time.now-7.days).to_i}})
   list.auto_paging_each do | charge |
     ProcessStripeCharge.new.call(charge)
   end
