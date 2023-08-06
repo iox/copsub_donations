@@ -26,3 +26,48 @@ Things you may want to cover:
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
+
+
+
+Local development
+-----------------
+
+Build container:
+
+    cd .devcontainer
+    docker build . -t donations
+
+
+Start container (first time):
+
+    docker run --name donations -p 0.0.0.0:3016:3016 --mount type=bind,source=/home/ignacio/copsub_donations,target=/workspace donations:latest
+
+
+Stop container (from another terminal):
+
+    docker kill donations
+
+
+Delete container
+
+    docker rm donations
+
+
+Restart container
+
+    docker start donations
+
+
+Install ruby packages and start webserver on a running container (from another terminal):
+
+    docker exec -it donations /bin/bash
+    bundle install
+    cp config/database.yml.example config/database.yml
+    rake db:create && rake db:schema:load
+    bundle exec rails s -p 3016 -b 0.0.0.0
+
+
+Create a user
+
+    bundle exec rails c
+    User.create(name: 'Admin', email_address: 'ignacio@ihuerta.net', password: 'secret', administrator: true)
