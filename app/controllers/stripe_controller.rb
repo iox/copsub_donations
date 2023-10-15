@@ -67,16 +67,12 @@ class StripeController < ApplicationController
 
   def onetime_payment_success
     Stripe.api_key = ENV['STRIPE_CS_API_KEY']
-    begin
-      customer_id = Stripe::Checkout::Session.retrieve(params[:session_id]).customer
-    rescue Stripe::InvalidRequestError
-      # Sometimes Stripe can take a few seconds before a session is available in the API
-      sleep 5
-      customer_id = Stripe::Checkout::Session.retrieve(params[:session_id]).customer
-    end
 
-    email = Stripe::Customer.retrieve(customer_id).email
+    Rails.logger.info params.inspect
 
+    session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    email = session.customer_details.email
+    
     donor = Donor.find_by_any_email(email).first || Donor.create(user_email: email)
 
     DonorMailer.thank_you(donor, false).deliver
