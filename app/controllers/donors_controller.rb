@@ -73,12 +73,12 @@ class DonorsController < ApplicationController
     donor.donation_method = params[:donation_method]
     donor.filled_donation_form_date = Date.today
 
-    if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
-      donor.subscribe_to_mailchimp_list
-      donor.mailchimp_status = "subscribed"
-    else
-      donor.mailchimp_status = "unsubscribed"
-    end
+    # if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
+    #   donor.subscribe_to_mailchimp_list
+    #   donor.mailchimp_status = "subscribed"
+    # else
+    #   donor.mailchimp_status = "unsubscribed"
+    # end
 
     donor.save
 
@@ -126,55 +126,55 @@ class DonorsController < ApplicationController
     redirect_to donors_path
   end
 
-  def mailchimp_email_preview
-    gibbon = Gibbon::Request.new
-    @automations = gibbon.automations.retrieve["automations"]
-    @automation_id = params[:automation_id] || @automations.first['id']
-    @emails = gibbon.automations(@automation_id).emails.retrieve["emails"]
+  # def mailchimp_email_preview
+  #   gibbon = Gibbon::Request.new
+  #   @automations = gibbon.automations.retrieve["automations"]
+  #   @automation_id = params[:automation_id] || @automations.first['id']
+  #   @emails = gibbon.automations(@automation_id).emails.retrieve["emails"]
 
 
-    if request.xhr?
-      hobo_ajax_response
-      return
-    end
+  #   if request.xhr?
+  #     hobo_ajax_response
+  #     return
+  #   end
 
-    unless params[:search]
-      flash[:error] = "You need to filter the users before sending a mailchimp email"
-      redirect_to :back
-    end
+  #   unless params[:search]
+  #     flash[:error] = "You need to filter the users before sending a mailchimp email"
+  #     redirect_to :back
+  #   end
 
-    @donors = donors_scope
-  end
+  #   @donors = donors_scope
+  # end
 
-  def send_mailchimp_email
-    if params[:emails].blank?
-      flash[:error] = "No users were selected"
-      redirect_to :back and return
-    end
+  # def send_mailchimp_email
+  #   if params[:emails].blank?
+  #     flash[:error] = "No users were selected"
+  #     redirect_to :back and return
+  #   end
 
-    unless Rails.env.production?
-      flash[:notice] = "Emails were not sent, because we are not running in production"
-      redirect_to :back and return
-    end
+  #   unless Rails.env.production?
+  #     flash[:notice] = "Emails were not sent, because we are not running in production"
+  #     redirect_to :back and return
+  #   end
 
-    gibbon = Gibbon::Request.new
-    email_details = gibbon.automations(params[:automation_id]).emails(params[:email_id]).retrieve
-    email_subject = (email_details && email_details["settings"]) ? email_details["settings"]["title"] : nil
+  #   gibbon = Gibbon::Request.new
+  #   email_details = gibbon.automations(params[:automation_id]).emails(params[:email_id]).retrieve
+  #   email_subject = (email_details && email_details["settings"]) ? email_details["settings"]["title"] : nil
 
-    for email in params[:emails]
-      begin
-        gibbon.automations(params[:automation_id]).emails(params[:email_id]).queue.create(body: {email_address: email})
-        flash[:notice] ||= ""
-        flash[:notice] += " Email sent to #{email}."
-        EmailLog.create(email: email, subject: email_subject) if email_subject
-      rescue => e
-        flash[:error] ||= ""
-        flash[:error] += " Mailchimp returned an error with #{email}: " + e.detail.inspect
-      end
-    end
+  #   for email in params[:emails]
+  #     begin
+  #       gibbon.automations(params[:automation_id]).emails(params[:email_id]).queue.create(body: {email_address: email})
+  #       flash[:notice] ||= ""
+  #       flash[:notice] += " Email sent to #{email}."
+  #       EmailLog.create(email: email, subject: email_subject) if email_subject
+  #     rescue => e
+  #       flash[:error] ||= ""
+  #       flash[:error] += " Mailchimp returned an error with #{email}: " + e.detail.inspect
+  #     end
+  #   end
 
-    redirect_to :back
-  end
+  #   redirect_to :back
+  # end
 
   def find_duplicated_donors
     emails = Hash.new

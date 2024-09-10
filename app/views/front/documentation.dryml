@@ -45,38 +45,7 @@
       </ul>
 
       <hr/><br/>
-      <h3>Mailchimp Sync</h3>
-      <p><strong>Trigger:</strong><br/>Cron Job, every night.</p>
-      <p><strong>Short description:</strong><br/>Connect to Mailchimp's API, update the donors mailchimp status.</p>
-      <p><strong>Actions:</strong></p>
-      <ul>
-        <li>Update all donors mailchimp_status to 'not_present'</li>
-        <li>Connect to the Mailchimp API</li>
-        <li>Retrieve all members from the list with ID <%= MAILCHIMP_LIST_ID %>, using pagination</li>
-        <li>For each member in Mailchimp, find a donor with matching user_email or paypalid</li>
-        <li>For each subscribed member in Mailchimp:
-          <ul>
-            <li>If the donor exists in the DB, update his mailchimp_status to 'subscribed'</li>
-            <li>If the donor does not exist yet, create a new donor with mailchimp_status 'subscribed' and role 'subscriber'</li>
-          </ul>
-        </li>
-        <li>For each unsubscribed member in Mailchimp:
-          <ul>
-            <li>If the donor exists, update this mailchimp_status to 'unsubscribed'</li>
-            <li>If the donor exists and has a 'subscriber' role, update his role to "inactive_subscriber"</li>
-            <li>If the donor does not exist, do nothing.</li>
-          </ul>
-        </li>
-        <li>For each member, update the "role" field from the donations app to mailchimp.</li>
-        <li>For each member, update the "last paypal failure" fields from the donations app to mailchimp. Paypal txn_type error messages are translated to numeric codes:
-          <ul>
-            <li><strong>1</strong> => 'recurring_payment_suspended_due_to_max_failed_payment'</li>
-            <li><strong>2</strong> => 'subscr_eot'</li>
-            <li><strong>3</strong> => 'subscr_failed'</li>
-            <li><strong>4</strong> => 'subscr_cancel'</li>
-          </ul>
-        </li>
-      </ul>
+      
 
 
       <hr/><br/>

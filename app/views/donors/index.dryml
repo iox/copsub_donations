@@ -24,7 +24,6 @@
       <div class="span6">
         <%= link_to "<i class='icon-list'></i> Export to CSV".html_safe, params.merge({:format => 'text'}), class: 'btn pull-right' %>
         <if test="&current_user.administrator?">
-          <%= link_to "<i class='icon-envelope'></i> Send Mailchimp email".html_safe, mailchimp_email_preview_path(params), class: 'btn pull-right', style: 'margin-right:10px' %>
           <%= link_to "<i class='icon-pencil'></i> Change roles".html_safe, change_roles_preview_path(params), class: 'btn pull-right', style: 'margin-right:10px' %>
           <%= link_to "<i class='icon-warning-sign'></i> Find duplicated".html_safe, "/find_duplicated_donors", class: 'btn pull-right', style: 'margin-right:10px' %>
           <%= link_to "<i class='icon-hdd'></i> Save search".html_safe, "/saved_searches/new", class: 'btn pull-right', style: 'margin-right: 10px' %>
@@ -74,10 +73,6 @@
 
           <br/><br/>
 
-          <select name="mailchimp_status" style="width: 135px; margin-left: 0px">
-            <option value="">-Mailchimp-</option>
-            <%= options_for_select([ ["Subscribed", "subscribed"], ["Unsubscribed", "unsubscribed"], ["Not in Mailchimp", "not_present" ]], params["mailchimp_status"]) %>
-          </select>
 
           <select name="donation_method" style="width: 165px; margin-left: 7px">
             <option value="">-Donation Method-</option>
