@@ -90,7 +90,7 @@ GEM
       activesupport (>= 3.0.0)
     faraday (1.0.0)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.23)
+    ffi (1.14.2)
     formatador (0.2.5)
     gibbon (2.2.3)
       faraday (>= 0.9.1)
