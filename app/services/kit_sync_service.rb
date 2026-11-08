@@ -51,6 +51,17 @@ class KitSyncService
     'inactive'   => 'not_present',
   }
 
+  # Kit subscribers created before this moment come from the October 2026
+  # bulk import, which marked ~everyone (including people who had unsubscribed
+  # in Mailchimp) as active. Their Kit state is therefore NOT trusted to flip a
+  # donor back to 'subscribed'. Subscribers created afterwards signed up for
+  # real (website form / donation form, double opt-in), so their state is.
+  KIT_IMPORT_CUTOFF = Time.utc(2026, 10, 17)
+
+  # Kit states in which a subscriber no longer receives emails. We never
+  # reactivate these through the API: a genuine opt-in must come from a form.
+  KIT_ENDED_STATES = %w(cancelled bounced complained)
+
   class << self
 
     def client
@@ -68,7 +79,13 @@ class KitSyncService
     # Applies a Kit subscriber's state to our donor list. Used by the Kit
     # webhooks (real time) and by the nightly sync task. Returns the affected
     # donor, or nil when nothing matched / nothing needed changing.
-    def apply_subscriber_state(email_address, kit_state, first_name = nil)
+    #
+    # authoritative: webhooks are real events and always apply. The nightly
+    # bulk pull passes false for subscribers from the October 2026 import (see
+    # kit_state_authoritative?), whose 'active' state may be stale: then an
+    # app 'unsubscribed' is never flipped back to 'subscribed', and a pending
+    # ('inactive') Kit state never overwrites a known app status.
+    def apply_subscriber_state(email_address, kit_state, first_name = nil, authoritative = true)
       status = STATE_TO_STATUS[kit_state.to_s]
       return nil if status.nil? || email_address.blank?
 
@@ -91,6 +108,11 @@ class KitSyncService
         return donor
       end
 
+      unless authoritative
+        return nil if status == 'subscribed' && donor.mailchimp_status == 'unsubscribed'
+        return nil if status == 'not_present' && donor.mailchimp_status.present?
+      end
+
       changed = false
       if donor.mailchimp_status != status
         # Direct setter: mailchimp_status is not attr_accessible.
@@ -109,37 +131,105 @@ class KitSyncService
       changed ? donor : nil
     end
 
-    # Pushes one donor to Kit: subscriber record, custom fields and tags.
+    # Whether a Kit subscriber's state can be trusted by the bulk pull.
+    def kit_state_authoritative?(subscriber)
+      created_at = Time.parse(subscriber['created_at'].to_s) rescue nil
+      created_at.present? && created_at >= KIT_IMPORT_CUTOFF
+    end
+
+    # Diff-based push of our donors to Kit. Works from two bulk snapshots taken
+    # up front, so API calls are only made for real differences:
     #
-    # Consent rule: only donors who opted into the newsletter in our app
-    # (mailchimp_status 'subscribed') are ever CREATED in Kit. Everyone else is
-    # only updated if they already exist there as an active subscriber (e.g.
-    # they subscribed through the website form). Donors who never opted in must
-    # never become Kit subscribers, or they would start receiving emails.
-    def push_donor(donor)
-      return nil if donor.user_email.blank?
-      email = donor.user_email.strip
+    #   subscribers:    KitClient#all_subscribers (downcased email => subscriber)
+    #   tag_membership: KitClient#subscriber_ids_by_tag(MANAGED_TAG_IDS)
+    #
+    # Per email address (donors sharing an address are handled together; if
+    # any of them unsubscribed, the address counts as unsubscribed):
+    #
+    #   app unsubscribed, Kit active/pending   -> update tags/fields, unsubscribe
+    #   app subscribed, not in Kit             -> create, set fields and tags
+    #   app subscribed, Kit cancelled/bounced  -> skip (never reactivate via API)
+    #   in Kit as active/pending               -> update fields/tags on diff only
+    #   app not subscribed, not in Kit         -> skip (no consent: never create)
+    #
+    # Returns a Hash of counters. Errors on one address are reported and counted
+    # but do not stop the run.
+    def reconcile(donors, subscribers:, tag_membership:, log: $stdout)
+      stats = Hash.new(0)
 
-      subscriber =
-        if donor.mailchimp_status == 'subscribed'
-          client.upsert_subscriber(email, :first_name => donor.first_name)
-        else
-          # Do not create; only enrich existing active subscribers.
-          client.subscriber(email)
+      groups = donors.group_by { |d| d.user_email.to_s.strip.downcase }
+      groups.delete('')
+
+      groups.each_with_index do |(email, group), index|
+        begin
+          donor = representative_donor(group)
+          stats[reconcile_one(email, donor, subscribers[email], tag_membership)] += 1
+        rescue => e
+          stats[:failed] += 1
+          log.puts "  ! #{email} (donor #{group.map(&:id).join(',')}): #{e.message}"
         end
-      return nil if subscriber.nil?
+        log.puts "  ... #{index + 1}/#{groups.size} addresses checked" if ((index + 1) % 1000).zero?
+      end
 
-      client.update_subscriber(subscriber['id'], email,
-        :first_name => donor.first_name,
-        :fields => custom_fields_for(donor))
+      stats
+    end
 
-      current_tag_ids = client.tags_for_subscriber(subscriber['id']).map { |t| t['id'] }
-      desired_tag_ids = desired_tags_for(donor)
+    # The donor whose data represents a shared email address: an unsubscribed
+    # one if any (unsubscribing wins), otherwise the biggest donor.
+    def representative_donor(group)
+      candidates = group.select { |d| d.mailchimp_status == 'unsubscribed' }
+      candidates = group if candidates.empty?
+      candidates.max_by { |d| [d.donated_total.to_i, d.number_of_donations.to_i, -d.id] }
+    end
 
-      (desired_tag_ids - current_tag_ids).each { |tag_id| client.add_tag(tag_id, email) }
-      ((current_tag_ids & MANAGED_TAG_IDS) - desired_tag_ids).each { |tag_id| client.remove_tag(tag_id, subscriber['id']) }
+    # Returns a Symbol describing what happened (used as a stats key).
+    def reconcile_one(email, donor, subscriber, tag_membership)
+      status = donor.mailchimp_status
 
-      subscriber
+      if subscriber.nil?
+        return :skipped_no_consent unless status == 'subscribed'
+        subscriber = client.upsert_subscriber(donor.user_email.strip, :first_name => donor.first_name)
+        enrich(donor, subscriber, Set.new)
+        return :created
+      end
+
+      return :skipped_ended_in_kit if KIT_ENDED_STATES.include?(subscriber['state'])
+
+      current_tags = tag_membership[subscriber['id']] || Set.new
+      changed = enrich(donor, subscriber, current_tags)
+
+      if status == 'unsubscribed'
+        client.unsubscribe(subscriber['id'])
+        return :unsubscribed
+      end
+
+      changed ? :updated : :unchanged
+    end
+
+    # Brings a Kit subscriber's first name, custom fields and managed tags in
+    # line with the donor, calling the API only for actual differences.
+    # Returns true if anything was changed.
+    def enrich(donor, subscriber, current_tags)
+      changed = false
+
+      current_fields = subscriber['fields'] || {}
+      field_diff = custom_fields_for(donor).reject { |key, value| current_fields[key].to_s == value.to_s }
+      name_diff = donor.first_name.present? && subscriber['first_name'].to_s != donor.first_name.to_s
+
+      if field_diff.any? || name_diff
+        # Keep Kit's own email address (casing etc.); we matched it case-insensitively.
+        client.update_subscriber(subscriber['id'], subscriber['email_address'],
+          :first_name => (donor.first_name if name_diff),
+          :fields => field_diff)
+        changed = true
+      end
+
+      desired = desired_tags_for(donor)
+      current = current_tags.to_a & MANAGED_TAG_IDS
+      (desired - current).each { |tag_id| client.tag_subscriber(tag_id, subscriber['id']); changed = true }
+      (current - desired).each { |tag_id| client.remove_tag(tag_id, subscriber['id']); changed = true }
+
+      changed
     end
 
     # 'current' if the donor donated in the last 92 days, 'past' if they ever
@@ -176,20 +266,6 @@ class KitSyncService
         'donor_id' => donor.id.to_s,
       }
       fields.reject { |_, value| value.blank? }
-    end
-
-    # Cheap local fingerprint of everything we push to Kit. The nightly sync
-    # task stores these per donor and only calls the API for donors whose
-    # fingerprint changed since the last run (avoids re-pushing 10k donors
-    # every night, since the daily donor update touches all updated_at values).
-    def fingerprint(donor)
-      [
-        donor.user_email.to_s.strip,
-        donor.first_name, donor.last_name, donor.role, donor.mailchimp_status,
-        donor_category(donor), donor.donated_total.to_i > 0,
-        donor.number_of_donations.to_i, donor.donation_method,
-        donor.city, donor.country
-      ].join('|')
     end
 
   end

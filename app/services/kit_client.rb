@@ -59,6 +59,47 @@ class KitClient
     json(get('/subscribers', params))
   end
 
+  # All subscribers of the account (all states), keyed by downcased email.
+  # Each entry is the full subscriber Hash including 'id', 'state' and
+  # 'fields'. One bulk pass instead of one lookup per donor.
+  def all_subscribers(per_page: 1000)
+    subs = {}
+    after = nil
+    loop do
+      page = subscribers_page(:status => 'all', :per_page => per_page, :after => after)
+      (page['subscribers'] || []).each do |s|
+        email = s['email_address'].to_s.downcase
+        subs[email] = s if email.present?
+      end
+      pagination = page['pagination'] || {}
+      break unless pagination['has_next_page']
+      after = pagination['end_cursor']
+    end
+    subs
+  end
+
+  # Membership of the given tags, as Hash of subscriber_id => Set of tag ids.
+  # One bulk pass per tag instead of one lookup per subscriber. status 'all'
+  # is required: this endpoint only returns active subscribers by default.
+  def subscriber_ids_by_tag(tag_ids, per_page: 1000)
+    mapping = {}
+    tag_ids.each do |tag_id|
+      after = nil
+      loop do
+        params = { :status => 'all', :per_page => per_page }
+        params[:after] = after if after.present?
+        page = json(get("/tags/#{tag_id}/subscribers", params))
+        (page['subscribers'] || []).each do |s|
+          (mapping[s['id']] ||= Set.new) << tag_id
+        end
+        pagination = page['pagination'] || {}
+        break unless pagination['has_next_page']
+        after = pagination['end_cursor']
+      end
+    end
+    mapping
+  end
+
   # --- Tags ---
 
   # All tags currently applied to a subscriber (follows pagination).
@@ -66,9 +107,9 @@ class KitClient
     tags = []
     after = nil
     loop do
-      path = "/subscribers/#{subscriber_id}/tags"
-      path += "?after=#{after}" if after.present?
-      page = json(get_raw(path))
+      params = {}
+      params[:after] = after if after.present?
+      page = json(get("/subscribers/#{subscriber_id}/tags", params))
       tags += (page['tags'] || [])
       pagination = page['pagination'] || {}
       break unless pagination['has_next_page']
@@ -77,9 +118,10 @@ class KitClient
     tags
   end
 
-  # Tags an existing subscriber, by email address. Idempotent.
-  def add_tag(tag_id, email_address)
-    post("/tags/#{tag_id}/subscribers", :email_address => email_address)
+  # Tags a subscriber, by subscriber id. Idempotent. Tagging by id (rather
+  # than by email) never creates or reactivates a subscriber.
+  def tag_subscriber(tag_id, subscriber_id)
+    post("/tags/#{tag_id}/subscribers/#{subscriber_id}", {})
     true
   end
 
@@ -122,11 +164,6 @@ class KitClient
 
   def get(path, params = {})
     request(:get, path, :query => params)
-  end
-
-  # For paths that already contain a query string.
-  def get_raw(path_with_query)
-    request(:get, path_with_query, {})
   end
 
   def post(path, body)

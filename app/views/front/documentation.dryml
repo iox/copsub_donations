@@ -54,14 +54,17 @@
         <li>Deliveries are authenticated with a shared secret (KIT_WEBHOOK_SECRET) before being processed; HMAC-signed deliveries from Kit's newer webhook API are also accepted.</li>
         <li>Known donors get their newsletter status (and subscriber role) updated; new confirmed subscribers that we don't know yet are created with the 'subscriber' role.</li>
       </ul>
-      <p><strong>Nightly (rake sync_kit_status):</strong></p>
+      <p><strong>Nightly (rake sync_kit_status, 03:00):</strong></p>
       <ul>
-        <li>Pulls all subscriber states from Kit first, updating each donor's newsletter status (subscribed / unsubscribed / not_present). Kit is the source of truth for subscription states.</li>
-        <li>Then pushes the donors whose relevant data changed since the last run to Kit: custom fields (role, category, number of donations, city, country, ...) and tags (role tags, status tags, currently_donating / past_donor / newsletter_subscriber, donor).</li>
-        <li>Only donors who opted into the newsletter are ever <em>created</em> in Kit; other donors are only updated if they already exist there as subscribers. People who never opted in never become subscribers.</li>
+        <li>Reads all Kit subscribers and the members of our managed tags once, compares them with the donor list locally, and only calls the Kit API for actual differences (a normal night takes a minute or two).</li>
+        <li><em>Pull:</em> updates each donor's newsletter status from Kit (subscribed / unsubscribed / not_present). Unsubscribes, bounces and complaints always apply. Subscribers created in Kit before 17 October 2026 come from the bulk import and their "active" state may be stale, so they never re-subscribe a donor who unsubscribed here.</li>
+        <li><em>Push:</em> donors who opted into the newsletter here but are missing in Kit are created; existing Kit subscribers get their custom fields (role, category, number of donations, city, country, ...) and tags (role tags, status tags, currently_donating / past_donor / newsletter_subscriber, donor) updated where they differ.</li>
+        <li>Donors who are unsubscribed here are unsubscribed in Kit too (and tagged "unsubscribed").</li>
+        <li>Only donors who opted into the newsletter are ever <em>created</em> in Kit, and people who unsubscribed, bounced or complained in Kit are never reactivated through the API: re-subscribing must go through a Kit form.</li>
         <li>Only tags managed by this app are ever added or removed; tags applied by Kit automations or manually are left untouched.</li>
-        <li>Use <code>FULL=true</code> to push every donor (slow: the Kit API is rate limited to about one request per second).</li>
+        <li><code>DRY_RUN=1</code> only reports what the pull would change.</li>
       </ul>
+      <p><strong>Removing unsubscribed people from Kit (manual, every few months):</strong><br/>The Kit API cannot delete subscribers, so they stay in Kit after unsubscribing. To keep the account under its plan limit: Kit dashboard -&gt; Subscribers -&gt; filter by status "Cancelled" (and also "Bounced", "Complained") -&gt; select all -&gt; Delete. This is safe: the nightly sync never re-creates people who are unsubscribed here.</p>
       <p><strong>Donation form opt-in:</strong><br/>Donors who tick "subscribe to the newsletter" in the donations flow are added to the Kit newsletter form (form ID <%= KIT_NEWSLETTER_FORM_ID %>) right away, so they receive the welcome emails.</p>
       <hr/><br/>
 

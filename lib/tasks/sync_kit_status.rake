@@ -1,77 +1,65 @@
 # Nightly synchronization between our donor list and Kit.com (newsletter).
 #
-#   rake sync_kit_status            # pull subscriber statuses from Kit, then
-#                                   # push donors changed since the last run
-#   rake sync_kit_status FULL=true  # push ALL donors (slow: rate limited to
-#                                   # ~1 API request/second). Only donors who
-#                                   # opted into the newsletter are created in
-#                                   # Kit; others are only updated if they
-#                                   # already exist as subscribers there.
-#   rake sync_kit_status LIMIT=20   # only push the first 20 changed donors (testing)
+#   rake sync_kit_status            # pull states from Kit, then push differences
+#   rake sync_kit_status DRY_RUN=1  # only report what the pull would change
 #
 # Real-time subscription/unsubscription events arrive through the Kit webhooks
-# (KitWebhooksController), so this task is mainly about donor data flowing into
-# Kit (roles, categories, custom fields) and about reconciling anything the
-# webhooks missed.
-desc 'Synchronize donors with Kit.com (push changed donors, pull subscriber statuses)'
+# (KitWebhooksController). This task reconciles everything else and is
+# diff-based: it reads all Kit subscribers and the members of our managed tags
+# once (a few dozen API calls), compares with the database locally, and only
+# calls the API for actual differences. See KitSyncService.reconcile.
+#
+# Run it under flock (cron does) so two runs never overlap:
+#   flock -n tmp/kit_sync.lock -c 'RAILS_ENV=production bundle exec rake sync_kit_status'
+desc 'Synchronize donors with Kit.com (pull subscriber states, push differences)'
 task :sync_kit_status => :environment do
+  dry_run = %w(true 1 yes).include?(ENV['DRY_RUN'].to_s.downcase)
+  client = KitSyncService.client
+  started = Time.now
 
-  full  = %w(true 1 yes).include?(ENV['FULL'].to_s.downcase)
-  limit = ENV['LIMIT'].to_i
+  # --- 1. Snapshot of Kit ----------------------------------------------------
+  puts "#{Time.now}: reading all Kit subscribers..."
+  subscribers = client.all_subscribers
+  puts "  #{subscribers.size} subscriber(s) in Kit."
 
-  # Per-donor fingerprints of what we last pushed to Kit. Kept out of the
-  # database on purpose; if it is lost, the next run is a (harmless) full push.
-  state_file = Rails.root.join('tmp', 'kit_push_state.json')
-  state = File.exist?(state_file) ? JSON.parse(File.read(state_file)) : {}
+  puts "#{Time.now}: reading managed tag memberships..."
+  tag_membership = client.subscriber_ids_by_tag(KitSyncService::MANAGED_TAG_IDS)
+  puts "  #{tag_membership.size} subscriber(s) carry managed tags."
 
-  # --- 1. PULL: subscriber states from Kit ----------------------------------
-  # Runs FIRST, so that the push below makes its create/update decisions with
-  # up-to-date subscription states (Kit is the source of truth for those).
-
-  puts 'PULL: reading subscriber statuses from Kit...'
-  affected = 0
-  after = nil
-  loop do
-    page = KitSyncService.client.subscribers_page(:status => 'all', :per_page => 500, :after => after)
-    (page['subscribers'] || []).each do |subscriber|
-      donor = KitSyncService.apply_subscriber_state(subscriber['email_address'], subscriber['state'], subscriber['first_name'])
-      affected += 1 if donor
+  # --- 2. PULL: Kit states -> donors -----------------------------------------
+  # Subscribers from the October 2026 import are not authoritative: their
+  # 'active' state may be stale, so they never re-subscribe an unsubscribed donor.
+  puts "#{Time.now}: PULL#{' (dry run)' if dry_run}..."
+  pulled = 0
+  subscribers.each_value do |subscriber|
+    authoritative = KitSyncService.kit_state_authoritative?(subscriber)
+    if dry_run
+      status = KitSyncService::STATE_TO_STATUS[subscriber['state'].to_s]
+      donor = Donor.find_by_any_email(subscriber['email_address'].to_s).first
+      next if donor.nil? || status.nil? || donor.mailchimp_status == status
+      next if !authoritative && status == 'subscribed' && donor.mailchimp_status == 'unsubscribed'
+      next if !authoritative && status == 'not_present' && donor.mailchimp_status.present?
+      puts "  would set donor #{donor.id} (#{subscriber['email_address']}): #{donor.mailchimp_status.inspect} -> #{status}"
+      pulled += 1
+    else
+      donor = KitSyncService.apply_subscriber_state(subscriber['email_address'], subscriber['state'],
+                                                    subscriber['first_name'], authoritative)
+      pulled += 1 if donor
     end
-
-    pagination = page['pagination'] || {}
-    break unless pagination['has_next_page']
-    after = pagination['end_cursor']
   end
-  puts "PULL done: #{affected} donor(s) created/updated from Kit subscriber states."
+  puts "  #{pulled} donor(s) #{'would be ' if dry_run}created/updated from Kit states."
 
-  # --- 2. PUSH: donors whose relevant data changed since the last run -------
-
-  donors = Donor.where("user_email IS NOT NULL AND user_email != '' AND user_email LIKE '%@%'").order(:id)
-  donors = donors.limit(limit) if limit > 0
-
-  total = donors.count
-  queue = []
-  donors.each { |donor| queue << donor if full || state[donor.id.to_s] != KitSyncService.fingerprint(donor) }
-
-  puts "PUSH: #{queue.size}/#{total} donor(s) changed since the last run#{' (FULL sync)' if full}."
-
-  pushed = 0
-  failed = 0
-  queue.each_with_index do |donor, index|
-    begin
-      KitSyncService.push_donor(donor)
-      state[donor.id.to_s] = KitSyncService.fingerprint(donor)
-      pushed += 1
-    rescue => e
-      failed += 1
-      puts "  ! Donor #{donor.id} (#{donor.user_email}) could not be pushed: #{e.message}"
-    end
-    puts "  ... pushed #{pushed}/#{queue.size}" if ((index + 1) % 50).zero?
+  if dry_run
+    puts 'Dry run: skipping the push.'
+    next
   end
-  puts "PUSH done: #{pushed} synchronized, #{failed} failed."
 
-  FileUtils.mkdir_p(File.dirname(state_file))
-  File.open(state_file, 'w') { |f| f.write(JSON.generate(state)) }
+  # --- 3. PUSH: differences -> Kit -------------------------------------------
+  puts "#{Time.now}: PUSH (reconcile)..."
+  donors = Donor.where("user_email IS NOT NULL AND user_email != '' AND user_email LIKE '%@%'").order(:id).to_a
+  stats = KitSyncService.reconcile(donors, :subscribers => subscribers, :tag_membership => tag_membership)
 
-  puts 'Kit sync finished.'
+  puts '  Results:'
+  stats.sort_by { |key, _| key.to_s }.each { |key, count| puts "    #{key}: #{count}" }
+  puts "#{Time.now}: Kit sync finished in #{(Time.now - started).round}s."
 end
