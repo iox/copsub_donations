@@ -101,11 +101,23 @@ class KitSyncService
     end
 
     # Pushes one donor to Kit: subscriber record, custom fields and tags.
+    #
+    # Consent rule: only donors who opted into the newsletter in our app
+    # (mailchimp_status 'subscribed') are ever CREATED in Kit. Everyone else is
+    # only updated if they already exist there as an active subscriber (e.g.
+    # they subscribed through the website form). Donors who never opted in must
+    # never become Kit subscribers, or they would start receiving emails.
     def push_donor(donor)
       return nil if donor.user_email.blank?
       email = donor.user_email.strip
 
-      subscriber = client.upsert_subscriber(email, :first_name => donor.first_name)
+      subscriber =
+        if donor.mailchimp_status == 'subscribed'
+          client.upsert_subscriber(email, :first_name => donor.first_name)
+        else
+          # Do not create; only enrich existing active subscribers.
+          client.subscriber(email)
+        end
       return nil if subscriber.nil?
 
       client.update_subscriber(subscriber['id'], email,

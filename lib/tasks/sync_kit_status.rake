@@ -1,9 +1,12 @@
 # Nightly synchronization between our donor list and Kit.com (newsletter).
 #
-#   rake sync_kit_status            # push donors changed since the last run,
-#                                   # then pull subscriber statuses from Kit
+#   rake sync_kit_status            # pull subscriber statuses from Kit, then
+#                                   # push donors changed since the last run
 #   rake sync_kit_status FULL=true  # push ALL donors (slow: rate limited to
-#                                   # ~1 API request/second)
+#                                   # ~1 API request/second). Only donors who
+#                                   # opted into the newsletter are created in
+#                                   # Kit; others are only updated if they
+#                                   # already exist as subscribers there.
 #   rake sync_kit_status LIMIT=20   # only push the first 20 changed donors (testing)
 #
 # Real-time subscription/unsubscription events arrive through the Kit webhooks
@@ -21,7 +24,27 @@ task :sync_kit_status => :environment do
   state_file = Rails.root.join('tmp', 'kit_push_state.json')
   state = File.exist?(state_file) ? JSON.parse(File.read(state_file)) : {}
 
-  # --- 1. PUSH: donors whose relevant data changed since the last run -------
+  # --- 1. PULL: subscriber states from Kit ----------------------------------
+  # Runs FIRST, so that the push below makes its create/update decisions with
+  # up-to-date subscription states (Kit is the source of truth for those).
+
+  puts 'PULL: reading subscriber statuses from Kit...'
+  affected = 0
+  after = nil
+  loop do
+    page = KitSyncService.client.subscribers_page(:status => 'all', :per_page => 500, :after => after)
+    (page['subscribers'] || []).each do |subscriber|
+      donor = KitSyncService.apply_subscriber_state(subscriber['email_address'], subscriber['state'], subscriber['first_name'])
+      affected += 1 if donor
+    end
+
+    pagination = page['pagination'] || {}
+    break unless pagination['has_next_page']
+    after = pagination['end_cursor']
+  end
+  puts "PULL done: #{affected} donor(s) created/updated from Kit subscriber states."
+
+  # --- 2. PUSH: donors whose relevant data changed since the last run -------
 
   donors = Donor.where("user_email IS NOT NULL AND user_email != '' AND user_email LIKE '%@%'").order(:id)
   donors = donors.limit(limit) if limit > 0
@@ -46,24 +69,6 @@ task :sync_kit_status => :environment do
     puts "  ... pushed #{pushed}/#{queue.size}" if ((index + 1) % 50).zero?
   end
   puts "PUSH done: #{pushed} synchronized, #{failed} failed."
-
-  # --- 2. PULL: subscriber states back from Kit -----------------------------
-
-  puts 'PULL: reading subscriber statuses from Kit...'
-  affected = 0
-  after = nil
-  loop do
-    page = KitSyncService.client.subscribers_page(:status => 'all', :per_page => 500, :after => after)
-    (page['subscribers'] || []).each do |subscriber|
-      donor = KitSyncService.apply_subscriber_state(subscriber['email_address'], subscriber['state'], subscriber['first_name'])
-      affected += 1 if donor
-    end
-
-    pagination = page['pagination'] || {}
-    break unless pagination['has_next_page']
-    after = pagination['end_cursor']
-  end
-  puts "PULL done: #{affected} donor(s) created/updated from Kit subscriber states."
 
   FileUtils.mkdir_p(File.dirname(state_file))
   File.open(state_file, 'w') { |f| f.write(JSON.generate(state)) }
