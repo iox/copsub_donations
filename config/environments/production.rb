@@ -78,26 +78,27 @@ CopsubDonations::Application.configure do
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
 
-  Rails.application.routes.default_url_options[:host] = 'donations.copsub.dk'
+  Rails.application.routes.default_url_options[:host] = 'donations.copsub.com'
   PREFIX = "cy3su_"
 
   Rails.application.config.middleware.use ExceptionNotification::Rack,
   :email => {
     :email_prefix => "[COPSUB DONATIONS ERROR] ",
     :sender_address => %{"no-reply" <no-reply@copsub.com>},
+#    :exception_recipients => %w{rhh@copsub.dk}
     :exception_recipients => %w{ignacio@ihuerta.net}
   }
   
   ActionMailer::Base.delivery_method = :smtp
   ActionMailer::Base.smtp_settings = {
    :address               => "send.one.com",
-   :port                  => 465,
-   :domain                => "copenhagensuborbitals.com",
+   :port                  => 587,
+   :domain                => "copsub.com",
    :user_name             => ENV['SMTP_USER'],
    :password              => ENV['SMTP_PASSWORD'],
    :authentication        => :plain,
-   :enable_starttls_auto  => false,
-   :ssl                   => true
+   :enable_starttls_auto  => true
+#   :ssl                   => true
   }
 
 

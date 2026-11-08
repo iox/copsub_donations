@@ -12,7 +12,7 @@
 /db/*.sqlite3-journal
 
 # Ignore all logfiles and tempfiles.
-/log/*.log
+/log/*
 /tmp
 app/views/taglibs/auto/**/*
 config/hobo_routes.rb
