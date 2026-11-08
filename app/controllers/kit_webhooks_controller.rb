@@ -108,12 +108,25 @@ class KitWebhooksController < ApplicationController
     valid_url_secret?
   end
 
+  # Constant-time string comparison. ActiveSupport::SecurityUtils only exists
+  # from Rails 4.1+; this app is on Rails 4.0, so we inline the same
+  # implementation here.
+  def secure_compare(a, b)
+    a = a.to_s
+    b = b.to_s
+    return false unless a.bytesize == b.bytesize
+    bytes = a.unpack('C*')
+    res = 0
+    b.each_byte { |byte| res |= byte ^ bytes.shift }
+    res == 0
+  end
+
   # Legacy webhooks: shared secret in the callback URL's ?secret= parameter.
   def valid_url_secret?
     secret = ENV['KIT_WEBHOOK_SECRET']
     given = params[:secret].to_s
     return false if secret.blank? || given.blank?
-    ActiveSupport::SecurityUtils.secure_compare(given, secret)
+    secure_compare(given, secret)
   end
 
   # New-style webhooks: header "t=<unix ts>,v1=<hex>[,v1=<hex>...]" with an
@@ -139,7 +152,7 @@ class KitWebhooksController < ApplicationController
     end
 
     candidates.any? do |candidate|
-      candidate.length == expected.length && ActiveSupport::SecurityUtils.secure_compare(candidate, expected)
+      candidate.length == expected.length && secure_compare(candidate, expected)
     end
   end
 
