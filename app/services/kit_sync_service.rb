@@ -79,25 +79,34 @@ class KitSyncService
         return nil unless status == 'subscribed'
         donor = Donor.new(
           :user_email => email_address.strip,
-          :role => 'subscriber',
-          :mailchimp_status => status,
-          :donated_last_year_in_dkk => 0
+          :role => 'subscriber'
         )
+        # mailchimp_status / donated_last_year_in_dkk are NOT attr_accessible,
+        # so they must be assigned with direct setters (mass assignment would
+        # silently drop them).
+        donor.mailchimp_status = status
+        donor.donated_last_year_in_dkk = 0
         donor.first_name = first_name if first_name.present?
         donor.save
         return donor
       end
 
-      attrs = {}
-      attrs[:mailchimp_status] = status if donor.mailchimp_status != status
+      changed = false
+      if donor.mailchimp_status != status
+        # Direct setter: mailchimp_status is not attr_accessible.
+        donor.mailchimp_status = status
+        changed = true
+      end
       if status == 'subscribed' && (donor.role.blank? || donor.role == 'inactive_subscriber')
-        attrs[:role] = 'subscriber'
+        donor.role = 'subscriber'
+        changed = true
       elsif status == 'unsubscribed' && donor.role == 'subscriber'
-        attrs[:role] = 'inactive_subscriber'
+        donor.role = 'inactive_subscriber'
+        changed = true
       end
 
-      donor.update_attributes(attrs) if attrs.present?
-      donor
+      donor.save if changed
+      changed ? donor : nil
     end
 
     # Pushes one donor to Kit: subscriber record, custom fields and tags.
