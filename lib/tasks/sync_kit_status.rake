@@ -13,6 +13,7 @@
 #   flock -n tmp/kit_sync.lock -c 'RAILS_ENV=production bundle exec rake sync_kit_status'
 desc 'Synchronize donors with Kit.com (pull subscriber states, push differences)'
 task :sync_kit_status => :environment do
+  $stdout.sync = true # progress shows up immediately, also when piped to a log
   dry_run = %w(true 1 yes).include?(ENV['DRY_RUN'].to_s.downcase)
   client = KitSyncService.client
   started = Time.now

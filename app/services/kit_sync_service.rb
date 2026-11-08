@@ -163,12 +163,13 @@ class KitSyncService
       groups.each_with_index do |(email, group), index|
         begin
           donor = representative_donor(group)
-          stats[reconcile_one(email, donor, subscribers[email], tag_membership)] += 1
+          stats[reconcile_one(email, donor, subscribers[email], tag_membership, log)] += 1
         rescue => e
           stats[:failed] += 1
           log.puts "  ! #{email} (donor #{group.map(&:id).join(',')}): #{e.message}"
         end
-        log.puts "  ... #{index + 1}/#{groups.size} addresses checked" if ((index + 1) % 1000).zero?
+        log.puts "  ... #{index + 1}/#{groups.size} addresses checked" if ((index + 1) % 100).zero?
+        log.flush if log.respond_to?(:flush)
       end
 
       stats
@@ -183,34 +184,39 @@ class KitSyncService
     end
 
     # Returns a Symbol describing what happened (used as a stats key).
-    def reconcile_one(email, donor, subscriber, tag_membership)
+    # Every change is logged as one line, so long runs show visible progress.
+    def reconcile_one(email, donor, subscriber, tag_membership, log = $stdout)
       status = donor.mailchimp_status
 
       if subscriber.nil?
         return :skipped_no_consent unless status == 'subscribed'
         subscriber = client.upsert_subscriber(donor.user_email.strip, :first_name => donor.first_name)
-        enrich(donor, subscriber, Set.new)
+        changes = enrich(donor, subscriber, Set.new)
+        log.puts "  created      #{email} (donor #{donor.id}) #{changes.join(' ')}"
         return :created
       end
 
       return :skipped_ended_in_kit if KIT_ENDED_STATES.include?(subscriber['state'])
 
       current_tags = tag_membership[subscriber['id']] || Set.new
-      changed = enrich(donor, subscriber, current_tags)
+      changes = enrich(donor, subscriber, current_tags)
 
       if status == 'unsubscribed'
         client.unsubscribe(subscriber['id'])
+        log.puts "  unsubscribed #{email} (donor #{donor.id}) #{changes.join(' ')}"
         return :unsubscribed
       end
 
-      changed ? :updated : :unchanged
+      return :unchanged if changes.empty?
+      log.puts "  updated      #{email} (donor #{donor.id}) #{changes.join(' ')}"
+      :updated
     end
 
     # Brings a Kit subscriber's first name, custom fields and managed tags in
     # line with the donor, calling the API only for actual differences.
-    # Returns true if anything was changed.
+    # Returns a list of short descriptions of the changes (empty if none).
     def enrich(donor, subscriber, current_tags)
-      changed = false
+      changes = []
 
       current_fields = subscriber['fields'] || {}
       field_diff = custom_fields_for(donor).reject { |key, value| current_fields[key].to_s == value.to_s }
@@ -221,15 +227,15 @@ class KitSyncService
         client.update_subscriber(subscriber['id'], subscriber['email_address'],
           :first_name => (donor.first_name if name_diff),
           :fields => field_diff)
-        changed = true
+        changes << "fields=#{(field_diff.keys + (name_diff ? ['first_name'] : [])).join(',')}"
       end
 
       desired = desired_tags_for(donor)
       current = current_tags.to_a & MANAGED_TAG_IDS
-      (desired - current).each { |tag_id| client.tag_subscriber(tag_id, subscriber['id']); changed = true }
-      (current - desired).each { |tag_id| client.remove_tag(tag_id, subscriber['id']); changed = true }
+      (desired - current).each { |tag_id| client.tag_subscriber(tag_id, subscriber['id']); changes << "+tag:#{tag_id}" }
+      (current - desired).each { |tag_id| client.remove_tag(tag_id, subscriber['id']); changes << "-tag:#{tag_id}" }
 
-      changed
+      changes
     end
 
     # 'current' if the donor donated in the last 92 days, 'past' if they ever
