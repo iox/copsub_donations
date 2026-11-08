@@ -45,7 +45,25 @@
       </ul>
 
       <hr/><br/>
-      
+      <h3>Kit.com Newsletter Sync</h3>
+      <p><strong>Trigger:</strong><br/>Webhooks from Kit.com (real time), plus a Cron Job every night.</p>
+      <p><strong>Short description:</strong><br/>Keeps our donor list and Kit.com (our newsletter tool) in sync, both ways.</p>
+      <p><strong>Real time (webhooks):</strong></p>
+      <ul>
+        <li>Kit POSTs subscription events (activate / unsubscribe / bounce / complain) to <code>/api/kit/webhook</code>, in real time.</li>
+        <li>Deliveries are authenticated with a shared secret (KIT_WEBHOOK_SECRET) before being processed; HMAC-signed deliveries from Kit's newer webhook API are also accepted.</li>
+        <li>Known donors get their newsletter status (and subscriber role) updated; new confirmed subscribers that we don't know yet are created with the 'subscriber' role.</li>
+      </ul>
+      <p><strong>Nightly (rake sync_kit_status):</strong></p>
+      <ul>
+        <li>Pushes the donors whose relevant data changed since the last run to Kit: custom fields (role, category, number of donations, city, country, ...) and tags (role tags, status tags, currently_donating / past_donor / newsletter_subscriber, donor).</li>
+        <li>Only tags managed by this app are ever added or removed; tags applied by Kit automations or manually are left untouched.</li>
+        <li>Then pulls all subscriber states back from Kit, updating each donor's newsletter status (subscribed / unsubscribed / not_present).</li>
+        <li>Use <code>FULL=true</code> to push every donor (slow: the Kit API is rate limited to about one request per second).</li>
+      </ul>
+      <p><strong>Donation form opt-in:</strong><br/>Donors who tick "subscribe to the newsletter" in the donations flow are added to the Kit newsletter form (form ID <%= KIT_NEWSLETTER_FORM_ID %>) right away, so they receive the welcome emails.</p>
+      <hr/><br/>
+
 
 
       <hr/><br/>

@@ -219,14 +219,13 @@ class Donor < ActiveRecord::Base
   end
   
   
-  # def subscribe_to_mailchimp_list
-  #   begin
-  #     gibbon = Gibbon::Request.new
-  #     gibbon.lists(MAILCHIMP_LIST_ID).members.create(body: {email_address: self.user_email, status: "subscribed", merge_fields: {:"FNAME" => self.first_name || "", :"LNAME" => self.last_name || ""}})
-  #   rescue
-  #     Rails.logger.info "The donor could not be subscribed. He is probably on the list already."
-  #   end
-  # end
+  # Subscribe this donor to the newsletter on Kit.com (donation form opt-in).
+  # Never let a newsletter problem break the donation flow.
+  def subscribe_to_kit_list
+    KitSyncService.subscribe_to_newsletter(user_email, first_name)
+  rescue => e
+    Rails.logger.error "The donor #{user_email} could not be subscribed to Kit.com: #{e.message}"
+  end
   
   def full_name
     if first_name.present? || last_name.present?
