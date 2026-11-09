@@ -75,7 +75,7 @@
 
           <select name="mailchimp_status" style="width: 135px; margin-left: 0px">
             <option value="">-Newsletter-</option>
-            <%= options_for_select([ ["Subscribed", "subscribed"], ["Unsubscribed", "unsubscribed"], ["Not in Kit", "not_present" ]], params["mailchimp_status"]) %>
+            <%= options_for_select([ ["Subscribed", "subscribed"], ["Pending confirmation", "pending"], ["Unsubscribed", "unsubscribed"], ["Bounced", "bounced"], ["Complained (spam)", "complained"], ["Not in Kit", "not_present" ]], params["mailchimp_status"]) %>
           </select>
 
           <select name="donation_method" style="width: 165px; margin-left: 7px">

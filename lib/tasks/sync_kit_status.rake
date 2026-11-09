@@ -20,6 +20,12 @@ task :sync_kit_status => :environment do
   client = KitSyncService.client
   started = Time.now
 
+  # The sync assumes the November 2026 cleanup has run (Kit is then the source
+  # of truth for newsletter statuses); before it, it would undo it.
+  if Donor.where(:role => 'inactive_subscriber').exists?
+    abort "*** Donors with role 'inactive_subscriber' found: run 'rake kit:cleanup' first. Nothing was changed. ***"
+  end
+
   puts "#{Time.now}: Kit sync#{' - DRY RUN, nothing will be changed' if dry_run}"
 
   puts "#{Time.now}: reading all Kit subscribers..."

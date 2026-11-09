@@ -43,7 +43,19 @@ class Donor < ActiveRecord::Base
   
   children :notes
 
-  ROLES = [:single_supporter, :subscriber, :inactive_supporter, :recurring_supporter, :inactive_subscriber]
+  # role = donor type only (newsletter subscription lives in mailchimp_status):
+  #   subscriber           never donated
+  #   single_supporter     donated (not recurring)
+  #   recurring_supporter  recurring donor
+  #   inactive_supporter   donated before, not any more
+  ROLES = [:single_supporter, :subscriber, :inactive_supporter, :recurring_supporter]
+
+  # mailchimp_status = newsletter subscription, mirroring Kit.com (the column
+  # keeps its historic name; newsletter_status is an alias for new code).
+  #   subscribed / pending (double opt-in not confirmed) / unsubscribed /
+  #   bounced / complained / not_present (never subscribed, not in Kit)
+  NEWSLETTER_STATUSES = %w(subscribed pending unsubscribed bounced complained not_present)
+  alias_attribute :newsletter_status, :mailchimp_status
 
   USER_FIELDS = %w{id user_email first_name last_name}
   USERMETA_FIELDS = %w{user_adress city country paymentid paypalid user_phone donated_last_year_in_dkk alternativeid}

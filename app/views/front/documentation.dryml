@@ -46,26 +46,28 @@
 
       <hr/><br/>
       <h3>Kit.com Newsletter Sync</h3>
-      <p><strong>Trigger:</strong><br/>Webhooks from Kit.com (real time), plus a Cron Job every night.</p>
-      <p><strong>Short description:</strong><br/>Keeps our donor list and Kit.com (our newsletter tool) in sync, both ways.</p>
-      <p><strong>Real time (webhooks):</strong></p>
+      <p><strong>Trigger:</strong><br/>Webhooks from Kit.com (real time), the donation form, plus a Cron Job every night.</p>
+      <p><strong>Short description:</strong><br/>Keeps our donor list and Kit.com (our newsletter tool) 100% in sync.</p>
+      <p><strong>Two separate things per donor:</strong></p>
       <ul>
-        <li>Kit POSTs subscription events (activate / unsubscribe / bounce / complain) to <code>/api/kit/webhook</code>, in real time.</li>
-        <li>Deliveries are authenticated with a shared secret (KIT_WEBHOOK_SECRET) before being processed; HMAC-signed deliveries from Kit's newer webhook API are also accepted.</li>
-        <li>Known donors get their newsletter status (and subscriber role) updated; new confirmed subscribers that we don't know yet are created with the 'subscriber' role.</li>
+        <li><em>Newsletter status</em> (column mailchimp_status): subscribed, pending (double opt-in not confirmed), unsubscribed, bounced, complained, or not_present (never subscribed). <strong>Kit is the source of truth</strong>: people subscribe, confirm and unsubscribe there, and this app mirrors it.</li>
+        <li><em>Donor type</em> (column role): subscriber (never donated), single_supporter, recurring_supporter, inactive_supporter. <strong>This app is the source of truth</strong> (daily donor update), and Kit gets it.</li>
+      </ul>
+      <p><strong>Real time:</strong></p>
+      <ul>
+        <li>Kit POSTs subscription events (activate / unsubscribe / bounce / complain) to <code>/api/kit/webhook</code>, authenticated with a shared secret (KIT_WEBHOOK_SECRET). The newsletter status of every donor with that email address is updated; unknown people get a donor record.</li>
+        <li>Donors who tick "subscribe to the newsletter" in the donations flow are added to Kit right away, with their segment tag and fields. Not ticking the box does not change an existing subscription.</li>
       </ul>
       <p><strong>Nightly (rake sync_kit_status, 03:00):</strong></p>
       <ul>
-        <li>Reads all Kit subscribers once, compares them with the donor list, prints a plan of every change, then applies it. <code>DRY_RUN=1</code> prints the same plan and changes nothing.</li>
-        <li><em>Our database:</em> newsletter statuses follow Kit (unsubscribes, bounces and complaints always apply; new confirmed Kit subscribers become donor records). Subscribers created in Kit before 17 October 2026 come from the bulk import and their "active" state may be stale, so they never re-subscribe a donor who unsubscribed here.</li>
-        <li><em>Kit:</em> (1) donors who are unsubscribed here are unsubscribed in Kit; (2) every subscriber gets exactly one of the three category tags behind the Kit segments: currently_donating (donated in the last 92 days), past_donor, newsletter_subscriber (never donated).</li>
-        <li>Donors who ticked the newsletter box on the donation form (since 17 October 2026) but are missing in Kit, because the real-time subscription failed, are added. Nobody who did not opt in is ever added.</li>
-        <li>The "role" custom field in Kit follows the donor's role here (recurring_supporter, single_supporter, inactive_supporter, subscriber, inactive_subscriber), so Kit segments can tell recurring donors from one-time donors.</li>
+        <li>Reads Kit, compares it with the donor list, prints a plan of every change, then applies exactly that plan. <code>DRY_RUN=1</code> prints the plan and changes nothing.</li>
+        <li><em>Our database:</em> the newsletter status of everyone in Kit is set to their Kit state; people in Kit who are unknown here get a donor record.</li>
+        <li><em>Kit:</em> donors who are subscribed here but missing in Kit are added; every subscriber gets the custom fields "role" and "mailchimp_status" from here, and exactly one of the three category tags behind the Kit segments: currently_donating (donated in the last 92 days), past_donor, newsletter_subscriber (never donated).</li>
         <li>Nothing else in Kit is ever changed: no other tags, no other custom fields.</li>
         <li>Safety brake: a run that would make more than 200 Kit changes stops without changing anything; after checking the plan, run it with <code>MAX_KIT_WRITES=&lt;number&gt;</code>.</li>
+        <li><code>rake kit:audit</code> (read-only) reports any remaining difference; it should say "100% in sync".</li>
       </ul>
-      <p><strong>Removing unsubscribed people from Kit (manual, every few months):</strong><br/>The Kit API cannot delete subscribers, so they stay in Kit after unsubscribing. To stay under the plan's 10,000 subscriber limit: Kit dashboard -&gt; Subscribers -&gt; filter by status "Cancelled" (and also "Bounced", "Complained") -&gt; select all -&gt; Delete. The nightly sync prints how many can be deleted.</p>
-      <p><strong>Donation form opt-in:</strong><br/>Donors who tick "subscribe to the newsletter" in the donations flow are added to Kit right away, with their segment tag, so they receive the next newsletter. Not ticking the box does not change an existing subscription.</p>
+      <p><strong>Removing people from Kit:</strong><br/>Never delete <em>active</em> subscribers in Kit: the nightly sync would add them again (they are still subscribed here). To remove someone, unsubscribe them in Kit. To stay under the plan's 10,000 subscriber limit, every few months: Kit dashboard -&gt; Subscribers -&gt; filter by status "Cancelled" (and also "Bounced", "Complained") -&gt; select all -&gt; Delete. They keep their status here, so they are never added again.</p>
       <hr/><br/>
 
 
