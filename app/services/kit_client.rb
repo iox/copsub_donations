@@ -35,6 +35,11 @@ class KitClient
     (json(get('/subscribers', :email_address => email_address, :slim => true))['subscribers'] || []).first
   end
 
+  # Live subscriber Hash (including 'fields') by subscriber id.
+  def subscriber_by_id(subscriber_id)
+    json(get("/subscribers/#{subscriber_id}"))['subscriber']
+  end
+
   # Updates first name and/or custom field values (Hash of key => value).
   # Unknown field keys are ignored by Kit (reported as warnings).
   def update_subscriber(subscriber_id, email_address, first_name: nil, fields: {})

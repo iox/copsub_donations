@@ -17,11 +17,15 @@
 #     The category follows from our donation data (see donor_category) and
 #     changes over time, so the nightly sync moves people between them.
 #
-#  3. Donors who tick the newsletter box on the donation form are added to Kit
+#  3. The 'role' custom field (recurring_supporter, single_supporter,
+#     inactive_supporter, subscriber, inactive_subscriber), so Kit can tell
+#     recurring donors from one-time donors.
+#
+#  4. Donors who tick the newsletter box on the donation form are added to Kit
 #     at once (and retried nightly if that failed). Nobody else is ever added.
 #
 # Every other tag (role/status tags from the October 2026 import, manual or
-# automation tags) and all custom fields are left alone.
+# automation tags) and every other custom field is left alone.
 class KitSyncService
 
   # Category tags (Kit dashboard -> Subscribers -> Tags); one segment each.
@@ -35,8 +39,9 @@ class KitSyncService
     24733350 => 'past_donor',
     24733357 => 'newsletter_subscriber',
   }
-  # When donors share an email address, the "best" category wins.
+  # When donors share an email address, the "best" category / role wins.
   CATEGORY_PRIORITY = %w(current past newsletter)
+  ROLE_PRIORITY = %w(recurring_supporter single_supporter inactive_supporter subscriber inactive_subscriber)
 
   # Kit subscriber state => our donors.mailchimp_status values
   STATE_TO_STATUS = {
@@ -87,6 +92,10 @@ class KitSyncService
       subscriber = client.upsert_subscriber(email_address.strip, :first_name => first_name)
       category = donor ? donor_category(donor) : 'newsletter'
       client.tag_subscriber(CATEGORY_TAGS[category], subscriber['id'])
+      if donor && donor.role.present?
+        client.update_subscriber(subscriber['id'], subscriber['email_address'] || email_address.strip,
+                                 :fields => { 'role' => donor.role })
+      end
       subscriber
     end
 
@@ -155,6 +164,14 @@ class KitSyncService
       changed
     end
 
+    # The donor's role once a planned status change is applied (same rules as
+    # set_donor_status).
+    def role_after(donor, new_status)
+      return 'subscriber' if new_status == 'subscribed' && (donor.role.blank? || donor.role == 'inactive_subscriber')
+      return 'inactive_subscriber' if new_status == 'unsubscribed' && donor.role == 'subscriber'
+      donor.role
+    end
+
     # 'current' if the donor donated in the last 92 days, 'past' if they ever
     # donated, 'newsletter' if they only subscribed. Same rules as the
     # segmentation used in the October 2026 import.
@@ -183,7 +200,7 @@ class KitSyncService
     # ------------------------------------------------------------------------
     def plan(donors, subscribers, category_tags)
       plan = { :new_donors => [], :status_changes => [], :unsubscribe => [],
-               :tag_moves => [], :create_in_kit => [], :missing_in_kit => [] }
+               :tag_moves => [], :role_updates => [], :create_in_kit => [], :missing_in_kit => [] }
 
       by_email = donors.group_by { |d| d.user_email.to_s.strip.downcase }
       by_email.delete('')
@@ -254,12 +271,29 @@ class KitSyncService
                               :reason => category_reason(donor) }
       end
 
+      # D. Kit: the 'role' custom field.
+      subscribers.each do |email, sub|
+        next if KIT_ENDED_STATES.include?(sub['state']) || unsubscribing.include?(email)
+        roles = (by_email[email] || [pulled_donor[email]].compact).map { |d| [d, role_after(d, new_status[d.id])] }
+        roles = roles.select { |_, role| role.present? }
+        next if roles.empty?
+        group = roles.map(&:first)
+        desired = roles.map(&:last).min_by { |role| ROLE_PRIORITY.index(role) || ROLE_PRIORITY.size }
+        next if (sub['fields'] || {})['role'].to_s == desired
+        # Confirm with the live subscriber (listings can lag behind).
+        live = client.subscriber_by_id(sub['id']) || {}
+        current = (live['fields'] || {})['role'].to_s
+        next if current == desired
+        plan[:role_updates] << { :email => email, :subscriber_id => sub['id'], :kit_email => sub['email_address'],
+                                 :from => current, :to => desired, :donor_ids => group.map(&:id) }
+      end
+
       plan
     end
 
     def kit_writes(plan)
       plan[:unsubscribe].size + plan[:tag_moves].sum { |m| m[:add].size + m[:remove].size } +
-        plan[:create_in_kit].size * 2
+        plan[:role_updates].size + plan[:create_in_kit].size * 3
     end
 
     def print_plan(plan, subscribers, log = $stdout)
@@ -292,13 +326,20 @@ class KitSyncService
       end
 
       log.puts
-      log.puts "E. KIT: #{plan[:create_in_kit].size} donor(s) to ADD (opted in on the donation form, but not in Kit yet)"
+      log.puts "E. KIT: #{plan[:role_updates].size} subscriber(s) whose 'role' field changes"
+      plan[:role_updates].group_by { |r| [r[:from], r[:to]] }.sort_by { |_, list| -list.size }.each do |(from, to), list|
+        log.puts "     #{from.present? ? from : '(empty)'} -> #{to}: #{list.size}"
+        list.sort_by { |r| r[:email] }.each { |r| log.puts "         #{r[:email]}  (donor #{r[:donor_ids].join(',')})" }
+      end
+
+      log.puts
+      log.puts "F. KIT: #{plan[:create_in_kit].size} donor(s) to ADD (opted in on the donation form, but not in Kit yet)"
       plan[:create_in_kit].sort_by { |c| c[:email] }.each do |c|
         log.puts "     + #{c[:email]}  (donor #{c[:donor].id}, opted in #{c[:form_date]}, segment #{CATEGORY_TAG_NAMES[CATEGORY_TAGS[donor_category(c[:donor])]]})"
       end
 
       log.puts
-      log.puts "F. NOT CHANGED, for information: #{plan[:missing_in_kit].size} older donor(s) marked subscribed here but not in Kit."
+      log.puts "G. NOT CHANGED, for information: #{plan[:missing_in_kit].size} older donor(s) marked subscribed here but not in Kit."
       log.puts '     Not added: no recent opt-in on record.'
       plan[:missing_in_kit].first(50).each { |m| log.puts "     ? #{m[:email]}  (donor #{m[:donor_ids].join(',')})" }
       log.puts "     ... and #{plan[:missing_in_kit].size - 50} more" if plan[:missing_in_kit].size > 50
@@ -310,10 +351,11 @@ class KitSyncService
       log.puts 'SUMMARY'
       log.puts "  Kit now:          #{subscribers.size} subscribers (#{states.sort.map { |s, n| "#{s} #{n}" }.join(', ')})"
       log.puts "  Kit API writes:   #{kit_writes(plan)} (#{plan[:create_in_kit].size} new subscribers, #{plan[:unsubscribe].size} unsubscribes, " \
-               "#{plan[:tag_moves].sum { |m| m[:add].size }} tags added, #{plan[:tag_moves].sum { |m| m[:remove].size }} tags removed)"
+               "#{plan[:tag_moves].sum { |m| m[:add].size }} tags added, #{plan[:tag_moves].sum { |m| m[:remove].size }} tags removed, " \
+               "#{plan[:role_updates].size} role fields)"
       log.puts "  Database writes:  #{plan[:new_donors].size + plan[:status_changes].size}"
       log.puts "  After this run, #{ended} Kit subscribers can be deleted in the Kit UI (status Cancelled/Bounced/Complained)."
-      log.puts '  Nothing else is changed: no other tags, no custom fields.'
+      log.puts '  Nothing else is changed: no other tags, no other custom fields.'
     end
 
     # Executes a plan from #plan. Returns the number of failed actions.
@@ -331,6 +373,11 @@ class KitSyncService
       end
       plan[:create_in_kit].each do |c|
         attempt(log, "add to Kit #{c[:email]}") { create_in_kit(c[:email], c[:donor].first_name, c[:donor]) }
+      end
+      plan[:role_updates].each do |r|
+        attempt(log, "#{r[:email]}: role #{r[:from].present? ? r[:from] : '(empty)'} -> #{r[:to]}") do
+          client.update_subscriber(r[:subscriber_id], r[:kit_email], :fields => { 'role' => r[:to] })
+        end
       end
       plan[:tag_moves].each do |m|
         label = "#{m[:email]}: #{m[:remove].map { |t| "-#{CATEGORY_TAG_NAMES[t]}" }.join(' ')} #{m[:add].map { |t| "+#{CATEGORY_TAG_NAMES[t]}" }.join(' ')}".squeeze(' ')
