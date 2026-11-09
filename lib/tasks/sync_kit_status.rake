@@ -11,7 +11,8 @@
 # run, a bigger one-off run is allowed with MAX_KIT_WRITES=<number>.
 #
 # Cron (as user donations), under flock so two runs never overlap:
-#   0 3 * * * cd /home/donations/app && /usr/bin/flock -n tmp/kit_sync.lock -c 'RAILS_ENV=production /usr/local/bin/bundle exec rake sync_kit_status >> log/kit_sync.log 2>&1'
+#   (after daily_donor_update at 03:00, so roles and categories are fresh)
+#   30 3 * * * cd /home/donations/app/ && /usr/bin/flock -n tmp/kit_sync.lock -c 'RAILS_ENV=production /usr/local/bin/bundle exec --no-color rake sync_kit_status' >> /home/donations/app/log/kit_sync.log 2>&1
 desc 'Synchronize donors with Kit.com (DRY_RUN=1 to only print the plan)'
 task :sync_kit_status => :environment do
   $stdout.sync = true # progress shows up immediately, also when piped to a log
