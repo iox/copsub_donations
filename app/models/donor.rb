@@ -222,7 +222,7 @@ class Donor < ActiveRecord::Base
   # Subscribe this donor to the newsletter on Kit.com (donation form opt-in).
   # Never let a newsletter problem break the donation flow.
   def subscribe_to_kit_list
-    KitSyncService.subscribe_to_newsletter(user_email, first_name)
+    KitSyncService.subscribe_to_newsletter(user_email, first_name, self)
   rescue => e
     Rails.logger.error "The donor #{user_email} could not be subscribed to Kit.com: #{e.message}"
   end

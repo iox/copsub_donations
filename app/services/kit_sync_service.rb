@@ -17,6 +17,9 @@
 #     The category follows from our donation data (see donor_category) and
 #     changes over time, so the nightly sync moves people between them.
 #
+#  3. Donors who tick the newsletter box on the donation form are added to Kit
+#     at once (and retried nightly if that failed). Nobody else is ever added.
+#
 # Every other tag (role/status tags from the October 2026 import, manual or
 # automation tags) and all custom fields are left alone.
 class KitSyncService
@@ -60,13 +63,31 @@ class KitSyncService
       @client ||= KitClient.new
     end
 
-    # Explicit newsletter opt-in (donation form checkbox). Adds the subscriber
-    # to the newsletter form, so they enter its automation / welcome emails.
-    # (The nightly sync gives them their category tag.)
-    def subscribe_to_newsletter(email_address, first_name = nil)
+    # Explicit newsletter opt-in (donation form checkbox): creates the Kit
+    # subscriber right away and puts them in their segment (category tag), so
+    # they get the very next newsletter. If this fails, the nightly sync
+    # retries it (see "create_in_kit" in #plan).
+    def subscribe_to_newsletter(email_address, first_name = nil, donor = nil)
       return if email_address.blank?
-      client.upsert_subscriber(email_address.strip, :first_name => first_name)
-      client.add_subscriber_to_form_by_email(KIT_NEWSLETTER_FORM_ID, email_address.strip)
+      subscriber = create_in_kit(email_address, first_name, donor)
+
+      # Also join the newsletter form, for its welcome automation. Kit answers
+      # 404 for this form type through the API; that must not undo the above.
+      begin
+        client.add_subscriber_to_form_by_email(KIT_NEWSLETTER_FORM_ID, email_address.strip)
+      rescue KitClient::Error => e
+        Rails.logger.info "Kit: #{email_address} not added to form #{KIT_NEWSLETTER_FORM_ID}: #{e.message}"
+      end
+      subscriber
+    end
+
+    # Creates (or updates) a Kit subscriber and gives them their category tag.
+    # Only for people who opted in.
+    def create_in_kit(email_address, first_name, donor)
+      subscriber = client.upsert_subscriber(email_address.strip, :first_name => first_name)
+      category = donor ? donor_category(donor) : 'newsletter'
+      client.tag_subscriber(CATEGORY_TAGS[category], subscriber['id'])
+      subscriber
     end
 
     # Applies a Kit subscriber's state to our donor list (real-time webhooks).
@@ -152,7 +173,8 @@ class KitSyncService
     end
 
     # ------------------------------------------------------------------------
-    # Nightly sync. Step 1 (plan) only reads; step 2 (apply_plan) writes. The
+    # Nightly sync. Step 1 (plan) only reads (Kit snapshots, plus a live tag
+    # check for each candidate segment move); step 2 (apply_plan) writes. The
     # dry run prints the plan and stops, so it shows exactly what a real run
     # would do.
     #
@@ -161,7 +183,7 @@ class KitSyncService
     # ------------------------------------------------------------------------
     def plan(donors, subscribers, category_tags)
       plan = { :new_donors => [], :status_changes => [], :unsubscribe => [],
-               :tag_moves => [], :missing_in_kit => [] }
+               :tag_moves => [], :create_in_kit => [], :missing_in_kit => [] }
 
       by_email = donors.group_by { |d| d.user_email.to_s.strip.downcase }
       by_email.delete('')
@@ -197,7 +219,20 @@ class KitSyncService
           plan[:unsubscribe] << { :email => email, :subscriber_id => sub['id'], :kit_state => sub['state'],
                                   :kit_created_at => sub['created_at'], :donor_ids => group.map(&:id) }
         elsif statuses.include?('subscribed') && sub.nil?
-          plan[:missing_in_kit] << { :email => email, :donor_ids => group.map(&:id) }
+          # Opted in on the donation form since Kit went live, but the
+          # real-time subscription failed: retry it. Older 'subscribed' donors
+          # missing in Kit are only reported (they were not in the import or
+          # were deleted from Kit on purpose).
+          opted_in = group.select do |d|
+            d.mailchimp_status == 'subscribed' && d.filled_donation_form_date.present? &&
+              d.filled_donation_form_date >= KIT_IMPORT_CUTOFF.to_date
+          end
+          if opted_in.any?
+            donor = opted_in.min_by { |d| CATEGORY_PRIORITY.index(donor_category(d)) }
+            plan[:create_in_kit] << { :email => email, :donor => donor, :form_date => opted_in.map(&:filled_donation_form_date).max }
+          else
+            plan[:missing_in_kit] << { :email => email, :donor_ids => group.map(&:id) }
+          end
         end
       end
 
@@ -208,6 +243,10 @@ class KitSyncService
         donor = group.min_by { |d| CATEGORY_PRIORITY.index(donor_category(d)) }
         desired = CATEGORY_TAGS[donor ? donor_category(donor) : 'newsletter']
         current = (category_tags[sub['id']] || Set.new).to_a
+        next if current == [desired]
+        # Kit's per-tag listings lag behind by minutes, so confirm with the
+        # subscriber's live tags (only for the few candidates) before planning.
+        current = client.tags_for_subscriber(sub['id']).map { |t| t['id'] } & CATEGORY_TAGS.values
         add = current.include?(desired) ? [] : [desired]
         remove = current - [desired]
         next if add.empty? && remove.empty?
@@ -219,7 +258,8 @@ class KitSyncService
     end
 
     def kit_writes(plan)
-      plan[:unsubscribe].size + plan[:tag_moves].sum { |m| m[:add].size + m[:remove].size }
+      plan[:unsubscribe].size + plan[:tag_moves].sum { |m| m[:add].size + m[:remove].size } +
+        plan[:create_in_kit].size * 2
     end
 
     def print_plan(plan, subscribers, log = $stdout)
@@ -252,8 +292,14 @@ class KitSyncService
       end
 
       log.puts
-      log.puts "E. NOT CHANGED, for information: #{plan[:missing_in_kit].size} donor(s) subscribed here but not in Kit."
-      log.puts '     The sync never creates Kit subscribers; people join through the Kit or donation forms.'
+      log.puts "E. KIT: #{plan[:create_in_kit].size} donor(s) to ADD (opted in on the donation form, but not in Kit yet)"
+      plan[:create_in_kit].sort_by { |c| c[:email] }.each do |c|
+        log.puts "     + #{c[:email]}  (donor #{c[:donor].id}, opted in #{c[:form_date]}, segment #{CATEGORY_TAG_NAMES[CATEGORY_TAGS[donor_category(c[:donor])]]})"
+      end
+
+      log.puts
+      log.puts "F. NOT CHANGED, for information: #{plan[:missing_in_kit].size} older donor(s) marked subscribed here but not in Kit."
+      log.puts '     Not added: no recent opt-in on record.'
       plan[:missing_in_kit].first(50).each { |m| log.puts "     ? #{m[:email]}  (donor #{m[:donor_ids].join(',')})" }
       log.puts "     ... and #{plan[:missing_in_kit].size - 50} more" if plan[:missing_in_kit].size > 50
 
@@ -263,11 +309,11 @@ class KitSyncService
       log.puts
       log.puts 'SUMMARY'
       log.puts "  Kit now:          #{subscribers.size} subscribers (#{states.sort.map { |s, n| "#{s} #{n}" }.join(', ')})"
-      log.puts "  Kit API writes:   #{kit_writes(plan)} (#{plan[:unsubscribe].size} unsubscribes, " \
+      log.puts "  Kit API writes:   #{kit_writes(plan)} (#{plan[:create_in_kit].size} new subscribers, #{plan[:unsubscribe].size} unsubscribes, " \
                "#{plan[:tag_moves].sum { |m| m[:add].size }} tags added, #{plan[:tag_moves].sum { |m| m[:remove].size }} tags removed)"
       log.puts "  Database writes:  #{plan[:new_donors].size + plan[:status_changes].size}"
       log.puts "  After this run, #{ended} Kit subscribers can be deleted in the Kit UI (status Cancelled/Bounced/Complained)."
-      log.puts '  Nothing else is changed: no other tags, no custom fields, no new Kit subscribers.'
+      log.puts '  Nothing else is changed: no other tags, no custom fields.'
     end
 
     # Executes a plan from #plan. Returns the number of failed actions.
@@ -282,6 +328,9 @@ class KitSyncService
       end
       plan[:unsubscribe].each do |u|
         attempt(log, "unsubscribe #{u[:email]}") { client.unsubscribe(u[:subscriber_id]) }
+      end
+      plan[:create_in_kit].each do |c|
+        attempt(log, "add to Kit #{c[:email]}") { create_in_kit(c[:email], c[:donor].first_name, c[:donor]) }
       end
       plan[:tag_moves].each do |m|
         label = "#{m[:email]}: #{m[:remove].map { |t| "-#{CATEGORY_TAG_NAMES[t]}" }.join(' ')} #{m[:add].map { |t| "+#{CATEGORY_TAG_NAMES[t]}" }.join(' ')}".squeeze(' ')

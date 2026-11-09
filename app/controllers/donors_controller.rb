@@ -73,11 +73,12 @@ class DonorsController < ApplicationController
     donor.donation_method = params[:donation_method]
     donor.filled_donation_form_date = Date.today
 
+    # Ticking the box subscribes. Not ticking it only means "no new opt-in": it
+    # must NOT unsubscribe someone who is already subscribed (the nightly Kit
+    # sync would then unsubscribe them from the newsletter).
     if params[:newsletter_opt_in] && params[:newsletter_opt_in] == 'on'
       donor.mailchimp_status = "subscribed"
       donor.subscribe_to_kit_list
-    else
-      donor.mailchimp_status = "unsubscribed"
     end
 
     donor.save
